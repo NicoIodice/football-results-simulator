@@ -630,8 +630,8 @@ function prepareAIContext(teamId, team, standings, nextGameweek) {
         const homeTeam = teams.find(t => t.id === match.homeTeam);
         const awayTeam = teams.find(t => t.id === match.awayTeam);
         return {
-            home: homeTeam.name,
-            away: awayTeam.name,
+            home: homeTeam ? homeTeam.name : match.homeTeam,
+            away: awayTeam ? awayTeam.name : match.awayTeam,
             date: match.date,
             time: match.time,
             isTeamInvolved: match.homeTeam === teamId || match.awayTeam === teamId
@@ -1263,8 +1263,8 @@ function getRemainingMatches(teamId) {
                 remaining.push({
                     ...match,
                     gameweek: gameweek.gameweek,
-                    homeTeamName: homeTeam.name,
-                    awayTeamName: awayTeam.name
+                    homeTeamName: homeTeam ? homeTeam.name : match.homeTeam,
+                    awayTeamName: awayTeam ? awayTeam.name : match.awayTeam
                 });
             }
         });
@@ -2278,11 +2278,13 @@ function generateCompetitorOutcomes(competitorMatches, teamId, gameweek, teamRes
     const matchOutcomes = competitorMatches.map(match => {
         const homeTeam = teams.find(t => t.id === match.homeTeam);
         const awayTeam = teams.find(t => t.id === match.awayTeam);
+        const homeTeamName = homeTeam ? homeTeam.name : match.homeTeam;
+        const awayTeamName = awayTeam ? awayTeam.name : match.awayTeam;
         
         return [
-            { match, result: 'home-win', homeScore: 2, awayScore: 0, desc: `${homeTeam.name} beats ${awayTeam.name}` },
-            { match, result: 'draw', homeScore: 1, awayScore: 1, desc: `${homeTeam.name} draws with ${awayTeam.name}` },
-            { match, result: 'away-win', homeScore: 0, awayScore: 2, desc: `${awayTeam.name} beats ${homeTeam.name}` }
+            { match, result: 'home-win', homeScore: 2, awayScore: 0, desc: `${homeTeamName} beats ${awayTeamName}` },
+            { match, result: 'draw', homeScore: 1, awayScore: 1, desc: `${homeTeamName} draws with ${awayTeamName}` },
+            { match, result: 'away-win', homeScore: 0, awayScore: 2, desc: `${awayTeamName} beats ${homeTeamName}` }
         ];
     });
     
@@ -3406,9 +3408,14 @@ function getRemainingMatches(teamId) {
                 );
                 
                 if (!isPlayed) {
+                    const homeTeam = teams.find(t => t.id === match.homeTeam);
+                    const awayTeam = teams.find(t => t.id === match.awayTeam);
+                    
                     remainingMatches.push({
                         ...match,
-                        gameweek: gameweek.gameweek
+                        gameweek: gameweek.gameweek,
+                        homeTeamName: homeTeam ? homeTeam.name : match.homeTeam,
+                        awayTeamName: awayTeam ? awayTeam.name : match.awayTeam
                     });
                 }
             }
