@@ -1,0 +1,42 @@
+# API Keys and Secrets
+*.key
+*.secret
+*api_key*
+*apikey*
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Configuration files that might contain secrets
+config.json
+secrets.json
+credentials.json
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# IDE/Editor files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# Build/Distribution files
+dist/
+build/
+*.min.js
+*.min.css
+
+# Node modules (if using Node.js in future)
+node_modules/
+package-lock.json
+yarn.lock

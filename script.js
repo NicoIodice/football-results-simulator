@@ -5,7 +5,7 @@ let results = [];
 
 // OpenAI API configuration
 const OPENAI_CONFIG = {
-    apiKey: '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', // Default API key
+    apiKey: null, // API key will be set by user input only
     endpoint: 'https://api.openai.com/v1/chat/completions',
     model: 'gpt-3.5-turbo'
 };
@@ -18,14 +18,17 @@ const SIMULATION_CONFIG = {
 
 // Set OpenAI API key (call this with your key)
 function setOpenAIKey(apiKey) {
-    OPENAI_CONFIG.apiKey = apiKey.trim();
-    localStorage.setItem('openai_api_key', OPENAI_CONFIG.apiKey);
+    if (apiKey && apiKey.trim()) {
+        OPENAI_CONFIG.apiKey = apiKey.trim();
+        // Store in sessionStorage instead of localStorage for better security
+        sessionStorage.setItem('openai_session_key', OPENAI_CONFIG.apiKey);
+    }
 }
 
-// Load API key from localStorage
+// Load API key from sessionStorage (only for current session)
 function loadOpenAIKey() {
-    const savedKey = localStorage.getItem('openai_api_key');
-    if (savedKey) {
+    const savedKey = sessionStorage.getItem('openai_session_key');
+    if (savedKey && savedKey.trim()) {
         OPENAI_CONFIG.apiKey = savedKey;
     }
 }
@@ -662,8 +665,10 @@ function prepareAIContext(teamId, team, standings, nextGameweek) {
 async function queryOpenAI(contextData) {
     const prompt = generateAIPrompt(contextData);
     
-    // Debug logging
-    console.log('Using API key:', OPENAI_CONFIG.apiKey);
+    // Validate API key without logging it
+    if (!OPENAI_CONFIG.apiKey || OPENAI_CONFIG.apiKey.trim().length === 0) {
+        throw new Error('API key is required for AI analysis');
+    }
     
     try {
         const response = await fetch(OPENAI_CONFIG.endpoint, {

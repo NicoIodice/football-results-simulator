@@ -1016,6 +1016,7 @@ tr.first-place .rank {
     padding: 10px;
     border-radius: 6px;
     background: #f8f9fa;
+    gap: 15px;
 }
 
 .projected-position.champion {
