@@ -367,6 +367,42 @@ tr.first-place .goal-diff-negative {
     100% { transform: scale(1); }
 }
 
+/* Group selector styling */
+.group-selector {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #3498db;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.group-selector label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 120px;
+}
+
+.group-selector select {
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 1rem;
+    color: #495057;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+    min-width: 300px;
+}
+
+.group-selector select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
 /* Simulator styling */
 .simulator-controls {
     background-color: #f8f9fa;
@@ -589,6 +625,21 @@ tr.first-place .goal-diff-negative {
 
 /* Responsive design for simulator */
 @media (max-width: 768px) {
+    .group-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .group-selector label {
+        min-width: auto;
+    }
+    
+    .group-selector select {
+        min-width: auto;
+        width: 100%;
+    }
+    
     .team-selector {
         flex-direction: column;
         align-items: flex-start;

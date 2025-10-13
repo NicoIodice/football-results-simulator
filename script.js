@@ -1,7 +1,9 @@
 // Global variables to store data
+let groups = [];
 let teams = [];
 let fixtures = [];
 let results = [];
+let selectedGroupId = null;
 
 // OpenAI API configuration
 const OPENAI_CONFIG = {
@@ -43,21 +45,97 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Load JSON data
 async function loadData() {
     try {
-        const [teamsResponse, fixturesResponse, resultsResponse] = await Promise.all([
+        const [groupsResponse, teamsResponse, fixturesResponse, resultsResponse] = await Promise.all([
+            fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
             fetch('data/results.json')
         ]);
         
+        groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await resultsResponse.json();
         
+        // Set the first group as default
+        if (groups.length > 0) {
+            selectedGroupId = groups[0].id;
+        }
+        
         console.log('Data loaded successfully');
+        populateGroupSelector();
+        updateTeamSelectorForGroup();
         updateAllTabs();
     } catch (error) {
         console.error('Error loading data:', error);
     }
+}
+
+// Populate group selector dropdown
+function populateGroupSelector() {
+    const groupSelect = document.getElementById('selected-group');
+    if (!groupSelect) return;
+    
+    groupSelect.innerHTML = '';
+    
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = `${group.name} - ${group.description}`;
+        if (group.id === selectedGroupId) {
+            option.selected = true;
+        }
+        groupSelect.appendChild(option);
+    });
+}
+
+// Update standings when group changes
+function updateStandingsForGroup() {
+    const groupSelect = document.getElementById('selected-group');
+    if (groupSelect) {
+        selectedGroupId = groupSelect.value;
+        updateStandings();
+        updateTeamSelectorForGroup(); // Update simulator team options
+    }
+}
+
+// Update team selector options based on current group
+function updateTeamSelectorForGroup() {
+    const teamSelect = document.getElementById('selected-team');
+    if (!teamSelect) return;
+    
+    const groupTeams = getTeamsForGroup();
+    const currentSelection = teamSelect.value;
+    
+    teamSelect.innerHTML = '';
+    
+    groupTeams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.id;
+        option.textContent = team.name;
+        teamSelect.appendChild(option);
+    });
+    
+    // Try to maintain current selection if team exists in new group
+    if (groupTeams.some(team => team.id === currentSelection)) {
+        teamSelect.value = currentSelection;
+    } else if (groupTeams.length > 0) {
+        // Default to first team if current selection not available
+        teamSelect.value = groupTeams[0].id;
+    }
+}
+
+// Get filtered data for current group
+function getTeamsForGroup(groupId = selectedGroupId) {
+    return teams.filter(team => team.groupId === groupId);
+}
+
+function getFixturesForGroup(groupId = selectedGroupId) {
+    return fixtures.filter(fixture => fixture.groupId === groupId);
+}
+
+function getResultsForGroup(groupId = selectedGroupId) {
+    return results.filter(result => result.groupId === groupId);
 }
 
 // Tab switching functionality
@@ -100,8 +178,12 @@ function showTab(tabName) {
 function calculateStandings() {
     const standings = [];
     
-    // Initialize standings for each team
-    teams.forEach(team => {
+    // Get teams and results for the selected group
+    const groupTeams = getTeamsForGroup();
+    const groupResults = getResultsForGroup();
+    
+    // Initialize standings for each team in the group
+    groupTeams.forEach(team => {
         standings.push({
             id: team.id,
             name: team.name,
@@ -119,8 +201,8 @@ function calculateStandings() {
         });
     });
     
-    // Process results
-    results.forEach(result => {
+    // Process results for the group
+    groupResults.forEach(result => {
         if (result.played) {
             const homeTeam = standings.find(team => team.id === result.homeTeam);
             const awayTeam = standings.find(team => team.id === result.awayTeam);
@@ -308,6 +390,7 @@ function updateFixtures() {
     const fixturesContent = document.getElementById('fixtures-content');
     fixturesContent.innerHTML = '';
     
+    // For now, show all fixtures (not filtered by group)
     fixtures.forEach(gameweek => {
         const gameweekDiv = document.createElement('div');
         gameweekDiv.className = 'gameweek-section';
@@ -389,7 +472,8 @@ function updateFixtures() {
 // AI-Powered Simulator functionality
 async function updateSimulation() {
     const selectedTeamId = document.getElementById('selected-team').value;
-    const selectedTeam = teams.find(t => t.id === selectedTeamId);
+    const groupTeams = getTeamsForGroup();
+    const selectedTeam = groupTeams.find(t => t.id === selectedTeamId);
     
     if (!selectedTeam) return;
     
@@ -483,8 +567,9 @@ function prepareAIContext(teamId, team, standings, nextGameweek) {
     
     // Format matches with team names
     const formattedMatches = relevantMatches.map(match => {
-        const homeTeam = teams.find(t => t.id === match.homeTeam);
-        const awayTeam = teams.find(t => t.id === match.awayTeam);
+        const groupTeams = getTeamsForGroup();
+        const homeTeam = groupTeams.find(t => t.id === match.homeTeam);
+        const awayTeam = groupTeams.find(t => t.id === match.awayTeam);
         return {
             home: homeTeam ? homeTeam.name : match.homeTeam,
             away: awayTeam ? awayTeam.name : match.awayTeam,
@@ -1086,7 +1171,8 @@ function calculateAdvancedScenarios(selectedTeamId, standings, relevantTeams) {
     
     // Get opponent info
     const opponentId = selectedMatch.homeTeam === selectedTeamId ? selectedMatch.awayTeam : selectedMatch.homeTeam;
-    const opponent = teams.find(t => t.id === opponentId);
+    const groupTeams = getTeamsForGroup();
+    const opponent = groupTeams.find(t => t.id === opponentId);
     const isHome = selectedMatch.homeTeam === selectedTeamId;
     const venue = isHome ? 'vs' : 'at';
     
@@ -2422,9 +2508,12 @@ function calculateRecentForm(team) {
 }
 
 function findNextGameweek() {
-    for (let gameweek of fixtures) {
+    const groupFixtures = getFixturesForGroup();
+    const groupResults = getResultsForGroup();
+    
+    for (let gameweek of groupFixtures) {
         const hasUnplayedMatch = gameweek.matches.some(match => {
-            return !results.some(result => 
+            return !groupResults.some(result => 
                 result.gameweek === gameweek.gameweek &&
                 result.homeTeam === match.homeTeam &&
                 result.awayTeam === match.awayTeam
@@ -2434,7 +2523,7 @@ function findNextGameweek() {
         if (hasUnplayedMatch) {
             // Only return matches that haven't been played
             const unplayedMatches = gameweek.matches.filter(match => {
-                return !results.some(result => 
+                return !groupResults.some(result => 
                     result.gameweek === gameweek.gameweek &&
                     result.homeTeam === match.homeTeam &&
                     result.awayTeam === match.awayTeam
@@ -2452,20 +2541,23 @@ function findNextGameweek() {
 
 function getRemainingMatches(teamId) {
     const remainingMatches = [];
+    const groupFixtures = getFixturesForGroup();
+    const groupResults = getResultsForGroup();
+    const groupTeams = getTeamsForGroup();
     
-    for (let gameweek of fixtures) {
+    for (let gameweek of groupFixtures) {
         for (let match of gameweek.matches) {
             if (match.homeTeam === teamId || match.awayTeam === teamId) {
                 // Check if this match hasn't been played
-                const isPlayed = results.some(result => 
+                const isPlayed = groupResults.some(result => 
                     result.gameweek === gameweek.gameweek &&
                     result.homeTeam === match.homeTeam &&
                     result.awayTeam === match.awayTeam
                 );
                 
                 if (!isPlayed) {
-                    const homeTeam = teams.find(t => t.id === match.homeTeam);
-                    const awayTeam = teams.find(t => t.id === match.awayTeam);
+                    const homeTeam = groupTeams.find(t => t.id === match.homeTeam);
+                    const awayTeam = groupTeams.find(t => t.id === match.awayTeam);
                     
                     remainingMatches.push({
                         ...match,

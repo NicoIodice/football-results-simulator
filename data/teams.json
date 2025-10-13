@@ -3,36 +3,94 @@
     "id": "logan-fc",
     "name": "LOGAN FC",
     "league": "CTW",
-    "fullName": "LOGAN FC (CTW)"
+    "fullName": "LOGAN FC (CTW)",
+    "groupId": "group-c"
   },
   {
     "id": "critical-techballers",
     "name": "Critical Techballers Braga",
     "league": "CTW",
-    "fullName": "Critical Techballers Braga (CTW)"
+    "fullName": "Critical Techballers Braga (CTW)",
+    "groupId": "group-c"
   },
   {
     "id": "sporting-esgaios",
     "name": "Sporting Clube dos Esgaios",
     "league": "CSW",
-    "fullName": "Sporting Clube dos Esgaios (CSW)"
+    "fullName": "Sporting Clube dos Esgaios (CSW)",
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "angelo-iodice",
+        "name": "Ângelo Iodice",
+        "position": "goalkeeper"
+      },
+      {
+        "id": "francisco-ferreira", 
+        "name": "Francisco Ferreira",
+        "position": "player"
+      },
+      {
+        "id": "ricardo-mesquita",
+        "name": "Ricardo Mesquita",
+        "position": "player"
+      },
+      {
+        "id": "bruno-gandres",
+        "name": "Bruno Gandres", 
+        "position": "player"
+      },
+      {
+        "id": "marcio-veiga",
+        "name": "Márcio Veiga",
+        "position": "player"
+      },
+      {
+        "id": "ricardo-moreira",
+        "name": "Ricardo Moreira",
+        "position": "player"
+      },
+      {
+        "id": "carlos-daniel-silva",
+        "name": "Carlos Daniel Silva",
+        "position": "player"
+      },
+      {
+        "id": "joao-noronha",
+        "name": "João Noronha",
+        "position": "player"
+      },
+      {
+        "id": "joao-manuel-amorim",
+        "name": "João Manuel Amorim",
+        "position": "player"
+      },
+      {
+        "id": "sandro-carvalho",
+        "name": "Sandro Carvalho",
+        "position": "player"
+      }
+    ]
   },
   {
     "id": "ctrl-shift-golo",
     "name": "Ctrl+Shift+Golo",
     "league": "CTW",
-    "fullName": "Ctrl+Shift+Golo (CTW)"
+    "fullName": "Ctrl+Shift+Golo (CTW)",
+    "groupId": "group-c"
   },
   {
     "id": "dataki",
     "name": "Dataki",
     "league": "CTW",
-    "fullName": "Dataki (CTW)"
+    "fullName": "Dataki (CTW)",
+    "groupId": "group-c"
   },
   {
     "id": "francesinha-united",
     "name": "Francesinha United",
     "league": "CSW",
-    "fullName": "Francesinha United (CSW)"
+    "fullName": "Francesinha United (CSW)",
+    "groupId": "group-c"
   }
 ]

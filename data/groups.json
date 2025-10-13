@@ -1,0 +1,15 @@
+[
+  {
+    "id": "group-c",
+    "name": "Group C",
+    "description": "Porto/Braga",
+    "teams": [
+      "logan-fc",
+      "critical-techballers", 
+      "sporting-esgaios",
+      "ctrl-shift-golo",
+      "dataki",
+      "francesinha-united"
+    ]
+  }
+]

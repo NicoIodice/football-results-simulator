@@ -26,6 +26,12 @@
             <!-- Standings Tab -->
             <div id="standings" class="tab-content active">
                 <h2>League Standings</h2>
+                <div class="group-selector">
+                    <label for="selected-group">Select Group:</label>
+                    <select id="selected-group" onchange="updateStandingsForGroup()">
+                        <!-- Groups will be populated by JavaScript -->
+                    </select>
+                </div>
                 <div class="table-container">
                     <table id="standings-table">
                         <thead>
@@ -63,12 +69,7 @@
                     <div class="team-selector">
                         <label for="selected-team">Select Team to Analyze:</label>
                         <select id="selected-team" onchange="updateSimulation()">
-                            <option value="sporting-esgaios" selected>Sporting Clube dos Esgaios</option>
-                            <option value="logan-fc">LOGAN FC</option>
-                            <option value="critical-techballers">Critical Techballers Braga</option>
-                            <option value="ctrl-shift-golo">Ctrl+Shift+Golo</option>
-                            <option value="dataki">Dataki</option>
-                            <option value="francesinha-united">Francesinha United</option>
+                            <!-- Teams will be populated by JavaScript -->
                         </select>
                     </div>
                 </div>
