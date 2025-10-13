@@ -230,17 +230,30 @@ tr.first-place .rank {
 /* Goal difference colors */
 .goal-diff-positive {
     color: #28a745 !important;
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .goal-diff-zero {
     color: #000 !important;
-    font-weight: bold;
+    font-weight: bold !important;
 }
 
 .goal-diff-negative {
     color: #dc3545 !important;
-    font-weight: bold;
+    font-weight: bold !important;
+}
+
+/* Ensure goal difference colors override first place highlighting */
+tr.first-place .goal-diff-positive {
+    color: #28a745 !important;
+}
+
+tr.first-place .goal-diff-zero {
+    color: #000 !important;
+}
+
+tr.first-place .goal-diff-negative {
+    color: #dc3545 !important;
 }
 
 /* Calendar and Results styling */
