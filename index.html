@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Football Live Results</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Football Live Results</h1>
+            <p>Championship Tournament</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-button active" onclick="showTab('standings')">Standings</button>
+            <button class="tab-button" onclick="showTab('calendar')">Calendar</button>
+            <button class="tab-button" onclick="showTab('results')">Results</button>
+            <button class="tab-button" onclick="showTab('simulator')">Simulator</button>
+        </nav>
+
+        <main>
+            <!-- Standings Tab -->
+            <div id="standings" class="tab-content active">
+                <h2>League Standings</h2>
+                <div class="table-container">
+                    <table id="standings-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Team</th>
+                                <th>Matches</th>
+                                <th>W-L-D</th>
+                                <th>Points</th>
+                                <th title="Total goals scored minus goals given up">Goals Diff</th>
+                                <th title="Number of total goals scored per team">Total Goals</th>
+                                <th title="The highest number of points obtained by the tied teams in the matches they played against each other">TB</th>
+                                <th>Match History</th>
+                            </tr>
+                        </thead>
+                        <tbody id="standings-body">
+                            <!-- Standings will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Calendar Tab -->
+            <div id="calendar" class="tab-content">
+                <h2>Match Calendar</h2>
+                <div id="calendar-content">
+                    <!-- Calendar will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Results Tab -->
+            <div id="results" class="tab-content">
+                <h2>Match Results by Gameweek</h2>
+                <div id="results-content">
+                    <!-- Results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Simulator Tab -->
+            <div id="simulator" class="tab-content">
+                <h2>Championship Simulator</h2>
+                <div class="simulator-controls">
+                    <div class="team-selector">
+                        <label for="selected-team">Select Team to Analyze:</label>
+                        <select id="selected-team" onchange="updateSimulation()">
+                            <option value="sporting-esgaios" selected>Sporting Clube dos Esgaios</option>
+                            <option value="logan-fc">LOGAN FC</option>
+                            <option value="critical-techballers">Critical Techballers Braga</option>
+                            <option value="ctrl-shift-golo">Ctrl+Shift+Golo</option>
+                            <option value="dataki">Dataki</option>
+                            <option value="francesinha-united">Francesinha United</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="simulation-results">
+                    <!-- Simulation results will be populated by JavaScript -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

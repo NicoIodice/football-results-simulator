@@ -1,0 +1,38 @@
+[
+  {
+    "id": "logan-fc",
+    "name": "LOGAN FC",
+    "league": "CTW",
+    "fullName": "LOGAN FC (CTW)"
+  },
+  {
+    "id": "critical-techballers",
+    "name": "Critical Techballers Braga",
+    "league": "CTW",
+    "fullName": "Critical Techballers Braga (CTW)"
+  },
+  {
+    "id": "sporting-esgaios",
+    "name": "Sporting Clube dos Esgaios",
+    "league": "CSW",
+    "fullName": "Sporting Clube dos Esgaios (CSW)"
+  },
+  {
+    "id": "ctrl-shift-golo",
+    "name": "Ctrl+Shift+Golo",
+    "league": "CTW",
+    "fullName": "Ctrl+Shift+Golo (CTW)"
+  },
+  {
+    "id": "dataki",
+    "name": "Dataki",
+    "league": "CTW",
+    "fullName": "Dataki (CTW)"
+  },
+  {
+    "id": "francesinha-united",
+    "name": "Francesinha United",
+    "league": "CSW",
+    "fullName": "Francesinha United (CSW)"
+  }
+]
