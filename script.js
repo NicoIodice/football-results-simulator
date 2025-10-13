@@ -129,8 +129,9 @@ function updateTeamSelectorForGroup() {
     if (groupTeams.some(team => team.id === currentSelection)) {
         teamSelect.value = currentSelection;
     } else if (groupTeams.length > 0) {
-        // Default to first team if current selection not available
-        teamSelect.value = groupTeams[0].id;
+        // Default to team marked as default, otherwise first team
+        const defaultTeam = groupTeams.find(team => team.isDefault === true);
+        teamSelect.value = defaultTeam ? defaultTeam.id : groupTeams[0].id;
     }
 }
 

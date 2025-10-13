@@ -33,6 +33,7 @@
     "league": "CSW",
     "fullName": "Sporting Clube dos Esgaios (CSW)",
     "groupId": "group-c",
+    "isDefault": true,
     "players": [
       {
         "id": "angelo-iodice",
