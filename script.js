@@ -3,6 +3,7 @@ let groups = [];
 let teams = [];
 let fixtures = [];
 let results = [];
+let goals = [];
 let selectedGroupId = null;
 
 // OpenAI API configuration
@@ -45,17 +46,19 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Load JSON data
 async function loadData() {
     try {
-        const [groupsResponse, teamsResponse, fixturesResponse, resultsResponse] = await Promise.all([
+        const [groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse] = await Promise.all([
             fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
-            fetch('data/results.json')
+            fetch('data/results.json'),
+            fetch('data/goals.json')
         ]);
         
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await resultsResponse.json();
+        goals = await goalsResponse.json();
         
         // Set the first group as default
         if (groups.length > 0) {
@@ -136,6 +139,159 @@ function getFixturesForGroup(groupId = selectedGroupId) {
 
 function getResultsForGroup(groupId = selectedGroupId) {
     return results.filter(result => result.groupId === groupId);
+}
+
+function getGoalsForGroup(groupId = selectedGroupId) {
+    return goals.filter(goal => goal.groupId === groupId);
+}
+
+// Calculate goal statistics by team and player for current group
+function calculateGoalStatistics() {
+    const groupGoals = getGoalsForGroup();
+    const teamStats = {};
+    
+    // Initialize stats for each team
+    const groupTeams = getTeamsForGroup();
+    groupTeams.forEach(team => {
+        teamStats[team.id] = {
+            teamName: team.name,
+            totalGoals: 0,
+            players: {},
+            topScorer: null
+        };
+        
+        // Initialize player stats
+        if (team.players) {
+            team.players.forEach(player => {
+                teamStats[team.id].players[player.id] = {
+                    playerName: player.name,
+                    goals: 0,
+                    matches: []
+                };
+            });
+        }
+    });
+    
+    // Count goals by player and team
+    groupGoals.forEach(goal => {
+        if (teamStats[goal.teamId]) {
+            teamStats[goal.teamId].totalGoals++;
+            
+            if (!teamStats[goal.teamId].players[goal.playerId]) {
+                teamStats[goal.teamId].players[goal.playerId] = {
+                    playerName: goal.playerName,
+                    goals: 0,
+                    matches: []
+                };
+            }
+            
+            teamStats[goal.teamId].players[goal.playerId].goals++;
+            teamStats[goal.teamId].players[goal.playerId].matches.push({
+                matchId: goal.matchId,
+                goalType: goal.goalType
+            });
+        }
+    });
+    
+    // Find top scorer for each team
+    Object.keys(teamStats).forEach(teamId => {
+        const players = teamStats[teamId].players;
+        let topScorer = null;
+        let maxGoals = 0;
+        
+        Object.keys(players).forEach(playerId => {
+            if (players[playerId].goals > maxGoals) {
+                maxGoals = players[playerId].goals;
+                topScorer = {
+                    playerId: playerId,
+                    playerName: players[playerId].playerName,
+                    goals: maxGoals
+                };
+            }
+        });
+        
+        teamStats[teamId].topScorer = topScorer;
+    });
+    
+    return teamStats;
+}
+
+// Show goal tooltip on hover
+function showGoalTooltip(event, teamId) {
+    const goalStats = calculateGoalStatistics();
+    const teamStats = goalStats[teamId];
+    
+    if (!teamStats || teamStats.totalGoals === 0) return;
+    
+    // Create tooltip if it doesn't exist
+    let tooltip = document.getElementById('goal-tooltip');
+    if (!tooltip) {
+        tooltip = document.createElement('div');
+        tooltip.id = 'goal-tooltip';
+        tooltip.className = 'goal-tooltip';
+        document.body.appendChild(tooltip);
+    }
+    
+    // Sort players by goals scored (descending)
+    const sortedPlayers = Object.keys(teamStats.players)
+        .map(playerId => ({
+            playerId,
+            ...teamStats.players[playerId]
+        }))
+        .filter(player => player.goals > 0)
+        .sort((a, b) => b.goals - a.goals);
+    
+    if (sortedPlayers.length === 0) {
+        tooltip.style.display = 'none';
+        return;
+    }
+    
+    // Generate tooltip content
+    let content = `
+        <div class="tooltip-header">
+            <strong>${teamStats.teamName}</strong><br>
+            Top Scorers
+        </div>
+        <div class="tooltip-content">
+    `;
+    
+    sortedPlayers.forEach((player, index) => {
+        const isTopScorer = teamStats.topScorer && player.playerId === teamStats.topScorer.playerId;
+        const championIcon = isTopScorer ? ' <span class="champion-icon">👑</span>' : '';
+        
+        content += `
+            <div class="player-goal-stat ${isTopScorer ? 'top-scorer' : ''}">
+                <span class="player-name">${player.playerName}${championIcon}</span>
+                <span class="player-goals">${player.goals} goal${player.goals !== 1 ? 's' : ''}</span>
+            </div>
+        `;
+    });
+    
+    content += '</div>';
+    tooltip.innerHTML = content;
+    
+    // Position tooltip
+    const rect = event.target.getBoundingClientRect();
+    tooltip.style.display = 'block';
+    tooltip.style.left = (rect.left + window.scrollX + rect.width + 10) + 'px';
+    tooltip.style.top = (rect.top + window.scrollY) + 'px';
+    
+    // Adjust if tooltip goes off screen
+    const tooltipRect = tooltip.getBoundingClientRect();
+    if (tooltipRect.right > window.innerWidth) {
+        tooltip.style.left = (rect.left + window.scrollX - tooltipRect.width - 10) + 'px';
+    }
+    if (tooltipRect.bottom > window.innerHeight) {
+        tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height) + 'px';
+    }
+}
+
+// Hide goal tooltip
+function hideGoalTooltip() {
+    const tooltip = document.getElementById('goal-tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
 }
 
 // Tab switching functionality
@@ -350,13 +506,17 @@ function updateStandings() {
         const goalDiffClass = team.goalDifference > 0 ? 'goal-diff-positive' : 
                              team.goalDifference < 0 ? 'goal-diff-negative' : 'goal-diff-zero';
 
+        // Get goal statistics for this team
+        const goalStats = calculateGoalStatistics();
+        const teamGoalStats = goalStats[team.id];
+        
         row.innerHTML = `
             <td class="rank ${rankClass}">${index + 1}</td>
             <td class="team-name">${team.name}</td>
             <td class="stats">${team.played}</td>
             <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
             <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
-            <td class="stats">${team.goalsFor}</td>
+            <td class="stats goals-cell" onmouseover="showGoalTooltip(event, '${team.id}')" onmouseout="hideGoalTooltip()">${team.goalsFor}</td>
             <td class="stats">${tb3Value}</td>
             <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
             <td class="stats points">${team.points}</td>

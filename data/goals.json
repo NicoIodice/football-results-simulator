@@ -1,0 +1,50 @@
+[
+  {
+    "matchId": "match-2",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "francisco-ferreira",
+    "playerName": "Francisco Ferreira",
+    "goalType": "regular"
+  },
+  {
+    "matchId": "match-4", 
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "ricardo-mesquita",
+    "playerName": "Ricardo Mesquita",
+    "goalType": "penalti"
+  },
+  {
+    "matchId": "match-4",
+    "groupId": "group-c", 
+    "teamId": "sporting-esgaios",
+    "playerId": "bruno-gandres",
+    "playerName": "Bruno Gandres",
+    "goalType": "regular"
+  },
+  {
+    "matchId": "match-4",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios", 
+    "playerId": "francisco-ferreira",
+    "playerName": "Francisco Ferreira",
+    "goalType": "regular"
+  },
+  {
+    "matchId": "match-9",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "marcio-veiga",
+    "playerName": "Márcio Veiga",
+    "goalType": "regular"
+  },
+  {
+    "matchId": "match-9",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "ricardo-mesquita", 
+    "playerName": "Ricardo Mesquita",
+    "goalType": "regular"
+  }
+]

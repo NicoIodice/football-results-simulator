@@ -1196,3 +1196,103 @@ tr.first-place .goal-diff-negative {
 .error {
     color: #e74c3c;
 }
+
+/* Goal Tooltip Styles */
+.goal-tooltip {
+    position: absolute;
+    background: #ffffff;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-width: 300px;
+    min-width: 250px;
+    display: none;
+}
+
+.tooltip-header {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 6px 6px 0 0;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+}
+
+.tooltip-content {
+    padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.player-goal-stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    border-radius: 5px;
+    transition: background-color 0.2s ease;
+}
+
+.player-goal-stat:hover {
+    background-color: #f8f9fa;
+}
+
+.player-goal-stat.top-scorer {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: 2px solid #ffc107;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.player-goal-stat.top-scorer:hover {
+    background: linear-gradient(135deg, #ffed4e, #ffd700);
+}
+
+.player-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.top-scorer .player-name {
+    color: #b8860b;
+}
+
+.player-goals {
+    font-weight: 600;
+    color: #007bff;
+    background: rgba(0, 123, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.top-scorer .player-goals {
+    background: rgba(184, 134, 11, 0.2);
+    color: #b8860b;
+}
+
+.champion-icon {
+    font-size: 16px;
+    margin-left: 5px;
+    animation: sparkle 2s infinite alternate;
+}
+
+@keyframes sparkle {
+    0% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.1) rotate(5deg); }
+    100% { transform: scale(1) rotate(-5deg); }
+}
+
+/* Hover cursor for goals column */
+.standings-table td.goals-cell {
+    cursor: pointer;
+    position: relative;
+}
+
+.standings-table td.goals-cell:hover {
+    background-color: #e3f2fd;
+    transition: background-color 0.2s ease;
+}

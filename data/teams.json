@@ -4,14 +4,28 @@
     "name": "LOGAN FC",
     "league": "CTW",
     "fullName": "LOGAN FC (CTW)",
-    "groupId": "group-c"
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "logan-player-1",
+        "name": "Logan Player 1",
+        "position": "goalkeeper"
+      }
+    ]
   },
   {
     "id": "critical-techballers",
     "name": "Critical Techballers Braga",
     "league": "CTW",
     "fullName": "Critical Techballers Braga (CTW)",
-    "groupId": "group-c"
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "techballers-player-1",
+        "name": "Techballers Player 1",
+        "position": "goalkeeper"
+      }
+    ]
   },
   {
     "id": "sporting-esgaios",
@@ -77,20 +91,41 @@
     "name": "Ctrl+Shift+Golo",
     "league": "CTW",
     "fullName": "Ctrl+Shift+Golo (CTW)",
-    "groupId": "group-c"
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "golo-player-1",
+        "name": "Golo Player 1",
+        "position": "goalkeeper"
+      }
+    ]
   },
   {
     "id": "dataki",
     "name": "Dataki",
     "league": "CTW",
     "fullName": "Dataki (CTW)",
-    "groupId": "group-c"
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "dataki-player-1",
+        "name": "Dataki Player 1",
+        "position": "goalkeeper"
+      }
+    ]
   },
   {
     "id": "francesinha-united",
     "name": "Francesinha United",
     "league": "CSW",
     "fullName": "Francesinha United (CSW)",
-    "groupId": "group-c"
+    "groupId": "group-c",
+    "players": [
+      {
+        "id": "francesinha-player-1",
+        "name": "Francesinha Player 1",
+        "position": "goalkeeper"
+      }
+    ]
   }
 ]
