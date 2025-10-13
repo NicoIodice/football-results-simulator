@@ -6,6 +6,12 @@ let results = [];
 let goals = [];
 let selectedGroupId = null;
 
+// Admin configuration
+const ADMIN_CONFIG = {
+    role: 'user',
+    validateTime: true // Enable/disable time validation for adding results
+};
+
 // OpenAI API configuration
 const OPENAI_CONFIG = {
     apiKey: null, // API key will be set by user input only
@@ -40,6 +46,7 @@ function loadOpenAIKey() {
 document.addEventListener('DOMContentLoaded', async function() {
     loadOpenAIKey();
     await loadData();
+    loadStoredResults();
     showTab('standings');
 });
 
@@ -611,13 +618,17 @@ function updateFixtures() {
             
             const scoreClass = result ? 'completed' : 'upcoming';
             
+            // Admin add result button
+            const addResultButton = (!result && ADMIN_CONFIG.role === 'admin') ? 
+                `<button class="add-result-btn" onclick="showAddResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}')">+</button>` : '';
+            
             matchDiv.innerHTML = `
                 <div class="match-teams">
                     ${homeTeam.name} <span class="match-vs">vs</span> ${awayTeam.name}
                     ${matchIndicator}
                 </div>
                 <div class="match-datetime">${formattedDate} - ${match.time}</div>
-                <div class="match-score ${scoreClass}">${scoreDisplay}</div>
+                <div class="match-score ${scoreClass}">${scoreDisplay}${addResultButton}</div>
             `;
             
             matchesDiv.appendChild(matchDiv);
@@ -2732,3 +2743,184 @@ function getRemainingMatches(teamId) {
     
     return remainingMatches;
 }
+
+// Admin functions for adding results
+let currentMatch = null;
+
+function showAddResultModal(matchId, homeTeamName, awayTeamName, matchDate, matchTime) {
+    // Find match details from fixtures
+    const match = findMatchById(matchId);
+    if (!match) return;
+    
+    currentMatch = {
+        id: matchId,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeTeamName: homeTeamName,
+        awayTeamName: awayTeamName,
+        date: matchDate,
+        time: matchTime,
+        gameweek: match.gameweek,
+        groupId: match.groupId
+    };
+    
+    // Populate modal
+    document.getElementById('modal-teams').textContent = `${homeTeamName} vs ${awayTeamName}`;
+    document.getElementById('modal-datetime').textContent = `${matchDate} at ${matchTime}`;
+    document.getElementById('homeTeamLabel').textContent = homeTeamName + ' Score:';
+    document.getElementById('awayTeamLabel').textContent = awayTeamName + ' Score:';
+    
+    // Reset form
+    document.getElementById('addResultForm').reset();
+    
+    // Show modal
+    document.getElementById('addResultModal').style.display = 'block';
+}
+
+function hideAddResultModal() {
+    document.getElementById('addResultModal').style.display = 'none';
+    currentMatch = null;
+}
+
+function findMatchById(matchId) {
+    for (const gameweek of fixtures) {
+        for (const match of gameweek.matches) {
+            if (match.id === matchId) {
+                return {
+                    ...match,
+                    gameweek: gameweek.gameweek,
+                    groupId: gameweek.groupId
+                };
+            }
+        }
+    }
+    return null;
+}
+
+function validateMatchTime(matchDate, matchTime) {
+    if (!ADMIN_CONFIG.validateTime) {
+        return true; // Skip validation if disabled
+    }
+    
+    // Create match datetime
+    const matchDateTime = new Date(`${matchDate}T${matchTime}`);
+    const currentDateTime = new Date();
+    
+    // Check if match time has passed
+    return currentDateTime >= matchDateTime;
+}
+
+function submitResult(event) {
+    event.preventDefault();
+    
+    if (!currentMatch) return;
+    
+    const homeScore = parseInt(document.getElementById('homeScore').value);
+    const awayScore = parseInt(document.getElementById('awayScore').value);
+    
+    // Validate match time
+    if (!validateMatchTime(currentMatch.date, currentMatch.time)) {
+        showToast('Cannot add result: Match has not started yet!', 'error');
+        return;
+    }
+    
+    // Create new result
+    const newResult = {
+        matchId: currentMatch.id,
+        homeTeam: currentMatch.homeTeam,
+        awayTeam: currentMatch.awayTeam,
+        homeScore: homeScore,
+        awayScore: awayScore,
+        gameweek: currentMatch.gameweek,
+        groupId: currentMatch.groupId,
+        played: true
+    };
+    
+    // Add to results array
+    results.push(newResult);
+    
+    // Save to localStorage (simulating backend save)
+    localStorage.setItem('football_results', JSON.stringify(results));
+    
+    // Hide modal
+    hideAddResultModal();
+    
+    // Show success toast
+    showToast('Result added successfully!', 'success');
+    
+    // Update all displays
+    updateAllTabs();
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = `toast ${type} show`;
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        toast.className = 'toast';
+    }, 3000);
+}
+
+// Load results from localStorage on page load
+function loadStoredResults() {
+    const storedResults = localStorage.getItem('football_results');
+    if (storedResults) {
+        try {
+            const parsed = JSON.parse(storedResults);
+            // Merge with existing results (avoid duplicates)
+            parsed.forEach(storedResult => {
+                const exists = results.some(r => r.matchId === storedResult.matchId);
+                if (!exists) {
+                    results.push(storedResult);
+                }
+            });
+        } catch (e) {
+            console.error('Error loading stored results:', e);
+        }
+    }
+}
+
+
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('addResultModal');
+    if (event.target === modal) {
+        hideAddResultModal();
+    }
+}
+
+// Function to enable admin mode (for testing)
+function enableAdminMode() {
+    ADMIN_CONFIG.role = 'admin';
+    updateAllTabs(); // Refresh to show admin buttons
+    showToast('Admin mode enabled', 'success');
+}
+
+// Function to disable admin mode
+function disableAdminMode() {
+    ADMIN_CONFIG.role = 'user';
+    updateAllTabs(); // Refresh to hide admin buttons
+    showToast('Admin mode disabled', 'info');
+}
+
+// Function to toggle time validation
+function toggleTimeValidation() {
+    ADMIN_CONFIG.validateTime = !ADMIN_CONFIG.validateTime;
+    const status = ADMIN_CONFIG.validateTime ? 'enabled' : 'disabled';
+    showToast(`Time validation ${status}`, 'info');
+}
+
+// Console helper functions (for testing)
+window.footballAdmin = {
+    enableAdmin: enableAdminMode,
+    disableAdmin: disableAdminMode,
+    toggleValidation: toggleTimeValidation,
+    getConfig: () => ADMIN_CONFIG,
+    showConfig: () => {
+        console.log('Current Admin Configuration:', ADMIN_CONFIG);
+        return ADMIN_CONFIG;
+    }
+};

@@ -93,6 +93,42 @@
         </main>
     </div>
 
+    <!-- Add Result Modal -->
+    <div id="addResultModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Match Result</h3>
+                <span class="close-modal" onclick="hideAddResultModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="match-info">
+                    <p><strong>Match:</strong> <span id="modal-teams"></span></p>
+                    <p><strong>Date & Time:</strong> <span id="modal-datetime"></span></p>
+                </div>
+                <form id="addResultForm" onsubmit="submitResult(event)">
+                    <div class="score-inputs">
+                        <div class="team-score">
+                            <label for="homeScore" id="homeTeamLabel"></label>
+                            <input type="number" id="homeScore" min="0" max="99" required>
+                        </div>
+                        <div class="vs-separator">VS</div>
+                        <div class="team-score">
+                            <label for="awayScore" id="awayTeamLabel"></label>
+                            <input type="number" id="awayScore" min="0" max="99" required>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn-secondary" onclick="hideAddResultModal()">Cancel</button>
+                        <button type="submit" class="btn-primary">Add Result</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
