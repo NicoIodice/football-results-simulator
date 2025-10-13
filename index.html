@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Football Live Results</title>
+    <title>Critical Cup 2025: Solidarity Football Tournament</title>
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
+    <link rel="apple-touch-icon" href="./assets/favicon-app.png">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>Football Live Results</h1>
-            <p>Championship Tournament</p>
+            <h1>Critical Cup 2025</h1>
+            <p>Solidarity Football Tournament</p>
         </header>
 
         <nav class="tabs">
             <button class="tab-button active" onclick="showTab('standings')">Standings</button>
-            <button class="tab-button" onclick="showTab('calendar')">Calendar</button>
-            <button class="tab-button" onclick="showTab('results')">Results</button>
+            <button class="tab-button" onclick="showTab('fixtures')">Fixtures</button>
             <button class="tab-button" onclick="showTab('simulator')">Simulator</button>
+            <button class="tab-button" onclick="showTab('forecast')">Forecast</button>
         </nav>
 
         <main>
@@ -32,11 +34,11 @@
                                 <th>Team</th>
                                 <th>Matches</th>
                                 <th>W-L-D</th>
-                                <th>Points</th>
-                                <th title="Total goals scored minus goals given up">Goals Diff</th>
-                                <th title="Number of total goals scored per team">Total Goals</th>
-                                <th title="The highest number of points obtained by the tied teams in the matches they played against each other">TB</th>
+                                <th title="Total goals scored minus goals given up">Goals Diff (TB1)</th>
+                                <th title="Number of total goals scored per team">Total Goals (TB2)</th>
+                                <th title="The highest number of points obtained by the tied teams in the matches they played against each other">TB3</th>
                                 <th>Match History</th>
+                                <th>Points</th>
                             </tr>
                         </thead>
                         <tbody id="standings-body">
@@ -46,19 +48,11 @@
                 </div>
             </div>
 
-            <!-- Calendar Tab -->
-            <div id="calendar" class="tab-content">
-                <h2>Match Calendar</h2>
-                <div id="calendar-content">
-                    <!-- Calendar will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Results Tab -->
-            <div id="results" class="tab-content">
-                <h2>Match Results by Gameweek</h2>
-                <div id="results-content">
-                    <!-- Results will be populated by JavaScript -->
+            <!-- Fixtures Tab -->
+            <div id="fixtures" class="tab-content">
+                <h2>Fixtures & Results</h2>
+                <div id="fixtures-content">
+                    <!-- Fixtures will be populated by JavaScript -->
                 </div>
             </div>
 
@@ -81,6 +75,18 @@
                 
                 <div id="simulation-results">
                     <!-- Simulation results will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Forecast Tab -->
+            <div id="forecast" class="tab-content">
+                <h2>🔮 Championship Forecast & Predictions</h2>
+                <div class="forecast-description">
+                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
+                </div>
+                
+                <div id="forecast-content">
+                    <!-- Forecast content will be populated by JavaScript -->
                 </div>
             </div>
         </main>
