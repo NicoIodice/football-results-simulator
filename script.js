@@ -46,7 +46,6 @@ function loadOpenAIKey() {
 document.addEventListener('DOMContentLoaded', async function() {
     loadOpenAIKey();
     await loadData();
-    loadStoredResults();
     showTab('standings');
 });
 
@@ -627,8 +626,11 @@ function updateFixtures() {
                     ${homeTeam.name} <span class="match-vs">vs</span> ${awayTeam.name}
                     ${matchIndicator}
                 </div>
-                <div class="match-datetime">${formattedDate} - ${match.time}</div>
-                <div class="match-score ${scoreClass}">${scoreDisplay}${addResultButton}</div>
+                <div class="match-datetime-container">
+                    ${addResultButton}
+                    <div class="match-datetime">${formattedDate} - ${match.time}</div>
+                </div>
+                <div class="match-score ${scoreClass}">${scoreDisplay}</div>
             `;
             
             matchesDiv.appendChild(matchDiv);
@@ -2767,8 +2769,8 @@ function showAddResultModal(matchId, homeTeamName, awayTeamName, matchDate, matc
     // Populate modal
     document.getElementById('modal-teams').textContent = `${homeTeamName} vs ${awayTeamName}`;
     document.getElementById('modal-datetime').textContent = `${matchDate} at ${matchTime}`;
-    document.getElementById('homeTeamLabel').textContent = homeTeamName + ' Score:';
-    document.getElementById('awayTeamLabel').textContent = awayTeamName + ' Score:';
+    document.getElementById('homeTeamLabel').textContent = homeTeamName;
+    document.getElementById('awayTeamLabel').textContent = awayTeamName;
     
     // Reset form
     document.getElementById('addResultForm').reset();
@@ -2836,17 +2838,17 @@ function submitResult(event) {
         played: true
     };
     
-    // Add to results array
+    // Add to results array (only in memory for current session)
     results.push(newResult);
     
-    // Save to localStorage (simulating backend save)
-    localStorage.setItem('football_results', JSON.stringify(results));
+    // Trigger download of updated results.json
+    downloadUpdatedResults();
     
     // Hide modal
     hideAddResultModal();
     
-    // Show success toast
-    showToast('Result added successfully!', 'success');
+    // Show success toast with instructions
+    showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
     
     // Update all displays
     updateAllTabs();
@@ -2863,24 +2865,7 @@ function showToast(message, type = 'info') {
     }, 3000);
 }
 
-// Load results from localStorage on page load
-function loadStoredResults() {
-    const storedResults = localStorage.getItem('football_results');
-    if (storedResults) {
-        try {
-            const parsed = JSON.parse(storedResults);
-            // Merge with existing results (avoid duplicates)
-            parsed.forEach(storedResult => {
-                const exists = results.some(r => r.matchId === storedResult.matchId);
-                if (!exists) {
-                    results.push(storedResult);
-                }
-            });
-        } catch (e) {
-            console.error('Error loading stored results:', e);
-        }
-    }
-}
+
 
 
 
@@ -2913,6 +2898,27 @@ function toggleTimeValidation() {
     showToast(`Time validation ${status}`, 'info');
 }
 
+// Function to download updated results.json
+function downloadUpdatedResults() {
+    const dataStr = JSON.stringify(results, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = 'results.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Function to export all current results for manual copying
+function exportAllResults() {
+    console.log('All Current Results (copy this to results.json):');
+    console.log(JSON.stringify(results, null, 2));
+    downloadUpdatedResults();
+    return results;
+}
+
 // Console helper functions (for testing)
 window.footballAdmin = {
     enableAdmin: enableAdminMode,
@@ -2922,5 +2928,11 @@ window.footballAdmin = {
     showConfig: () => {
         console.log('Current Admin Configuration:', ADMIN_CONFIG);
         return ADMIN_CONFIG;
+    },
+    exportResults: exportAllResults,
+    downloadResults: downloadUpdatedResults,
+    reloadPage: () => {
+        showToast('Reloading page to read from updated file...', 'info');
+        setTimeout(() => location.reload(), 1000);
     }
 };

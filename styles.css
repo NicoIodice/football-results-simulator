@@ -1326,6 +1326,17 @@ tr.first-place .goal-diff-negative {
     transform: scale(0.95);
 }
 
+/* Match datetime container for proper button positioning */
+.match-datetime-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.match-datetime {
+    flex: 1;
+}
+
 /* Modal Styles */
 .modal {
     display: none;
