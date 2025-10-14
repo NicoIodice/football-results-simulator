@@ -1210,6 +1210,44 @@ tr.first-place .goal-diff-negative {
     display: none;
 }
 
+/* Mobile-specific tooltip styling */
+.goal-tooltip.mobile-tooltip {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    max-width: 280px !important;
+    min-width: 260px !important;
+    width: 85% !important;
+    z-index: 9999 !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    border-radius: 12px !important;
+    animation: mobileTooltipFadeIn 0.3s ease-out !important;
+}
+
+/* Add backdrop for mobile tooltip */
+.goal-tooltip.mobile-tooltip::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    z-index: -1;
+}
+
+@keyframes mobileTooltipFadeIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
 .tooltip-header {
     background: linear-gradient(135deg, #007bff, #0056b3);
     color: white;
@@ -1284,6 +1322,37 @@ tr.first-place .goal-diff-negative {
     0% { transform: scale(1) rotate(0deg); }
     50% { transform: scale(1.1) rotate(5deg); }
     100% { transform: scale(1) rotate(-5deg); }
+}
+
+/* Mobile tooltip adjustments */
+@media (max-width: 768px) {
+    .goal-tooltip.mobile-tooltip .tooltip-header {
+        font-size: 13px;
+        padding: 10px 12px;
+    }
+    
+    .goal-tooltip.mobile-tooltip .tooltip-content {
+        padding: 10px;
+        max-height: 200px;
+    }
+    
+    .goal-tooltip.mobile-tooltip .player-goal-stat {
+        padding: 6px 10px;
+        margin-bottom: 3px;
+    }
+    
+    .goal-tooltip.mobile-tooltip .player-name {
+        font-size: 13px;
+    }
+    
+    .goal-tooltip.mobile-tooltip .player-goals {
+        font-size: 11px;
+        padding: 3px 6px;
+    }
+    
+    .goal-tooltip.mobile-tooltip .champion-icon {
+        font-size: 12px;
+    }
 }
 
 /* Hover cursor for goals column */

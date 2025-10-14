@@ -454,12 +454,15 @@ function calculateGoalStatistics() {
     return teamStats;
 }
 
-// Show goal tooltip on hover
+// Show goal tooltip on hover (desktop) or click (mobile)
 function showGoalTooltip(event, teamId) {
     const goalStats = calculateGoalStatistics();
     const teamStats = goalStats[teamId];
     
     if (!teamStats || teamStats.totalGoals === 0) return;
+    
+    // Check if this is a mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
     
     // Create tooltip if it doesn't exist
     let tooltip = document.getElementById('goal-tooltip');
@@ -468,6 +471,12 @@ function showGoalTooltip(event, teamId) {
         tooltip.id = 'goal-tooltip';
         tooltip.className = 'goal-tooltip';
         document.body.appendChild(tooltip);
+    }
+    
+    // If mobile and tooltip is already visible for this team, hide it
+    if (isMobile && tooltip.style.display === 'block' && tooltip.dataset.currentTeam === teamId) {
+        hideGoalTooltip();
+        return;
     }
     
     // Sort players by goals scored (descending)
@@ -507,20 +516,33 @@ function showGoalTooltip(event, teamId) {
     
     content += '</div>';
     tooltip.innerHTML = content;
+    tooltip.dataset.currentTeam = teamId; // Track which team tooltip is showing
     
     // Position tooltip
-    const rect = event.target.getBoundingClientRect();
-    tooltip.style.display = 'block';
-    tooltip.style.left = (rect.left + window.scrollX + rect.width + 10) + 'px';
-    tooltip.style.top = (rect.top + window.scrollY) + 'px';
-    
-    // Adjust if tooltip goes off screen
-    const tooltipRect = tooltip.getBoundingClientRect();
-    if (tooltipRect.right > window.innerWidth) {
-        tooltip.style.left = (rect.left + window.scrollX - tooltipRect.width - 10) + 'px';
-    }
-    if (tooltipRect.bottom > window.innerHeight) {
-        tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height) + 'px';
+    if (isMobile) {
+        // Center the tooltip on mobile
+        tooltip.style.display = 'block';
+        tooltip.style.left = '50%';
+        tooltip.style.top = '50%';
+        tooltip.style.transform = 'translate(-50%, -50%)';
+        tooltip.classList.add('mobile-tooltip');
+    } else {
+        // Desktop positioning (original behavior)
+        const rect = event.target.getBoundingClientRect();
+        tooltip.style.display = 'block';
+        tooltip.style.left = (rect.left + window.scrollX + rect.width + 10) + 'px';
+        tooltip.style.top = (rect.top + window.scrollY) + 'px';
+        tooltip.style.transform = 'none';
+        tooltip.classList.remove('mobile-tooltip');
+        
+        // Adjust if tooltip goes off screen
+        const tooltipRect = tooltip.getBoundingClientRect();
+        if (tooltipRect.right > window.innerWidth) {
+            tooltip.style.left = (rect.left + window.scrollX - tooltipRect.width - 10) + 'px';
+        }
+        if (tooltipRect.bottom > window.innerHeight) {
+            tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height) + 'px';
+        }
     }
 }
 
@@ -529,8 +551,28 @@ function hideGoalTooltip() {
     const tooltip = document.getElementById('goal-tooltip');
     if (tooltip) {
         tooltip.style.display = 'none';
+        tooltip.classList.remove('mobile-tooltip');
+        delete tooltip.dataset.currentTeam;
     }
 }
+
+// Add global click handler for mobile tooltip dismissal
+document.addEventListener('click', function(event) {
+    const tooltip = document.getElementById('goal-tooltip');
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    // Only handle on mobile and if tooltip is visible
+    if (!isMobile || !tooltip || tooltip.style.display !== 'block') {
+        return;
+    }
+    
+    // Check if the click was on a goals cell (to show tooltip) or elsewhere (to hide)
+    const clickedOnGoalsCell = event.target.closest('.goals-cell');
+    
+    if (!clickedOnGoalsCell && !event.target.closest('#goal-tooltip')) {
+        hideGoalTooltip();
+    }
+});
 
 // Tab switching functionality
 function showTab(tabName) {
@@ -754,7 +796,10 @@ function updateStandings() {
             <td class="stats">${team.played}</td>
             <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
             <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
-            <td class="stats goals-cell" onmouseover="showGoalTooltip(event, '${team.id}')" onmouseout="hideGoalTooltip()">${team.goalsFor}</td>
+            <td class="stats goals-cell" 
+                onclick="showGoalTooltip(event, '${team.id}')" 
+                onmouseover="showGoalTooltip(event, '${team.id}')" 
+                onmouseout="hideGoalTooltip()">${team.goalsFor}</td>
             <td class="stats">${tb3Value}</td>
             <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
             <td class="stats points">${team.points}</td>
