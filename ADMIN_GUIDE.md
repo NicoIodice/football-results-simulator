@@ -44,6 +44,64 @@ footballAdmin.showConfig()           // Show current configuration
 footballAdmin.exportResults()        // Export all results to console and download
 footballAdmin.downloadResults()      // Download current results.json
 footballAdmin.reloadPage()           // Reload page after updating file
+
+// OpenAI controls
+footballAdmin.enableOpenAI()         // Enable AI-powered analysis
+footballAdmin.disableOpenAI()        // Disable AI-powered analysis
+footballAdmin.checkOpenAI()          // Check OpenAI client status
+
+// Cost optimization
+footballAdmin.setMaxTokens(300)      // Set token limit (50-2000)
+footballAdmin.getTokenStats()        // View usage statistics
+footballAdmin.resetTokenStats()      // Reset usage counters
+
+// Rate limiting
+footballAdmin.setRetryAttempts(3)    // Set retry attempts (1-5)
+```
+
+## 🤖 OpenAI Integration
+
+### API Key Configuration:
+
+**Option 1: config.json file (Recommended)**
+```json
+{"OPENAI_API_KEY": "your-actual-api-key-here"}
+```
+
+**Option 2: .env file (Fallback)**
+```properties
+OPENAI_API_KEY=your-actual-api-key-here
+```
+
+**Option 3: Manual entry**
+- Use the simulator interface to enter your API key manually
+- Key is stored in session storage for current session only
+
+### Rate Limiting & Error Handling:
+- **Automatic Retries**: 3 attempts with exponential backoff
+- **Rate Limit Handling**: Intelligent delays for 429 errors
+- **Timeout Protection**: 30-second request timeout
+- **Graceful Fallbacks**: Custom analysis when AI fails
+
+### Cost Optimization:
+- **Token Limits**: Default 500 tokens (configurable 50-2000)
+- **Usage Tracking**: Monitor tokens and estimated costs
+- **Efficient Prompts**: Optimized for concise responses
+- **Stop Sequences**: Prevent overly long responses
+
+### Usage:
+```javascript
+// Enable AI with cost monitoring
+footballAdmin.enableOpenAI()
+
+// Check current usage
+footballAdmin.getTokenStats()
+
+// Optimize for lower costs
+footballAdmin.setMaxTokens(300)
+
+// Check configuration
+footballAdmin.showConfig()
 ```
 
 ## ⏰ Time Validation
