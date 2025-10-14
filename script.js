@@ -566,13 +566,24 @@ document.addEventListener('click', function(event) {
         return;
     }
     
-    // Check if the click was on a goals cell (to show tooltip) or elsewhere (to hide)
+    // Check if the click was on a goals cell or inside the tooltip
     const clickedOnGoalsCell = event.target.closest('.goals-cell');
+    const clickedOnTooltip = event.target.closest('#goal-tooltip');
     
-    if (!clickedOnGoalsCell && !event.target.closest('#goal-tooltip')) {
+    if (!clickedOnGoalsCell && !clickedOnTooltip) {
         hideGoalTooltip();
     }
 });
+
+// Prevent mouseout from hiding tooltip on mobile
+function handleTooltipMouseOut(event, teamId) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    // Don't hide on mobile (only click-to-dismiss)
+    if (!isMobile) {
+        hideGoalTooltip();
+    }
+}
 
 // Tab switching functionality
 function showTab(tabName) {
@@ -799,7 +810,7 @@ function updateStandings() {
             <td class="stats goals-cell" 
                 onclick="showGoalTooltip(event, '${team.id}')" 
                 onmouseover="showGoalTooltip(event, '${team.id}')" 
-                onmouseout="hideGoalTooltip()">${team.goalsFor}</td>
+                onmouseout="handleTooltipMouseOut(event, '${team.id}')">${team.goalsFor}</td>
             <td class="stats">${tb3Value}</td>
             <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
             <td class="stats points">${team.points}</td>
@@ -2958,14 +2969,26 @@ function generateChampionshipForecastHTML(forecast) {
         <div class="championship-forecast">
             <h3>🏆 Final Standings Projection</h3>
             <div class="projected-table">
-                ${forecast.projections.map((team, index) => `
-                    <div class="projected-position ${index === 0 ? 'champion' : index < 3 ? 'podium' : ''}">
-                        <div class="proj-rank">${index + 1}</div>
-                        <div class="proj-team">${team.name}</div>
-                        <div class="proj-points">${team.projectedPoints} pts</div>
-                        <div class="proj-probability">${team.championshipProbability}% chance</div>
-                    </div>
-                `).join('')}
+                ${forecast.projections.map((team, index) => {
+                    // Determine border color based on championship probability
+                    let borderClass = '';
+                    if (team.championshipProbability >= 75) {
+                        borderClass = 'high-chance'; // Green
+                    } else if (team.championshipProbability >= 50) {
+                        borderClass = 'good-chance'; // Yellow
+                    } else if (team.championshipProbability >= 25) {
+                        borderClass = 'medium-chance'; // Orange
+                    }
+                    
+                    return `
+                        <div class="projected-position ${index === 0 ? 'champion' : index < 3 ? 'podium' : ''} ${borderClass}">
+                            <div class="proj-rank">${index + 1}</div>
+                            <div class="proj-team">${team.name}</div>
+                            <div class="proj-points">${team.projectedPoints} pts</div>
+                            <div class="proj-probability">${team.championshipProbability}% chance</div>
+                        </div>
+                    `;
+                }).join('')}
             </div>
             
             <div class="forecast-summary">
