@@ -129,6 +129,23 @@
     <!-- Toast Notification -->
     <div id="toast" class="toast"></div>
 
+    <!-- Loading Mask for OpenAI SDK -->
+    <div id="openai-loading-mask" class="loading-mask hide">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <div class="loading-text">
+                <h3>🤖 Initializing AI Engine</h3>
+                <p>Loading OpenAI SDK for advanced analysis...</p>
+                <div class="loading-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="loading-progress-fill"></div>
+                    </div>
+                    <span class="progress-text" id="loading-progress-text">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- OpenAI SDK -->
     <script src="https://cdn.jsdelivr.net/npm/openai@4.0.0/dist/openai.min.js"></script>
     <script src="script.js"></script>

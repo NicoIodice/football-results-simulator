@@ -12,6 +12,12 @@ const ADMIN_CONFIG = {
     validateTime: true // Enable/disable time validation for adding results
 };
 
+// Configuration for simulation type
+const SIMULATION_CONFIG = {
+    useOpenAI: false, // Switch to enable/disable OpenAI analysis (default off)
+    pointsGapLimit: 3 // Only analyze teams within this points gap
+};
+
 // OpenAI API configuration
 const OPENAI_CONFIG = {
     apiKey: null, // API key will be loaded from .env file
@@ -24,12 +30,6 @@ const OPENAI_CONFIG = {
 };
 
 let openai = null; // OpenAI client instance
-
-// Configuration for simulation type
-const SIMULATION_CONFIG = {
-    useOpenAI: true, // Switch to enable/disable OpenAI analysis (default off)
-    pointsGapLimit: 3 // Only analyze teams within this points gap
-};
 
 // Load API key from config.json file
 async function loadOpenAIKeyFromConfig() {
@@ -87,16 +87,24 @@ async function loadOpenAIKeyFromEnv() {
 
 // Initialize OpenAI client
 function initializeOpenAI(apiKey) {
-    if (window.OpenAI && apiKey) {
-        try {
-            openai = new window.OpenAI({
-                apiKey: apiKey,
-                dangerouslyAllowBrowser: true // Required for browser usage
-            });
-            console.log('OpenAI client initialized successfully');
-        } catch (error) {
-            console.error('Failed to initialize OpenAI client:', error);
-        }
+    if (!window.OpenAI) {
+        console.warn('⚠️ OpenAI SDK not available');
+        return;
+    }
+    
+    if (!apiKey) {
+        console.warn('⚠️ No API key provided for OpenAI initialization');
+        return;
+    }
+    
+    try {
+        openai = new window.OpenAI({
+            apiKey: apiKey,
+            dangerouslyAllowBrowser: true // Required for browser usage
+        });
+        console.log('✅ OpenAI client initialized successfully');
+    } catch (error) {
+        console.error('❌ Failed to initialize OpenAI client:', error);
     }
 }
 
@@ -122,6 +130,135 @@ function loadOpenAIKeyFromSession() {
 // Note: localStorage persistence removed to avoid overriding default settings
 // Configuration is now purely based on code defaults and API key availability
 
+// Show loading mask
+function showLoadingMask() {
+    const mask = document.getElementById('openai-loading-mask');
+    if (mask) {
+        mask.classList.remove('hide', 'hidden');
+        mask.style.display = 'flex';
+        
+        // Simulate loading progress with messages
+        let progress = 0;
+        let step = 0;
+        const progressFill = document.getElementById('loading-progress-fill');
+        const progressText = document.getElementById('loading-progress-text');
+        const loadingTextP = mask.querySelector('.loading-text p');
+        
+        const loadingMessages = [
+            'Loading OpenAI SDK for advanced analysis...',
+            'Initializing AI models...',
+            'Preparing championship analysis engine...',
+            'Setting up intelligent predictions...',
+            'Almost ready for AI-powered insights...'
+        ];
+        
+        const updateProgress = () => {
+            progress += Math.random() * 12 + 8; // Random increment between 8-20%
+            if (progress > 95) progress = 95; // Don't complete until actually loaded
+            
+            // Update message based on progress
+            const messageIndex = Math.floor((progress / 100) * loadingMessages.length);
+            if (messageIndex < loadingMessages.length && loadingTextP) {
+                loadingTextP.textContent = loadingMessages[messageIndex];
+            }
+            
+            if (progressFill) progressFill.style.width = progress + '%';
+            if (progressText) progressText.textContent = Math.round(progress) + '%';
+            
+            if (progress < 95) {
+                setTimeout(updateProgress, 300 + Math.random() * 400); // Random delay 300-700ms
+            }
+        };
+        
+        updateProgress();
+    }
+}
+
+// Hide loading mask
+function hideLoadingMask() {
+    const mask = document.getElementById('openai-loading-mask');
+    if (mask) {
+        // Complete the progress bar
+        const progressFill = document.getElementById('loading-progress-fill');
+        const progressText = document.getElementById('loading-progress-text');
+        if (progressFill) progressFill.style.width = '100%';
+        if (progressText) progressText.textContent = '100%';
+        
+        // Hide after a brief delay to show completion
+        setTimeout(() => {
+            mask.classList.add('hidden');
+            setTimeout(() => {
+                mask.style.display = 'none';
+            }, 300); // Wait for fade out animation
+        }, 500);
+    }
+}
+
+// Initialize OpenAI system (only called if enabled)
+async function initializeOpenAISystem() {
+    try {
+        // Show loading mask only once
+        showLoadingMask();
+        
+        // Wait for SDK to be available
+        await waitForOpenAISDK();
+        
+        // Try to load API key in order of preference
+        await loadOpenAIKeyFromConfig(); // Try config.json first
+        if (!OPENAI_CONFIG.apiKey) {
+            await loadOpenAIKeyFromEnv(); // Fallback to .env
+        }
+        if (!OPENAI_CONFIG.apiKey) {
+            loadOpenAIKeyFromSession(); // Final fallback to session storage
+        }
+        
+        // Hide loading mask
+        hideLoadingMask();
+        
+        // Show success or error toast
+        if (openai && OPENAI_CONFIG.apiKey) {
+            showToast('🤖 AI Engine Ready - Advanced analysis available!', 'success', 5000);
+            console.log('✅ OpenAI system fully initialized');
+        } else {
+            showToast('⚠️ AI Engine unavailable - Using standard analysis', 'warning', 5000);
+            console.log('⚠️ OpenAI system initialization incomplete');
+        }
+        
+    } catch (error) {
+        hideLoadingMask();
+        showToast('❌ AI Engine failed to initialize - Using standard analysis', 'error', 5000);
+        console.error('❌ OpenAI system initialization failed:', error);
+    }
+}
+
+// Wait for OpenAI SDK to be available (background operation)
+function waitForOpenAISDK() {
+    return new Promise((resolve, reject) => {
+        if (window.OpenAI) {
+            console.log('✅ OpenAI SDK already available');
+            resolve();
+            return;
+        }
+        
+        let attempts = 0;
+        const maxAttempts = 50; // 5 seconds total (100ms * 50)
+        
+        const checkInterval = setInterval(() => {
+            attempts++;
+            
+            if (window.OpenAI) {
+                clearInterval(checkInterval);
+                console.log('✅ OpenAI SDK loaded successfully');
+                resolve();
+            } else if (attempts >= maxAttempts) {
+                clearInterval(checkInterval);
+                console.warn('⚠️ OpenAI SDK failed to load after 5 seconds');
+                reject(new Error('OpenAI SDK loading timeout'));
+            }
+        }, 100); // Check every 100ms
+    });
+}
+
 // Load data when page loads
 document.addEventListener('DOMContentLoaded', async function() {
     console.log('Using default OpenAI configuration:', {
@@ -131,17 +268,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         model: OPENAI_CONFIG.model
     });
     
-    // Try to load API key in order of preference
-    await loadOpenAIKeyFromConfig(); // Try config.json first
-    if (!OPENAI_CONFIG.apiKey) {
-        await loadOpenAIKeyFromEnv(); // Fallback to .env
-    }
-    if (!OPENAI_CONFIG.apiKey) {
-        loadOpenAIKeyFromSession(); // Final fallback to session storage
-    }
-    
+    // Load data first (non-blocking)
     await loadData();
     showTab('standings');
+    
+    // Initialize OpenAI only if enabled
+    if (SIMULATION_CONFIG.useOpenAI) {
+        initializeOpenAISystem();
+    } else {
+        console.log('ℹ️ OpenAI feature disabled, skipping SDK initialization');
+    }
 });
 
 // Load JSON data
@@ -781,11 +917,17 @@ async function updateSimulation() {
             }
         } else {
             // Use custom championship analysis
+            const reason = !SIMULATION_CONFIG.useOpenAI ? 'OpenAI disabled' : 
+                          !openai ? 'OpenAI client not initialized' : 
+                          !OPENAI_CONFIG.apiKey ? 'No API key available' : 'Unknown';
+                          
             console.log('⚠️ Using fallback analysis because:', {
                 useOpenAI: SIMULATION_CONFIG.useOpenAI,
                 openaiClient: !!openai,
-                reason: !SIMULATION_CONFIG.useOpenAI ? 'OpenAI disabled' : !openai ? 'OpenAI client not initialized' : 'Unknown'
+                hasApiKey: !!OPENAI_CONFIG.apiKey,
+                reason: reason
             });
+            
             const customAnalysis = generateCustomSimulation(selectedTeamId, selectedTeam);
             simulationResults.innerHTML = customAnalysis;
         }
@@ -3040,15 +3182,17 @@ function submitResult(event) {
     updateAllTabs();
 }
 
-function showToast(message, type = 'info') {
+function showToast(message, type = 'info', duration = 3000) {
     const toast = document.getElementById('toast');
+    if (!toast) return;
+    
     toast.textContent = message;
     toast.className = `toast ${type} show`;
     
-    // Hide after 3 seconds
+    // Hide after specified duration
     setTimeout(() => {
         toast.className = 'toast';
-    }, 3000);
+    }, duration);
 }
 
 // Close modal when clicking outside
@@ -3159,13 +3303,20 @@ window.footballAdmin = {
     },
     // OpenAI controls
     enableOpenAI: () => {
+        const wasEnabled = SIMULATION_CONFIG.useOpenAI;
         SIMULATION_CONFIG.useOpenAI = true;
-        showToast('OpenAI analysis enabled', 'success');
+        
+        if (!wasEnabled) {
+            // Initialize OpenAI if it wasn't enabled before
+            initializeOpenAISystem();
+        } else {
+            showToast('OpenAI analysis already enabled', 'info', 3000);
+        }
         console.log('OpenAI enabled for this session');
     },
     disableOpenAI: () => {
         SIMULATION_CONFIG.useOpenAI = false;
-        showToast('OpenAI analysis disabled', 'info');
+        showToast('OpenAI analysis disabled - Using standard analysis', 'info', 3000);
         console.log('OpenAI disabled for this session');
     },
     checkOpenAI: () => {
@@ -3267,7 +3418,8 @@ window.footballAdmin = {
     },
     debugOpenAI: () => {
         console.log('🔍 Complete OpenAI Debug Report:');
-        console.log('SIMULATION_CONFIG.useOpenAI:', SIMULATION_CONFIG.useOpenAI, '(from code defaults, not localStorage)');
+        console.log('window.OpenAI available:', !!window.OpenAI);
+        console.log('SIMULATION_CONFIG.useOpenAI:', SIMULATION_CONFIG.useOpenAI, '(from code defaults)');
         console.log('openai client exists:', !!openai);
         console.log('OPENAI_CONFIG.apiKey exists:', !!OPENAI_CONFIG.apiKey);
         console.log('API Key prefix:', OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none');
@@ -3290,10 +3442,20 @@ window.footballAdmin = {
         const isReady = SIMULATION_CONFIG.useOpenAI && !!openai && !!OPENAI_CONFIG.apiKey;
         console.log('🎯 OpenAI Ready:', isReady);
         
+        if (!isReady) {
+            console.log('❌ Issues preventing OpenAI from working:');
+            if (!window.OpenAI) console.log('  - OpenAI SDK not loaded');
+            if (!SIMULATION_CONFIG.useOpenAI) console.log('  - OpenAI disabled in config');
+            if (!openai) console.log('  - OpenAI client not initialized');
+            if (!OPENAI_CONFIG.apiKey) console.log('  - No API key available');
+        }
+        
         return {
             ready: isReady,
-            usingDefaults: true,
-            hasOldLocalStorage: !!oldLocalStorage
+            sdkLoaded: !!window.OpenAI,
+            clientInitialized: !!openai,
+            hasApiKey: !!OPENAI_CONFIG.apiKey,
+            enabled: SIMULATION_CONFIG.useOpenAI
         };
     },
     clearConfig: () => {
