@@ -616,6 +616,28 @@ tr.first-place .goal-diff-negative {
 .match-teams-sim {
     font-weight: 600;
     color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.team-home {
+    flex: 1;
+    text-align: left;
+}
+
+.team-away {
+    flex: 1;
+    text-align: right;
+}
+
+.vs-separator {
+    font-weight: 500;
+    color: #7f8c8d;
+    font-size: 0.9em;
+    flex-shrink: 0;
+    text-align: center;
 }
 
 .match-date-sim {
@@ -710,6 +732,7 @@ tr.first-place .goal-diff-negative {
         overflow-wrap: break-word;
         text-align: center;
         width: 100%;
+        font-size: 15px;
     }
     
     .match-datetime-container {
@@ -748,16 +771,46 @@ tr.first-place .goal-diff-negative {
     .team-metrics .metric:nth-child(4) { order: 4; } /* Defense */
     .team-metrics .metric:nth-child(5) { order: 5; } /* Win Rate */
     
-    /* Fix teams within gap cards */
+    /* Mobile: Keep tight spacing between label and value */
+    .team-metrics .metric {
+        gap: 8px !important;
+        justify-content: space-between !important;
+    }
+    
+    .team-metrics .metric-value {
+        margin-left: 0 !important;
+    }
+    
+    /* Fix teams within gap cards with synchronized horizontal scroll */
+    .relevant-teams {
+        overflow-x: auto !important;
+        padding-bottom: 8px !important;
+    }
+    
+    .teams-list {
+        display: grid !important;
+        gap: 8px !important;
+        margin-top: 10px !important;
+        min-width: 300px !important;
+        width: max-content !important;
+    }
+    
     .team-item {
-        flex-direction: column;
-        text-align: center;
-        padding: 10px;
-        gap: 5px;
+        display: grid !important;
+        grid-template-columns: 40px 1fr 80px 60px !important;
+        align-items: center !important;
+        padding: 8px 12px !important;
+        background: white !important;
+        border-radius: 6px !important;
+        border-left: 3px solid #e0e0e0 !important;
+        min-width: 280px !important;
+        white-space: nowrap !important;
     }
     
     .team-name {
-        margin-bottom: 5px;
+        margin-bottom: 0 !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
     
     /* Fix match predictions on mobile */
@@ -1075,14 +1128,19 @@ tr.first-place .goal-diff-negative {
 }
 
 .metric {
-    display: flex;
-    justify-content: space-between;
+    display: block; /* flex */
+    gap: 7px;
     padding: 5px 0;
 }
 
 .metric-label {
     color: #7f8c8d;
     font-size: 0.9em;
+    flex-shrink: 0;
+}
+
+.metric-value {
+    margin-left: auto;
 }
 
 .metric-value {
@@ -1339,6 +1397,7 @@ tr.first-place .goal-diff-negative {
     top: 50% !important;
     left: 50% !important;
     transform: translate(-50%, -50%) !important;
+    background: #ffffff !important;
     max-width: 280px !important;
     min-width: 260px !important;
     width: 85% !important;
@@ -1857,30 +1916,49 @@ tr.first-place .goal-diff-negative {
 
 /* Complete mobile responsive design fixes */
 @media (max-width: 768px) {
-    /* Match predictions mobile layout */
-    .match-prediction-card {
-        padding: 15px !important;
-        margin-bottom: 15px !important;
+    /* Match predictions mobile layout with synchronized horizontal scroll - FORECAST ONLY */
+    .forecast-content .match-predictions {
+        display: grid !important;
+        gap: 15px !important;
+        overflow-x: auto !important;
+        overflow-y: visible !important;
+        padding-bottom: 10px !important;
     }
     
-    .match-prediction-card h4 {
+    .forecast-content .match-prediction-card {
+        width: 350px !important;
+        min-width: 350px !important;
+        max-width: 350px !important;
+        padding: 15px !important;
+        margin-bottom: 0 !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+    }
+    
+    .forecast-content .match-prediction-card h4 {
         font-size: 1rem !important;
         line-height: 1.4 !important;
         margin-bottom: 12px !important;
+        white-space: nowrap !important;
     }
     
-    .prediction-details {
+    .forecast-content .match-teams {
+        min-width: 320px !important;
+        white-space: nowrap !important;
+    }
+    
+    .forecast-content .prediction-details {
         flex-direction: column !important;
         gap: 12px !important;
     }
     
-    .prediction-score {
+    .forecast-content .prediction-score {
         text-align: center !important;
         padding: 10px !important;
         font-size: 1.1rem !important;
     }
     
-    .prediction-reasoning {
+    .forecast-content .prediction-reasoning {
         padding: 12px !important;
         font-size: 0.9rem !important;
         line-height: 1.5 !important;
@@ -1942,5 +2020,53 @@ tr.first-place .goal-diff-negative {
     .remaining-matches h4 {
         font-size: 1rem !important;
         margin-bottom: 8px !important;
+    }
+    
+    /* Mobile: Keep Team A - vs - Team B layout */
+    .match-list {
+        display: grid !important;
+        gap: 8px !important;
+    }
+    
+    .remaining-match {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 12px !important;
+        background: white !important;
+        border-radius: 4px !important;
+        border-left: 3px solid #ff9800 !important;
+    }
+    
+    .match-teams-sim {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 6px !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .team-home {
+        flex: 1 !important;
+        text-align: left !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .team-away {
+        flex: 1 !important;
+        text-align: right !important;
+        font-size: 0.85rem !important;
+    }
+    
+    .vs-separator {
+        font-size: 0.75rem !important;
+        color: #7f8c8d !important;
+        flex-shrink: 0 !important;
+        text-align: center !important;
+    }
+    
+    .match-date-sim {
+        font-size: 0.75rem !important;
+        flex-shrink: 0 !important;
     }
 }

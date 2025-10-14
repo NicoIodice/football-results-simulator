@@ -1678,7 +1678,11 @@ function generateRemainingMatchHTML(match) {
     
     return `
         <div class="remaining-match">
-            <div class="match-teams-sim">${match.homeTeamName} vs ${match.awayTeamName}</div>
+            <div class="match-teams-sim">
+                <span class="team-home">${match.homeTeamName}</span>
+                <span class="vs-separator">vs</span>
+                <span class="team-away">${match.awayTeamName}</span>
+            </div>
             <div class="match-date-sim">${formattedDate} - ${match.time}</div>
         </div>
     `;
@@ -2967,7 +2971,7 @@ function generateMatchPredictionsHTML(predictions) {
 function generateChampionshipForecastHTML(forecast) {
     return `
         <div class="championship-forecast">
-            <h3>🏆 Final Standings Projection</h3>
+            <h3>Final Standings Projection</h3>
             <div class="projected-table">
                 ${forecast.projections.map((team, index) => {
                     // Determine border color based on championship probability
