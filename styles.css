@@ -219,6 +219,16 @@ tr.first-place .rank {
 .stats {
     font-family: 'Courier New', monospace;
     font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+}
+
+/* Specific styling for W-L-D column to prevent wrapping */
+#standings-table th:nth-child(4),
+#standings-table td:nth-child(4) {
+    min-width: 60px;
+    white-space: nowrap;
+    text-align: center;
 }
 
 .points {
@@ -655,6 +665,16 @@ tr.first-place .goal-diff-negative {
     
     .group-selector label {
         min-width: auto;
+    }
+    
+    /* Ensure W-L-D column doesn't wrap on mobile */
+    #standings-table th:nth-child(4),
+    #standings-table td:nth-child(4) {
+        min-width: 55px !important;
+        max-width: 55px !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+        font-size: 0.9rem !important;
     }
     
     .group-selector select {
