@@ -762,12 +762,12 @@ tr.first-place .goal-diff-negative {
     .team-metrics {
         display: flex !important;
         flex-direction: column !important;
-        gap: 6px !important;
+        gap: 1px !important;
     }
     
     .team-metrics .metric:nth-child(1) { order: 1; } /* Form */
-    .team-metrics .metric:nth-child(3) { order: 2; } /* Momentum */
-    .team-metrics .metric:nth-child(2) { order: 3; } /* Attack */
+    .team-metrics .metric:nth-child(2) { order: 2; } /* Momentum */
+    .team-metrics .metric:nth-child(3) { order: 3; } /* Attack */
     .team-metrics .metric:nth-child(4) { order: 4; } /* Defense */
     .team-metrics .metric:nth-child(5) { order: 5; } /* Win Rate */
     
@@ -775,6 +775,7 @@ tr.first-place .goal-diff-negative {
     .team-metrics .metric {
         gap: 8px !important;
         justify-content: space-between !important;
+        padding: 0 !important;
     }
     
     .team-metrics .metric-value {
