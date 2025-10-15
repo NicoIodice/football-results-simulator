@@ -18,10 +18,11 @@ const SIMULATION_CONFIG = {
     pointsGapLimit: 3 // Only analyze teams within this points gap
 };
 
-// OpenAI API configuration
+// OpenRouter API configuration (formerly OpenAI)
 const OPENAI_CONFIG = {
     apiKey: null, // API key will be loaded from .env file
-    model: 'gpt-3.5-turbo',
+    baseURL: 'https://openrouter.ai/api/v1',
+    model: 'openai/gpt-oss-20b:free', //'openai/gpt-4o'
     maxTokens: 500, // Limit response length to optimize costs
     temperature: 0.7,
     retryAttempts: 3,
@@ -29,7 +30,7 @@ const OPENAI_CONFIG = {
     timeoutMs: 30000 // 30 second timeout
 };
 
-let openai = null; // OpenAI client instance
+let openaiInitialized = false; // Track initialization status
 
 // Load API key from config.json file
 async function loadOpenAIKeyFromConfig() {
@@ -45,14 +46,14 @@ async function loadOpenAIKeyFromConfig() {
         if (apiKey && apiKey !== 'your-api-key-here' && apiKey.trim()) {
             OPENAI_CONFIG.apiKey = apiKey.trim();
             initializeOpenAI(OPENAI_CONFIG.apiKey);
-            console.log('✅ OpenAI API key loaded from config.json');
+            console.log('✅ OpenRouter API key loaded from config.json');
             return;
         } else {
-            console.warn('⚠️ No valid OpenAI API key found in config.json');
+            console.warn('⚠️ No valid OpenRouter API key found in config.json');
         }
     } catch (error) {
         console.warn('⚠️ Could not load config.json:', error.message);
-        console.info('💡 Create a config.json file with: {"OPENAI_API_KEY": "your-key-here"}');
+        console.info('💡 Create a config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
     }
 }
 
@@ -73,12 +74,12 @@ async function loadOpenAIKeyFromEnv() {
                 if (apiKey && apiKey !== 'your-api-key-here') {
                     OPENAI_CONFIG.apiKey = apiKey;
                     initializeOpenAI(apiKey);
-                    console.log('✅ OpenAI API key loaded from .env file');
+                    console.log('✅ OpenRouter API key loaded from .env file');
                     return;
                 }
             }
         }
-        console.warn('⚠️ No valid OpenAI API key found in .env file');
+        console.warn('⚠️ No valid OpenRouter API key found in .env file');
     } catch (error) {
         // Don't log .env errors since it's expected to fail often
         console.debug('.env file not accessible via HTTP (this is normal)');
@@ -87,24 +88,16 @@ async function loadOpenAIKeyFromEnv() {
 
 // Initialize OpenAI client
 function initializeOpenAI(apiKey) {
-    if (!window.OpenAI) {
-        console.warn('⚠️ OpenAI SDK not available');
-        return;
-    }
-    
     if (!apiKey) {
-        console.warn('⚠️ No API key provided for OpenAI initialization');
+        console.warn('⚠️ No API key provided for OpenRouter initialization');
         return;
     }
     
     try {
-        openai = new window.OpenAI({
-            apiKey: apiKey,
-            dangerouslyAllowBrowser: true // Required for browser usage
-        });
-        console.log('✅ OpenAI client initialized successfully');
+        OPENAI_CONFIG.apiKey = apiKey;
+        console.log('✅ OpenRouter client initialized successfully');
     } catch (error) {
-        console.error('❌ Failed to initialize OpenAI client:', error);
+        console.error('❌ Failed to initialize OpenRouter client:', error);
     }
 }
 
@@ -145,7 +138,7 @@ function showLoadingMask() {
         const loadingTextP = mask.querySelector('.loading-text p');
         
         const loadingMessages = [
-            'Loading OpenAI SDK for advanced analysis...',
+            'Initializing OpenRouter connection...',
             'Initializing AI models...',
             'Preparing championship analysis engine...',
             'Setting up intelligent predictions...',
@@ -195,13 +188,10 @@ function hideLoadingMask() {
 }
 
 // Initialize OpenAI system (only called if enabled)
-async function initializeOpenAISystem() {
+// Initialize OpenRouter system on page load
+async function initializeOpenRouterSystem() {
     try {
-        // Show loading mask only once
-        showLoadingMask();
-        
-        // Wait for SDK to be available
-        await waitForOpenAISDK();
+        console.log('🔄 Initializing OpenRouter system...');
         
         // Try to load API key in order of preference
         await loadOpenAIKeyFromConfig(); // Try config.json first
@@ -211,52 +201,20 @@ async function initializeOpenAISystem() {
         if (!OPENAI_CONFIG.apiKey) {
             loadOpenAIKeyFromSession(); // Final fallback to session storage
         }
-        
-        // Hide loading mask
-        hideLoadingMask();
-        
+
         // Show success or error toast
-        if (openai && OPENAI_CONFIG.apiKey) {
-            showToast('🤖 AI Engine Ready - Advanced analysis available!', 'success', 5000);
-            console.log('✅ OpenAI system fully initialized');
+        if (OPENAI_CONFIG.apiKey) {
+            showToast('🤖 OpenRouter Engine Ready - Advanced analysis available!', 'success', 5000);
+            console.log('✅ OpenRouter system fully initialized');
         } else {
-            showToast('⚠️ AI Engine unavailable - Using standard analysis', 'warning', 5000);
-            console.log('⚠️ OpenAI system initialization incomplete');
+            showToast('⚠️ OpenRouter Engine unavailable - Using standard analysis', 'warning', 5000);
+            console.log('⚠️ OpenRouter system initialization incomplete - no API key');
         }
         
     } catch (error) {
-        hideLoadingMask();
-        showToast('❌ AI Engine failed to initialize - Using standard analysis', 'error', 5000);
-        console.error('❌ OpenAI system initialization failed:', error);
+        showToast('❌ OpenRouter Engine failed to initialize - Using standard analysis', 'error', 5000);
+        console.error('❌ OpenRouter system initialization failed:', error);
     }
-}
-
-// Wait for OpenAI SDK to be available (background operation)
-function waitForOpenAISDK() {
-    return new Promise((resolve, reject) => {
-        if (window.OpenAI) {
-            console.log('✅ OpenAI SDK already available');
-            resolve();
-            return;
-        }
-        
-        let attempts = 0;
-        const maxAttempts = 50; // 5 seconds total (100ms * 50)
-        
-        const checkInterval = setInterval(() => {
-            attempts++;
-            
-            if (window.OpenAI) {
-                clearInterval(checkInterval);
-                console.log('✅ OpenAI SDK loaded successfully');
-                resolve();
-            } else if (attempts >= maxAttempts) {
-                clearInterval(checkInterval);
-                console.warn('⚠️ OpenAI SDK failed to load after 5 seconds');
-                reject(new Error('OpenAI SDK loading timeout'));
-            }
-        }, 100); // Check every 100ms
-    });
 }
 
 // Load data when page loads
@@ -272,11 +230,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadData();
     showTab('standings');
     
-    // Initialize OpenAI only if enabled
+    // Initialize OpenRouter only if enabled
     if (SIMULATION_CONFIG.useOpenAI) {
-        initializeOpenAISystem();
+        initializeOpenRouterSystem();
     } else {
-        console.log('ℹ️ OpenAI feature disabled, skipping SDK initialization');
+        console.log('ℹ️ OpenRouter feature disabled, skipping initialization');
     }
 });
 
@@ -945,14 +903,14 @@ async function updateSimulation() {
         // Debug logging for OpenAI configuration
         console.log('🔍 OpenAI Debug Info:', {
             useOpenAI: SIMULATION_CONFIG.useOpenAI,
-            openaiClientExists: !!openai,
+            openaiClientExists: !!OPENAI_CONFIG.apiKey,
             apiKeyExists: !!OPENAI_CONFIG.apiKey,
             apiKeyPrefix: OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none'
         });
         
-        // Check if OpenAI is enabled and client is initialized
-        if (SIMULATION_CONFIG.useOpenAI && openai) {
-            console.log('✅ Using OpenAI for simulation analysis');
+        // Check if OpenRouter is enabled and configured
+        if (SIMULATION_CONFIG.useOpenAI && OPENAI_CONFIG.apiKey) {
+            console.log('✅ Using OpenRouter for simulation analysis');
             try {
                 const aiAnalysis = await generateAISimulation(selectedTeamId, selectedTeam);
                 simulationResults.innerHTML = aiAnalysis;
@@ -974,12 +932,12 @@ async function updateSimulation() {
         } else {
             // Use custom championship analysis
             const reason = !SIMULATION_CONFIG.useOpenAI ? 'OpenAI disabled' : 
-                          !openai ? 'OpenAI client not initialized' : 
+                          !OPENAI_CONFIG.apiKey ? 'OpenRouter client not initialized' : 
                           !OPENAI_CONFIG.apiKey ? 'No API key available' : 'Unknown';
                           
             console.log('⚠️ Using fallback analysis because:', {
                 useOpenAI: SIMULATION_CONFIG.useOpenAI,
-                openaiClient: !!openai,
+                openaiClient: !!OPENAI_CONFIG.apiKey,
                 hasApiKey: !!OPENAI_CONFIG.apiKey,
                 reason: reason
             });
@@ -1001,7 +959,7 @@ async function updateSimulation() {
 
 async function generateAISimulation(teamId, team) {
     // Check if OpenAI client is initialized
-    if (!openai) {
+    if (!OPENAI_CONFIG.apiKey) {
         throw new Error('OpenAI client not initialized');
     }
 
@@ -1109,72 +1067,85 @@ function prepareAIContext(teamId, team, standings, nextGameweek) {
 async function queryOpenAI(contextData) {
     const prompt = generateAIPrompt(contextData);
     
-    // Validate OpenAI client is initialized
-    if (!openai) {
-        throw new Error('OpenAI client not initialized. Please check your API key configuration.');
+    // Validate API key is available
+    if (!OPENAI_CONFIG.apiKey) {
+        throw new Error('OpenRouter API key not available. Please check your configuration.');
     }
     
     // Retry logic with exponential backoff
     let lastError;
     for (let attempt = 1; attempt <= OPENAI_CONFIG.retryAttempts; attempt++) {
         try {
-            console.log(`OpenAI API attempt ${attempt}/${OPENAI_CONFIG.retryAttempts}`);
+            console.log(`OpenRouter API attempt ${attempt}/${OPENAI_CONFIG.retryAttempts}`);
             
             // Create abort controller for timeout
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), OPENAI_CONFIG.timeoutMs);
             
-            const response = await Promise.race([
-                openai.chat.completions.create({
-                    model: OPENAI_CONFIG.model,
-                    messages: [
-                        {
-                            role: 'system',
-                            content: 'You are an expert football championship analyst. Provide concise strategic insights about championship scenarios. Focus on key points and be brief.'
-                        },
-                        {
-                            role: 'user',
-                            content: prompt
-                        }
-                    ],
-                    max_tokens: OPENAI_CONFIG.maxTokens, // Cost optimization
-                    temperature: OPENAI_CONFIG.temperature,
-                    // Optional: Add stop sequences to further control response length
-                    stop: ["\n\n\n", "---"]
-                }),
-                new Promise((_, reject) => 
-                    controller.signal.addEventListener('abort', () => 
-                        reject(new Error('Request timeout'))
-                    )
-                )
-            ]);
+            const requestBody = {
+                model: OPENAI_CONFIG.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'You are an expert football championship analyst. Provide concise strategic insights about championship scenarios. Focus on key points and be brief.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: OPENAI_CONFIG.maxTokens,
+                temperature: OPENAI_CONFIG.temperature,
+                stop: ["\n\n\n", "---"]
+            };
+
+            const response = await fetch(`${OPENAI_CONFIG.baseURL}/chat/completions`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${OPENAI_CONFIG.apiKey}`
+                },
+                body: JSON.stringify(requestBody),
+                signal: controller.signal
+            });
             
             clearTimeout(timeoutId);
             
-            // Log and track token usage for cost monitoring
-            if (response.usage) {
-                console.log('Token usage:', {
-                    prompt_tokens: response.usage.prompt_tokens,
-                    completion_tokens: response.usage.completion_tokens,
-                    total_tokens: response.usage.total_tokens,
-                    estimated_cost: '$' + ((response.usage.total_tokens / 1000) * 0.002).toFixed(4)
-                });
-                updateCostEstimate(response.usage);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(`HTTP ${response.status}: ${errorData.error?.message || response.statusText}`);
             }
             
-            return response.choices[0].message.content;
+            const data = await response.json();
+            
+            // Log and track token usage for cost monitoring
+            if (data.usage) {
+                console.log('Token usage:', {
+                    prompt_tokens: data.usage.prompt_tokens,
+                    completion_tokens: data.usage.completion_tokens,
+                    total_tokens: data.usage.total_tokens,
+                    estimated_cost: '$' + ((data.usage.total_tokens / 1000) * 0.002).toFixed(4)
+                });
+                updateCostEstimate(data.usage);
+            }
+            
+            return data.choices[0].message.content;
             
         } catch (error) {
             lastError = error;
-            console.warn(`OpenAI API attempt ${attempt} failed:`, error.message);
+            console.warn(`OpenRouter API attempt ${attempt} failed:`, error.message);
+            
+            // Extract status code from error message for HTTP errors
+            const httpStatusMatch = error.message.match(/HTTP (\d+)/);
+            const statusCode = httpStatusMatch ? parseInt(httpStatusMatch[1]) : null;
             
             // Don't retry on certain errors
-            if (error.status === 401 || error.status === 403 || error.status === 400) {
+            if (statusCode === 401 || statusCode === 403 || statusCode === 400) {
                 break; // Authentication or bad request errors shouldn't be retried
             }
             
             // Handle rate limiting with longer delays
-            if (error.status === 429) {
+            if (statusCode === 429) {
                 const isRateLimit = error.message && error.message.toLowerCase().includes('rate limit');
                 const baseDelay = isRateLimit ? OPENAI_CONFIG.retryDelay * 2 : OPENAI_CONFIG.retryDelay;
                 const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
@@ -3346,7 +3317,7 @@ window.footballAdmin = {
     showConfig: () => {
         console.log('Current Admin Configuration:', ADMIN_CONFIG);
         console.log('OpenAI Configuration:', {
-            clientInitialized: !!openai,
+            clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
             useOpenAI: SIMULATION_CONFIG.useOpenAI,
             model: OPENAI_CONFIG.model,
@@ -3358,7 +3329,7 @@ window.footballAdmin = {
         return { 
             ADMIN_CONFIG, 
             OPENAI_CONFIG: {
-                client: !!openai, 
+                client: !!OPENAI_CONFIG.apiKey, 
                 apiKey: !!OPENAI_CONFIG.apiKey, 
                 enabled: SIMULATION_CONFIG.useOpenAI,
                 model: OPENAI_CONFIG.model,
@@ -3380,7 +3351,7 @@ window.footballAdmin = {
         
         if (!wasEnabled) {
             // Initialize OpenAI if it wasn't enabled before
-            initializeOpenAISystem();
+            initializeOpenRouterSystem();
         } else {
             showToast('OpenAI analysis already enabled', 'info', 3000);
         }
@@ -3394,12 +3365,12 @@ window.footballAdmin = {
     checkOpenAI: () => {
         const status = {
             enabled: SIMULATION_CONFIG.useOpenAI,
-            clientInitialized: !!openai,
+            clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts,
-            readyForUse: SIMULATION_CONFIG.useOpenAI && !!openai && !!OPENAI_CONFIG.apiKey
+            readyForUse: SIMULATION_CONFIG.useOpenAI && !!OPENAI_CONFIG.apiKey
         };
         console.log('🤖 OpenAI Status:', status);
         
@@ -3490,7 +3461,7 @@ window.footballAdmin = {
     },
     debugOpenAI: () => {
         console.log('🔍 Complete OpenAI Debug Report:');
-        console.log('window.OpenAI available:', !!window.OpenAI);
+        console.log('window.fetch available:', !!window.fetch);
         console.log('SIMULATION_CONFIG.useOpenAI:', SIMULATION_CONFIG.useOpenAI, '(from code defaults)');
         console.log('openai client exists:', !!openai);
         console.log('OPENAI_CONFIG.apiKey exists:', !!OPENAI_CONFIG.apiKey);
@@ -3516,7 +3487,7 @@ window.footballAdmin = {
         
         if (!isReady) {
             console.log('❌ Issues preventing OpenAI from working:');
-            if (!window.OpenAI) console.log('  - OpenAI SDK not loaded');
+            if (!window.fetch) console.log('  - Fetch API not available');
             if (!SIMULATION_CONFIG.useOpenAI) console.log('  - OpenAI disabled in config');
             if (!openai) console.log('  - OpenAI client not initialized');
             if (!OPENAI_CONFIG.apiKey) console.log('  - No API key available');
@@ -3524,7 +3495,7 @@ window.footballAdmin = {
         
         return {
             ready: isReady,
-            sdkLoaded: !!window.OpenAI,
+            sdkLoaded: !!window.fetch,
             clientInitialized: !!openai,
             hasApiKey: !!OPENAI_CONFIG.apiKey,
             enabled: SIMULATION_CONFIG.useOpenAI
