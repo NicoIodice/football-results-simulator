@@ -17,6 +17,7 @@
 
         <nav class="tabs">
             <button class="tab-button active" onclick="showTab('standings')">Standings</button>
+            <button class="tab-button" onclick="showTab('teams')">Teams</button>
             <button class="tab-button" onclick="showTab('fixtures')">Fixtures</button>
             <button class="tab-button" onclick="showTab('simulator')">Simulator</button>
             <button class="tab-button" onclick="showTab('forecast')">Forecast</button>
@@ -51,6 +52,90 @@
                             <!-- Standings will be populated by JavaScript -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Teams Tab -->
+            <div id="teams" class="tab-content">
+                <h2>Team Lineup & Squad</h2>
+                <div class="team-selector">
+                    <label for="selected-team-lineup">Select Team:</label>
+                    <select id="selected-team-lineup" onchange="updateTeamLineup()">
+                        <!-- Teams will be populated by JavaScript -->
+                    </select>
+                </div>
+                
+                <div id="team-lineup-content">
+                    <div class="football-field">
+                        <!-- Goalkeeper Area -->
+                        <div class="goalkeeper-area">
+                            <div class="goal">
+                                <div class="goalkeeper-position">
+                                    <div id="goalkeeper" class="player-icon goalkeeper">
+                                        <span class="player-number">1</span>
+                                    </div>
+                                    <div id="goalkeeper-name" class="player-name">Goalkeeper</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Field Players Area -->
+                        <div class="field-players">
+                            <div class="formation-line defense">
+                                <div class="player-position" id="position-2">
+                                    <div class="player-icon defender">
+                                        <span class="player-number">2</span>
+                                    </div>
+                                    <div class="player-name">Defender</div>
+                                </div>
+                                <div class="player-position" id="position-3">
+                                    <div class="player-icon defender">
+                                        <span class="player-number">3</span>
+                                    </div>
+                                    <div class="player-name">Defender</div>
+                                </div>
+                            </div>
+                            
+                            <div class="formation-line midfield">
+                                <div class="player-position" id="position-4">
+                                    <div class="player-icon midfielder">
+                                        <span class="player-number">4</span>
+                                    </div>
+                                    <div class="player-name">Midfielder</div>
+                                </div>
+                            </div>
+                            
+                            <div class="formation-line attack">
+                                <div class="player-position" id="position-5">
+                                    <div class="player-icon forward">
+                                        <span class="player-number">5</span>
+                                    </div>
+                                    <div class="player-name">Forward</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Center Circle -->
+                        <div class="center-circle"></div>
+                        
+                        <!-- Field Lines -->
+                        <div class="field-lines">
+                            <div class="enemy-goal-area"></div>
+                            <div class="penalty-spot enemy-penalty"></div>
+                            <div class="enemy-penalty-arc"></div>
+                            <div class="penalty-area"></div>
+                            <div class="penalty-spot player-penalty"></div>
+                            <div class="goal-area"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bench Area -->
+                    <div class="bench-area">
+                        <h3>🪑 Bench</h3>
+                        <div id="bench-players" class="bench-players">
+                            <!-- Bench players will be populated by JavaScript -->
+                        </div>
+                    </div>
                 </div>
             </div>
 

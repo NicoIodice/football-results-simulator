@@ -3529,3 +3529,199 @@ window.footballAdmin = {
             .catch(err => console.log('.env error:', err.message));
     }
 };
+
+// ===================================
+// TEAMS TAB - LINEUP FUNCTIONALITY
+// ===================================
+
+let teamsData = [];
+
+// Load team data with player information
+async function loadPlayersData() {
+    try {
+        const response = await fetch('./data/teams.json');
+        teamsData = await response.json();
+        console.log('Teams data loaded:', teamsData);
+        populateTeamLineupSelector();
+    } catch (error) {
+        console.error('Error loading teams data:', error);
+    }
+}
+
+// Populate team selector for lineup
+function populateTeamLineupSelector() {
+    const selector = document.getElementById('selected-team-lineup');
+    if (!selector) return;
+    
+    // Clear existing options
+    selector.innerHTML = '<option value="">Select a team...</option>';
+    
+    // Add teams from teams data
+    teamsData.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.id;
+        option.textContent = team.name;
+        selector.appendChild(option);
+    });
+    
+    // Set default team if available
+    const defaultTeam = teamsData.find(team => team.id === 'sporting-esgaios' || team.isDefault);
+    if (defaultTeam) {
+        selector.value = defaultTeam.id;
+        updateTeamLineup();
+    }
+}
+
+// Update team lineup when team selection changes
+function updateTeamLineup() {
+    const selectedTeamId = document.getElementById('selected-team-lineup').value;
+    if (!selectedTeamId) return;
+    
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    if (!team) return;
+    
+    console.log('Updating lineup for team:', team.name);
+    
+    // Update field players
+    updateFieldPlayers(team);
+    
+    // Update bench players
+    updateBenchPlayers(team);
+}
+
+// Update players on the field
+function updateFieldPlayers(team) {
+    const starters = team.players.filter(player => player.isStarter);
+    
+    // Update goalkeeper
+    const goalkeeper = starters.find(p => p.position === 'goalkeeper');
+    if (goalkeeper) {
+        updatePlayerIcon('goalkeeper', goalkeeper);
+        updatePlayerName('goalkeeper-name', goalkeeper);
+    }
+    
+    // Update field positions based on formation
+    const defenders = starters.filter(p => p.position === 'defender');
+    const midfielders = starters.filter(p => p.position === 'midfielder');
+    const forwards = starters.filter(p => p.position === 'forward');
+    
+    // Update defenders (positions 2-3)
+    defenders.forEach((player, index) => {
+        const positionId = `position-${2 + index}`;
+        updatePlayerIcon(positionId, player);
+    });
+    
+    // Update midfielder (position 4)
+    if (midfielders.length > 0) {
+        updatePlayerIcon('position-4', midfielders[0]);
+    }
+    
+    // Update forward (position 5)
+    if (forwards.length > 0) {
+        updatePlayerIcon('position-5', forwards[0]);
+    }
+}
+
+// Update player icon and information
+function updatePlayerIcon(positionId, player) {
+    const positionElement = document.getElementById(positionId);
+    if (!positionElement) return;
+    
+    const playerIcon = positionElement.querySelector('.player-icon');
+    const playerNumber = positionElement.querySelector('.player-number');
+    const playerName = positionElement.querySelector('.player-name');
+    
+    if (playerIcon && playerNumber && playerName) {
+        // Update number
+        playerNumber.textContent = player.number;
+        
+        // Update name
+        playerName.textContent = player.name;
+        
+        // Update position class
+        playerIcon.className = `player-icon ${player.position}`;
+        
+        // Add injury indicator if needed
+        if (player.status === 'injured') {
+            playerIcon.classList.add('player-injured');
+        } else {
+            playerIcon.classList.remove('player-injured');
+        }
+    }
+}
+
+// Update player name (for goalkeeper)
+function updatePlayerName(elementId, player) {
+    const nameElement = document.getElementById(elementId);
+    if (nameElement) {
+        nameElement.textContent = player.name;
+    }
+}
+
+// Update bench players
+function updateBenchPlayers(team) {
+    const benchContainer = document.getElementById('bench-players');
+    if (!benchContainer) return;
+    
+    const benchPlayers = team.players.filter(player => !player.isStarter);
+    
+    // Sort bench players: fit players first, injured players at the bottom
+    benchPlayers.sort((a, b) => {
+        if (a.status === 'injured' && b.status !== 'injured') return 1;
+        if (a.status !== 'injured' && b.status === 'injured') return -1;
+        return 0;
+    });
+    
+    // Clear existing bench players
+    benchContainer.innerHTML = '';
+    
+    // Add bench players
+    benchPlayers.forEach(player => {
+        const benchPlayerElement = createBenchPlayerElement(player);
+        benchContainer.appendChild(benchPlayerElement);
+    });
+}
+
+// Create bench player element
+function createBenchPlayerElement(player) {
+    const playerDiv = document.createElement('div');
+    playerDiv.className = `bench-player ${player.status === 'injured' ? 'injured' : ''}`;
+    
+    const playerIcon = document.createElement('div');
+    playerIcon.className = `bench-player-icon ${player.position}`;
+    playerIcon.textContent = player.number;
+    
+    const playerInfo = document.createElement('div');
+    playerInfo.className = 'bench-player-info';
+    
+    const playerName = document.createElement('div');
+    playerName.className = 'bench-player-name';
+    playerName.textContent = player.name;
+    
+    const playerPosition = document.createElement('div');
+    playerPosition.className = 'bench-player-position';
+    playerPosition.textContent = player.position;
+    
+    playerInfo.appendChild(playerName);
+    playerInfo.appendChild(playerPosition);
+    
+    playerDiv.appendChild(playerIcon);
+    playerDiv.appendChild(playerInfo);
+    
+    // Add injury indicator if needed
+    if (player.status === 'injured') {
+        const injuryIndicator = document.createElement('div');
+        injuryIndicator.className = 'injury-indicator';
+        injuryIndicator.textContent = '🩹';
+        injuryIndicator.title = player.injury || 'Injured';
+        playerDiv.appendChild(injuryIndicator);
+    }
+    
+    return playerDiv;
+}
+
+// Initialize teams tab when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Load players data when page loads
+    loadPlayersData();
+});

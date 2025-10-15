@@ -2104,3 +2104,468 @@ tr.first-place .goal-diff-negative {
         flex-shrink: 0 !important;
     }
 }
+
+/* ===================================
+   TEAMS TAB - FOOTBALL FIELD STYLES
+   =================================== */
+
+/* Team selector for lineup */
+.team-selector {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.team-selector label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 100px;
+}
+
+.team-selector select {
+    padding: 8px 12px;
+    border: 2px solid #3498db;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 1rem;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.team-selector select:focus {
+    outline: none;
+    border-color: #2980b9;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Main team lineup container */
+#team-lineup-content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+/* Football Field Container */
+.football-field {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+    height: 400px;
+    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    border: 3px solid #1e8449;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Field Lines and Markings */
+.field-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+}
+
+/* Middle Field Line */
+.field-lines::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.8);
+    transform: translateY(-50%);
+}
+
+/* Player Goal Area Box inside penalty area */
+.penalty-area::before {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-bottom: none;
+}
+
+/* Player Penalty Arc (half-moon) */
+.penalty-area::after {
+    content: '';
+    position: absolute;
+    bottom: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-bottom: none;
+    border-radius: 50px 50px 0 0;
+}
+
+/* Goal Area (Player's Goal) */
+.goal-area {
+    position: absolute;
+    bottom: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 4px 4px 0 0;
+}
+
+/* Enemy Goal Area */
+.enemy-goal-area {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 0 0 4px 4px;
+}
+
+/* Enemy Goal 6-yard box */
+.enemy-goal-area::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 40px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-top: none;
+}
+
+/* Enemy Penalty Arc (half-moon) */
+.enemy-penalty-arc {
+    position: absolute;
+    top: 45px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50px;
+    height: 25px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-top: none;
+    border-radius: 0 0 50px 50px;
+}
+
+/* Penalty Spots */
+.penalty-spot {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.penalty-spot.player-penalty {
+    bottom: 25px;
+}
+
+.penalty-spot.enemy-penalty {
+    top: 25px;
+}
+
+/* Center Circle */
+.center-circle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100px;
+    height: 100px;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+}
+
+/* Center Spot */
+.center-circle::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    z-index: 2;
+}
+
+/* Goalkeeper Area */
+.goalkeeper-area {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+}
+
+.goal {
+    position: relative;
+    width: 80px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.goalkeeper-position {
+    text-align: center;
+}
+
+/* Field Players Container */
+.field-players {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    z-index: 5;
+}
+
+/* Formation Lines */
+.formation-line {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 40px;
+}
+
+.formation-line.defense {
+    margin-top: 20px;
+}
+
+.formation-line.midfield {
+    margin: 20px 0;
+}
+
+.formation-line.attack {
+    margin-bottom: 20px;
+}
+
+/* Player Position Container */
+.player-position {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+}
+
+/* Player Icons */
+.player-icon {
+    position: relative;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.9rem;
+    border: 2px solid white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.player-icon:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* Player Position-specific Colors */
+.player-icon.goalkeeper {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+}
+
+.player-icon.defender {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.player-icon.midfielder {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.player-icon.forward {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+/* Player Numbers */
+.player-number {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* Player Names */
+.player-name {
+    margin-top: 5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #2c3e50;
+    text-align: center;
+    max-width: 80px;
+    word-wrap: break-word;
+    line-height: 1.2;
+}
+
+/* Bench Area */
+.bench-area {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    border: 2px solid #bdc3c7;
+    height: fit-content;
+}
+
+.bench-area h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.bench-players {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+/* Bench Player Cards */
+.bench-player {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #95a5a6;
+    transition: background-color 0.2s ease;
+}
+
+.bench-player:hover {
+    background: #ecf0f1;
+}
+
+.bench-player-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.8rem;
+    border: 1px solid white;
+    flex-shrink: 0;
+}
+
+.bench-player-info {
+    flex: 1;
+}
+
+.bench-player-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.9rem;
+}
+
+.bench-player-position {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    text-transform: capitalize;
+}
+
+/* Injury Status */
+.player-injured {
+    position: relative;
+}
+
+.player-injured::after {
+    content: "🩹";
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    font-size: 1.2rem;
+    z-index: 15;
+}
+
+.bench-player.injured {
+    border-left-color: #e74c3c;
+    background: #fdf2f2;
+}
+
+.bench-player.injured .bench-player-name {
+    color: #e74c3c;
+}
+
+.injury-indicator {
+    font-size: 1rem;
+    margin-left: auto;
+}
+
+/* Mobile Responsive Design for Teams Tab */
+@media (max-width: 768px) {
+    #team-lineup-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .football-field {
+        height: 350px;
+        max-width: 100%;
+    }
+    
+    .player-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.8rem;
+    }
+    
+    .player-name {
+        font-size: 0.7rem;
+        max-width: 60px;
+    }
+    
+    .formation-line {
+        padding: 0 20px;
+    }
+    
+    .bench-area {
+        order: -1;
+        margin-bottom: 20px;
+    }
+    
+    .bench-players {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 8px;
+    }
+    
+    .team-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .team-selector label {
+        min-width: auto;
+    }
+}
