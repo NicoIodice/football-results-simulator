@@ -2310,7 +2310,7 @@ tr.first-place .goal-diff-negative {
     position: absolute;
     bottom: 10px;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translateX(-30%);
     z-index: 10;
 }
 
@@ -2343,21 +2343,37 @@ tr.first-place .goal-diff-negative {
 /* Formation Lines */
 .formation-line {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
     padding: 0 40px;
+    gap: 80px;
 }
 
 .formation-line.defense {
     margin-top: 20px;
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-47%);
+    width: 100%;
 }
 
 .formation-line.midfield {
     margin: 20px 0;
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-47%);
+    width: 100%;
 }
 
 .formation-line.attack {
     margin-bottom: 20px;
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    transform: translateX(-47%);
+    width: 100%;
 }
 
 /* Player Position Container */
@@ -2447,15 +2463,15 @@ tr.first-place .goal-diff-negative {
 
 /* Player Names */
 .player-name {
-    margin-top: 5px;
+    margin-top: 3px;
     font-size: 0.8rem;
     font-weight: 600;
     color: #2c3e50;
-    text-align: center;
+    text-align: left;
     max-width: 80px;
     width: 100%;
     word-wrap: break-word;
-    line-height: 1.2;
+    line-height: 1.0;
     display: block;
 }
 
@@ -2510,6 +2526,23 @@ tr.first-place .goal-diff-negative {
     font-size: 0.8rem;
     border: 1px solid white;
     flex-shrink: 0;
+}
+
+/* Bench Player Position-specific Colors */
+.bench-player-icon.goalkeeper {
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+}
+
+.bench-player-icon.defender {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.bench-player-icon.midfielder {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.bench-player-icon.forward {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
 .bench-player-info {

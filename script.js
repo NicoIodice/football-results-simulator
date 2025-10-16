@@ -8,8 +8,8 @@ let selectedGroupId = null;
 
 // Admin configuration
 const ADMIN_CONFIG = {
-    role: 'user',
-    validateTime: true // Enable/disable time validation for adding results
+    role: 'admin',
+    validateTime: false // Enable/disable time validation for adding results
 };
 
 // Configuration for simulation type
@@ -228,6 +228,10 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Load data first (non-blocking)
     await loadData();
+    
+    // Load any pending results from session storage (mobile)
+    loadPendingResults();
+    
     showTab('standings');
     
     // Initialize OpenRouter only if enabled
@@ -3218,8 +3222,12 @@ function submitResult(event) {
     // Hide modal
     hideAddResultModal();
     
-    // Show success toast with instructions
-    showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
+    // Show success toast with instructions based on device type
+    if (isMobileDevice()) {
+        showToast('Result added! Data stored in session (will be lost on refresh)', 'success');
+    } else {
+        showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
+    }
     
     // Update all displays
     updateAllTabs();
@@ -3267,8 +3275,48 @@ function toggleTimeValidation() {
     showToast(`Time validation ${status}`, 'info');
 }
 
+// Function to load pending results from session storage
+function loadPendingResults() {
+    const pendingResults = sessionStorage.getItem('pendingResults');
+    if (pendingResults && isMobileDevice()) {
+        try {
+            const sessionResults = JSON.parse(pendingResults);
+            // Merge session results with loaded results, avoiding duplicates
+            sessionResults.forEach(sessionResult => {
+                const exists = results.some(result => 
+                    result.homeTeam === sessionResult.homeTeam && 
+                    result.awayTeam === sessionResult.awayTeam &&
+                    result.date === sessionResult.date
+                );
+                if (!exists) {
+                    results.push(sessionResult);
+                }
+            });
+            console.log('Loaded pending results from session');
+            showToast('Previous session data restored', 'info');
+        } catch (error) {
+            console.error('Error loading pending results:', error);
+        }
+    }
+}
+
+// Function to detect if the device is mobile
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+           window.innerWidth <= 768;
+}
+
 // Function to download updated results.json
 function downloadUpdatedResults() {
+    // Check if it's a mobile device
+    if (isMobileDevice()) {
+        // On mobile, just store in session and show different message
+        sessionStorage.setItem('pendingResults', JSON.stringify(results));
+        console.log('Results stored in session (mobile device)');
+        return;
+    }
+    
+    // On desktop, proceed with download
     const dataStr = JSON.stringify(results, null, 2);
     const dataBlob = new Blob([dataStr], {type: 'application/json'});
     
@@ -3284,8 +3332,22 @@ function downloadUpdatedResults() {
 function exportAllResults() {
     console.log('All Current Results (copy this to results.json):');
     console.log(JSON.stringify(results, null, 2));
-    downloadUpdatedResults();
+    
+    if (!isMobileDevice()) {
+        downloadUpdatedResults();
+    } else {
+        // On mobile, just show the data in console and update session
+        sessionStorage.setItem('pendingResults', JSON.stringify(results));
+        showToast('Results available in browser console (F12)', 'info');
+    }
+    
     return results;
+}
+
+// Function to clear pending session data
+function clearSessionData() {
+    sessionStorage.removeItem('pendingResults');
+    showToast('Session data cleared', 'info');
 }
 
 // Cost and usage tracking
@@ -3340,6 +3402,7 @@ window.footballAdmin = {
     },
     exportResults: exportAllResults,
     downloadResults: downloadUpdatedResults,
+    clearSessionData: clearSessionData,
     reloadPage: () => {
         showToast('Reloading page to read from updated file...', 'info');
         setTimeout(() => location.reload(), 1000);
@@ -3639,7 +3702,7 @@ function validateFutsalFormation(formation) {
 
 // Clear all field positions
 function clearFieldPositions() {
-    for (let i = 2; i <= 5; i++) {
+    for (let i = 2; i <= 7; i++) {
         const position = document.getElementById(`position-${i}`);
         if (position) {
             position.style.display = 'none';
@@ -3669,20 +3732,20 @@ function positionPlayers(positionType, players, maxPlayers) {
 // Get available positions based on formation needs
 function getAvailablePositions(positionType, count) {
     const allPositions = {
-        'defender': ['position-2', 'position-3'],
-        'midfielder': ['position-3', 'position-4'], 
-        'forward': ['position-4', 'position-5']
+        'defender': ['position-2', 'position-3'],     // Only defensive positions
+        'midfielder': ['position-4', 'position-6'],   // Midfield positions  
+        'forward': ['position-5', 'position-7']       // Only attacking positions
     };
     
     const positions = allPositions[positionType] || [];
     
     // Return positions based on count needed
     if (count === 1) {
-        // For 1 player, use the preferred position (first in array)
+        // For 1 player, use the first available position for that type
         return [positions[0]];
     } else if (count === 2) {
-        // For 2 players, use both available positions
-        return positions;
+        // For 2 players, use available positions for that type
+        return positions.slice(0, 2);
     }
     
     return positions.slice(0, count);
