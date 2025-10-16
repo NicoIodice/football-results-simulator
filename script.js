@@ -3930,6 +3930,61 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     playerDiv.addEventListener('dragstart', playerDiv._dragStartHandler);
     playerDiv.addEventListener('dragend', playerDiv._dragEndHandler);
     
+    // Touch support for mobile
+    let touchStartData = null;
+    
+    // Remove existing touch listeners to prevent duplicates
+    playerDiv.removeEventListener('touchstart', playerDiv._touchStartHandler);
+    playerDiv.removeEventListener('touchend', playerDiv._touchEndHandler);
+    
+    playerDiv._touchStartHandler = function(e) {
+        e.preventDefault();
+        console.log('Bench touch start for player:', player.name);
+        touchStartData = {
+            playerId: player.id,
+            playerPosition: player.position,
+            isBenchPlayer: true,
+            sourceElement: 'bench'
+        };
+        
+        playerDiv.classList.add('dragging');
+        playerDiv.style.cursor = 'grabbing';
+        showBenchDropZones(player.position);
+    };
+    
+    playerDiv._touchEndHandler = function(e) {
+        e.preventDefault();
+        console.log('Bench touch end for player:', player.name);
+        
+        if (touchStartData) {
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            // Check if dropped on field position
+            const targetFieldPosition = elementBelow?.closest('.player-position');
+            if (targetFieldPosition && isValidDropPosition(touchStartData.playerPosition, targetFieldPosition.id)) {
+                console.log('Bench player dropped on field position:', targetFieldPosition.id);
+                moveBenchPlayerToField(touchStartData, targetFieldPosition.id);
+                showToast(`${player.name} moved to ${getPositionDisplayName(targetFieldPosition.id)}`, 'success');
+            }
+            // Check if dropped on bench area
+            else if (elementBelow?.closest('#bench-players')) {
+                console.log('Bench player dropped on bench area');
+                // Handle bench reordering if needed
+                showToast(`${player.name} reordered in bench`, 'info');
+            }
+        }
+        
+        playerDiv.classList.remove('dragging');
+        playerDiv.style.cursor = 'grab';
+        hideBenchDropZones();
+        touchStartData = null;
+    };
+    
+    // Attach touch events
+    playerDiv.addEventListener('touchstart', playerDiv._touchStartHandler);
+    playerDiv.addEventListener('touchend', playerDiv._touchEndHandler);
+    
     console.log('Bench drag and drop setup completed for:', player.name);
 }
 
