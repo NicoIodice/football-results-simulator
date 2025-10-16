@@ -3403,6 +3403,7 @@ window.footballAdmin = {
     exportResults: exportAllResults,
     downloadResults: downloadUpdatedResults,
     clearSessionData: clearSessionData,
+    testDragDrop: testDragAndDrop,
     reloadPage: () => {
         showToast('Reloading page to read from updated file...', 'info');
         setTimeout(() => location.reload(), 1000);
@@ -3797,7 +3798,488 @@ function updatePlayerIcon(positionId, player) {
         } else {
             playerIcon.classList.remove('player-injured');
         }
+        
+        // Add drag-and-drop functionality
+        setupPlayerDragAndDrop(playerIcon, positionId, player);
     }
+}
+
+// Drag and Drop Functionality
+function setupPlayerDragAndDrop(playerIcon, positionId, player) {
+    if (!playerIcon) return;
+    
+    // Make the player icon draggable
+    playerIcon.draggable = true;
+    
+    // Store player data on the element
+    playerIcon.dataset.playerId = player.id;
+    playerIcon.dataset.playerPosition = player.position;
+    playerIcon.dataset.currentPositionId = positionId;
+    
+    // Remove existing event listeners to prevent duplicates
+    playerIcon.removeEventListener('dragstart', playerIcon._dragStartHandler);
+    playerIcon.removeEventListener('dragend', playerIcon._dragEndHandler);
+    playerIcon.removeEventListener('touchstart', playerIcon._touchStartHandler);
+    playerIcon.removeEventListener('touchend', playerIcon._touchEndHandler);
+    
+    // Create and store event handlers
+    playerIcon._dragStartHandler = function(e) {
+        console.log('Drag start for player:', player.name);
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            playerId: player.id,
+            playerPosition: player.position,
+            sourcePositionId: positionId
+        }));
+        
+        playerIcon.classList.add('dragging');
+        showDropZones(player.position);
+    };
+    
+    playerIcon._dragEndHandler = function(e) {
+        console.log('Drag end for player:', player.name);
+        playerIcon.classList.remove('dragging');
+        hideDropZones();
+    };
+    
+    // Attach drag events
+    playerIcon.addEventListener('dragstart', playerIcon._dragStartHandler);
+    playerIcon.addEventListener('dragend', playerIcon._dragEndHandler);
+    
+    // Touch support for mobile
+    let touchStartData = null;
+    
+    playerIcon._touchStartHandler = function(e) {
+        e.preventDefault();
+        console.log('Touch start for player:', player.name);
+        touchStartData = {
+            playerId: player.id,
+            playerPosition: player.position,
+            sourcePositionId: positionId
+        };
+        
+        playerIcon.classList.add('dragging');
+        showDropZones(player.position);
+    };
+    
+    playerIcon._touchEndHandler = function(e) {
+        e.preventDefault();
+        console.log('Touch end for player:', player.name);
+        
+        if (touchStartData) {
+            const touch = e.changedTouches[0];
+            const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+            const targetPosition = elementBelow?.closest('.player-position');
+            
+            if (targetPosition && isValidDropPosition(touchStartData.playerPosition, targetPosition.id)) {
+                swapPlayers(touchStartData.sourcePositionId, targetPosition.id);
+                showToast(`Player moved to ${getPositionDisplayName(targetPosition.id)}`, 'success');
+            }
+        }
+        
+        playerIcon.classList.remove('dragging');
+        hideDropZones();
+        touchStartData = null;
+    };
+    
+    playerIcon.addEventListener('touchstart', playerIcon._touchStartHandler);
+    playerIcon.addEventListener('touchend', playerIcon._touchEndHandler);
+    
+    console.log('Drag and drop setup completed for:', player.name, 'at position:', positionId);
+}
+
+// Bench Player Drag and Drop Functionality
+function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
+    if (!playerDiv || !playerIcon) return;
+    
+    // Make the bench player draggable
+    playerDiv.draggable = true;
+    playerDiv.style.cursor = 'grab';
+    
+    // Store player data on the element
+    playerDiv.dataset.playerId = player.id;
+    playerDiv.dataset.playerPosition = player.position;
+    playerDiv.dataset.isBenchPlayer = 'true';
+    
+    // Remove existing event listeners to prevent duplicates
+    playerDiv.removeEventListener('dragstart', playerDiv._dragStartHandler);
+    playerDiv.removeEventListener('dragend', playerDiv._dragEndHandler);
+    
+    // Create and store event handlers
+    playerDiv._dragStartHandler = function(e) {
+        console.log('Bench drag start for player:', player.name);
+        e.dataTransfer.setData('text/plain', JSON.stringify({
+            playerId: player.id,
+            playerPosition: player.position,
+            isBenchPlayer: true,
+            sourceElement: 'bench'
+        }));
+        
+        playerDiv.classList.add('dragging');
+        playerDiv.style.cursor = 'grabbing';
+        showBenchDropZones(player.position);
+    };
+    
+    playerDiv._dragEndHandler = function(e) {
+        console.log('Bench drag end for player:', player.name);
+        playerDiv.classList.remove('dragging');
+        playerDiv.style.cursor = 'grab';
+        hideBenchDropZones();
+    };
+    
+    // Attach drag events
+    playerDiv.addEventListener('dragstart', playerDiv._dragStartHandler);
+    playerDiv.addEventListener('dragend', playerDiv._dragEndHandler);
+    
+    console.log('Bench drag and drop setup completed for:', player.name);
+}
+
+// Show drop zones for bench players (field positions + bench area)
+function showBenchDropZones(playerPosition) {
+    console.log('Showing bench drop zones for position:', playerPosition);
+    
+    // Show field drop zones (same as field players)
+    showDropZones(playerPosition);
+    
+    // Also set up bench area as drop zone for reordering
+    const benchArea = document.getElementById('bench-players');
+    if (benchArea) {
+        benchArea.classList.add('bench-drop-zone');
+        setupBenchDropZone(benchArea);
+    }
+}
+
+// Hide bench drop zones
+function hideBenchDropZones() {
+    hideDropZones(); // Hide field drop zones
+    
+    const benchArea = document.getElementById('bench-players');
+    if (benchArea) {
+        benchArea.classList.remove('bench-drop-zone');
+        removeBenchDropZone(benchArea);
+    }
+}
+
+// Setup bench area as drop zone
+function setupBenchDropZone(benchArea) {
+    console.log('Setting up bench drop zone');
+    
+    function handleBenchDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    }
+    
+    function handleBenchDrop(e) {
+        e.preventDefault();
+        console.log('Drop on bench area');
+        
+        try {
+            const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+            console.log('Bench drop data:', dragData);
+            
+            if (dragData.isBenchPlayer) {
+                // Reordering within bench - handled by the bench container
+                console.log('Bench player reordering');
+            } else {
+                // Field player moving to bench
+                console.log('Field player moving to bench');
+                moveFieldPlayerToBench(dragData);
+            }
+        } catch (error) {
+            console.error('Bench drop error:', error);
+        }
+        
+        hideBenchDropZones();
+    }
+    
+    // Remove existing listeners first
+    if (benchArea._benchDragOverHandler) {
+        benchArea.removeEventListener('dragover', benchArea._benchDragOverHandler);
+    }
+    if (benchArea._benchDropHandler) {
+        benchArea.removeEventListener('drop', benchArea._benchDropHandler);
+    }
+    
+    benchArea.addEventListener('dragover', handleBenchDragOver);
+    benchArea.addEventListener('drop', handleBenchDrop);
+    
+    // Store event handlers for cleanup
+    benchArea._benchDragOverHandler = handleBenchDragOver;
+    benchArea._benchDropHandler = handleBenchDrop;
+}
+
+// Remove bench drop zone handlers
+function removeBenchDropZone(benchArea) {
+    if (benchArea._benchDragOverHandler) {
+        benchArea.removeEventListener('dragover', benchArea._benchDragOverHandler);
+        delete benchArea._benchDragOverHandler;
+    }
+    
+    if (benchArea._benchDropHandler) {
+        benchArea.removeEventListener('drop', benchArea._benchDropHandler);
+        delete benchArea._benchDropHandler;
+    }
+}
+
+// Show valid drop zones for a player position
+function showDropZones(playerPosition) {
+    console.log('Showing drop zones for position:', playerPosition);
+    const allPositions = document.querySelectorAll('.player-position');
+    console.log('Found positions:', allPositions.length);
+    
+    allPositions.forEach(position => {
+        const positionId = position.id;
+        const isValidDrop = isValidDropPosition(playerPosition, positionId);
+        
+        console.log(`Position ${positionId}: valid=${isValidDrop}`);
+        
+        position.classList.add('drop-zone');
+        
+        if (isValidDrop) {
+            position.classList.add('valid-drop');
+            setupDropZone(position);
+        } else {
+            position.classList.add('invalid-drop');
+        }
+    });
+}
+
+// Hide all drop zones
+function hideDropZones() {
+    const allPositions = document.querySelectorAll('.player-position');
+    
+    allPositions.forEach(position => {
+        position.classList.remove('drop-zone', 'valid-drop', 'invalid-drop');
+        removeDropZone(position);
+    });
+}
+
+// Check if a position is valid for a player type
+function isValidDropPosition(playerPosition, targetPositionId) {
+    const positionRules = {
+        'defender': ['position-2', 'position-3'],
+        'midfielder': ['position-4', 'position-6'],
+        'forward': ['position-5', 'position-7'],
+        'goalkeeper': ['goalkeeper'] // Goalkeepers can only go to goalkeeper position
+    };
+    
+    return positionRules[playerPosition]?.includes(targetPositionId) || false;
+}
+
+// Move field player to bench
+function moveFieldPlayerToBench(dragData) {
+    const selectedTeamId = document.getElementById('selected-team-lineup').value;
+    if (!selectedTeamId) return;
+    
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    if (!team) return;
+    
+    const player = team.players.find(p => p.id === dragData.playerId);
+    if (!player) return;
+    
+    // Set player as non-starter (move to bench)
+    player.isStarter = false;
+    
+    // Clear the field position
+    const sourceElement = document.getElementById(dragData.sourcePositionId);
+    if (sourceElement) {
+        sourceElement.style.display = 'none';
+    }
+    
+    // Refresh the team lineup to update both field and bench
+    updateTeamLineup();
+    
+    showToast(`${player.name} moved to bench`, 'success');
+}
+
+// Move bench player to field position
+function moveBenchPlayerToField(dragData, targetPositionId) {
+    const selectedTeamId = document.getElementById('selected-team-lineup').value;
+    if (!selectedTeamId) return;
+    
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    if (!team) return;
+    
+    const benchPlayer = team.players.find(p => p.id === dragData.playerId);
+    if (!benchPlayer) return;
+    
+    // Check if target position is occupied
+    const targetElement = document.getElementById(targetPositionId);
+    const targetPlayerIcon = targetElement?.querySelector('.player-icon');
+    
+    if (targetPlayerIcon && targetElement.style.display !== 'none') {
+        // Position is occupied - swap the field player to bench
+        const fieldPlayerId = targetPlayerIcon.dataset.playerId;
+        const fieldPlayer = team.players.find(p => p.id === fieldPlayerId);
+        
+        if (fieldPlayer) {
+            fieldPlayer.isStarter = false; // Move field player to bench
+        }
+    }
+    
+    // Move bench player to field
+    benchPlayer.isStarter = true;
+    
+    // Refresh the team lineup
+    updateTeamLineup();
+    
+    showToast(`${benchPlayer.name} moved to field`, 'success');
+}
+
+// Setup drop zone event handlers
+function setupDropZone(positionElement) {
+    console.log('Setting up drop zone for:', positionElement.id);
+    
+    function handleDragOver(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        console.log('Drag over:', positionElement.id);
+    }
+    
+    function handleDrop(e) {
+        e.preventDefault();
+        console.log('Drop on:', positionElement.id);
+        
+        try {
+            const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const targetPositionId = positionElement.id;
+            
+            console.log('Drop data:', dragData);
+            console.log('Target position:', targetPositionId);
+            
+            if (isValidDropPosition(dragData.playerPosition, targetPositionId)) {
+                console.log('Valid drop');
+                
+                if (dragData.isBenchPlayer) {
+                    // Bench player moving to field
+                    moveBenchPlayerToField(dragData, targetPositionId);
+                } else {
+                    // Field player moving to another field position
+                    swapPlayers(dragData.sourcePositionId, targetPositionId);
+                }
+                
+                showToast(`Player moved to ${getPositionDisplayName(targetPositionId)}`, 'success');
+            } else {
+                console.log('Invalid drop position');
+            }
+        } catch (error) {
+            console.error('Drop error:', error);
+        }
+        
+        hideDropZones();
+    }
+    
+    // Remove existing listeners first
+    if (positionElement._dragOverHandler) {
+        positionElement.removeEventListener('dragover', positionElement._dragOverHandler);
+    }
+    if (positionElement._dropHandler) {
+        positionElement.removeEventListener('drop', positionElement._dropHandler);
+    }
+    
+    positionElement.addEventListener('dragover', handleDragOver);
+    positionElement.addEventListener('drop', handleDrop);
+    
+    // Store event handlers for cleanup
+    positionElement._dragOverHandler = handleDragOver;
+    positionElement._dropHandler = handleDrop;
+}
+
+// Remove drop zone event handlers
+function removeDropZone(positionElement) {
+    if (positionElement._dragOverHandler) {
+        positionElement.removeEventListener('dragover', positionElement._dragOverHandler);
+        delete positionElement._dragOverHandler;
+    }
+    
+    if (positionElement._dropHandler) {
+        positionElement.removeEventListener('drop', positionElement._dropHandler);
+        delete positionElement._dropHandler;
+    }
+}
+
+// Swap players between positions
+function swapPlayers(sourcePositionId, targetPositionId) {
+    const selectedTeamId = document.getElementById('selected-team-lineup').value;
+    if (!selectedTeamId) return;
+    
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    if (!team) return;
+    
+    const sourceElement = document.getElementById(sourcePositionId);
+    const targetElement = document.getElementById(targetPositionId);
+    
+    if (!sourceElement || !targetElement) return;
+    
+    // Get current players
+    const sourcePlayerIcon = sourceElement.querySelector('.player-icon');
+    const targetPlayerIcon = targetElement.querySelector('.player-icon');
+    
+    if (!sourcePlayerIcon) return;
+    
+    const sourcePlayerId = sourcePlayerIcon.dataset.playerId;
+    
+    // Find the players in the team data
+    const sourcePlayer = team.players.find(p => p.id === sourcePlayerId);
+    
+    if (sourcePlayer) {
+        // If target position is empty, just move the player
+        if (!targetPlayerIcon || targetElement.style.display === 'none') {
+            // Clear source position
+            sourceElement.style.display = 'none';
+            
+            // Show and update target position
+            targetElement.style.display = 'block';
+            updatePlayerIcon(targetPositionId, sourcePlayer);
+        } else {
+            // If target has a player, swap them
+            const targetPlayerId = targetPlayerIcon.dataset.playerId;
+            const targetPlayer = team.players.find(p => p.id === targetPlayerId);
+            
+            if (targetPlayer) {
+                updatePlayerIcon(sourcePositionId, targetPlayer);
+                updatePlayerIcon(targetPositionId, sourcePlayer);
+            }
+        }
+    }
+}
+
+// Get display name for position
+function getPositionDisplayName(positionId) {
+    const positionNames = {
+        'position-2': 'Left Defense',
+        'position-3': 'Right Defense', 
+        'position-4': 'Left Midfield',
+        'position-6': 'Right Midfield',
+        'position-5': 'Left Attack',
+        'position-7': 'Right Attack',
+        'goalkeeper': 'Goalkeeper'
+    };
+    
+    return positionNames[positionId] || positionId;
+}
+
+// Debug function to test drag and drop setup
+function testDragAndDrop() {
+    console.log('=== TESTING DRAG AND DROP SETUP ===');
+    
+    const allPlayerIcons = document.querySelectorAll('.player-icon');
+    console.log('Found player icons:', allPlayerIcons.length);
+    
+    allPlayerIcons.forEach((icon, index) => {
+        console.log(`Player ${index + 1}:`);
+        console.log('  - Draggable:', icon.draggable);
+        console.log('  - Has dataset:', !!icon.dataset.playerId);
+        console.log('  - Position:', icon.dataset.playerPosition);
+        console.log('  - Current pos:', icon.dataset.currentPositionId);
+        console.log('  - Classes:', icon.className);
+    });
+    
+    const allPositions = document.querySelectorAll('.player-position');
+    console.log('Found position elements:', allPositions.length);
+    
+    allPositions.forEach((pos, index) => {
+        console.log(`Position ${index + 1}: ${pos.id} - Display: ${pos.style.display}`);
+    });
 }
 
 // Update player name (for goalkeeper)
@@ -3860,6 +4342,14 @@ function createBenchPlayerElement(player) {
     
     playerDiv.appendChild(playerIcon);
     playerDiv.appendChild(playerInfo);
+    
+    // Add drag-and-drop functionality for non-injured players
+    if (player.status !== 'injured') {
+        setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player);
+    } else {
+        // Add disabled styling for injured players
+        playerDiv.classList.add('drag-disabled');
+    }
     
     // Add injury indicator if needed
     if (player.status === 'injured') {

@@ -2400,8 +2400,63 @@ tr.first-place .goal-diff-negative {
     font-size: 0.9rem;
     border: 2px solid white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
+    cursor: grab;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    user-select: none;
+}
+
+/* Drag and Drop States */
+.player-icon:active {
+    cursor: grabbing;
+}
+
+.player-icon.dragging {
+    opacity: 0.7;
+    transform: scale(1.1);
+    z-index: 1000;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* Touch support for mobile */
+@media (max-width: 768px) {
+    .player-icon {
+        cursor: pointer;
+    }
+    
+    .player-icon.dragging {
+        transform: scale(1.2);
+    }
+}
+
+.player-position.drop-zone {
+    position: relative;
+}
+
+.player-position.drop-zone::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px dashed rgba(255, 255, 255, 0.6);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.player-position.drop-zone.valid-drop::after {
+    opacity: 1;
+}
+
+.player-position.drop-zone.invalid-drop::after {
+    background: rgba(255, 0, 0, 0.2);
+    border-color: rgba(255, 0, 0, 0.5);
+    opacity: 1;
 }
 
 .player-icon:hover {
@@ -2543,6 +2598,36 @@ tr.first-place .goal-diff-negative {
 
 .bench-player-icon.forward {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+/* Bench Drag and Drop Styles */
+.bench-player.dragging {
+    opacity: 0.7;
+    transform: scale(1.05);
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    cursor: grabbing !important;
+}
+
+.bench-player.drag-disabled {
+    opacity: 0.6;
+    cursor: not-allowed !important;
+}
+
+.bench-player.drag-disabled .bench-player-icon {
+    filter: grayscale(50%);
+}
+
+.bench-drop-zone {
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.3);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.bench-drop-zone:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.5);
 }
 
 .bench-player-info {
