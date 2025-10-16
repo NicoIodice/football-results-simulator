@@ -9,7 +9,7 @@ let selectedGroupId = null;
 // Admin configuration
 const ADMIN_CONFIG = {
     role: 'admin',
-    validateTime: false // Enable/disable time validation for adding results
+    validateTime: true // Enable/disable time validation for adding results
 };
 
 // Configuration for simulation type
@@ -3179,11 +3179,20 @@ function validateMatchTime(matchDate, matchTime) {
         return true; // Skip validation if disabled
     }
     
-    // Create match datetime
-    const matchDateTime = new Date(`${matchDate}T${matchTime}`);
+    // Create match datetime - using local timezone
+    const matchDateTime = new Date(`${matchDate}T${matchTime}:00`);
     const currentDateTime = new Date();
     
-    // Check if match time has passed
+    // Debug logging (can be removed later)
+    console.log('Match time validation:', {
+        matchDate,
+        matchTime,
+        matchDateTime: matchDateTime.toLocaleString(),
+        currentDateTime: currentDateTime.toLocaleString(),
+        canAddResult: currentDateTime >= matchDateTime
+    });
+    
+    // Check if current time has reached or passed the match time
     return currentDateTime >= matchDateTime;
 }
 
