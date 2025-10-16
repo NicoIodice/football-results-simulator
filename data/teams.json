@@ -5,7 +5,7 @@
     "league": "CTW",
     "fullName": "LOGAN FC (CTW)",
     "groupId": "group-c",
-    "formation": "4-1-1",
+    "formation": "2-1-1",
     "players": [
       {
         "id": "logan-gk",
@@ -13,7 +13,8 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "logan-def1",
@@ -21,7 +22,8 @@
         "number": 2,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "logan-def2",
@@ -29,7 +31,8 @@
         "number": 3,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "logan-mid",
@@ -37,7 +40,8 @@
         "number": 4,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "logan-fwd",
@@ -45,7 +49,8 @@
         "number": 5,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "logan-sub1",
@@ -53,7 +58,8 @@
         "number": 6,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "logan-sub2",
@@ -61,7 +67,8 @@
         "number": 7,
         "position": "forward",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   },
@@ -71,7 +78,7 @@
     "league": "CTW",
     "fullName": "Critical Techballers Braga (CTW)",
     "groupId": "group-c",
-    "formation": "4-1-1",
+    "formation": "2-1-1",
     "players": [
       {
         "id": "tech-gk",
@@ -79,7 +86,8 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "tech-def1",
@@ -87,7 +95,8 @@
         "number": 2,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "tech-def2",
@@ -95,7 +104,8 @@
         "number": 3,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "tech-mid",
@@ -103,7 +113,8 @@
         "number": 4,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "tech-fwd",
@@ -111,7 +122,8 @@
         "number": 5,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "tech-sub1",
@@ -119,7 +131,8 @@
         "number": 6,
         "position": "defender",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "tech-sub2",
@@ -127,7 +140,8 @@
         "number": 7,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   },
@@ -138,7 +152,7 @@
     "fullName": "Sporting Clube dos Esgaios (CSW)",
     "groupId": "group-c",
     "isDefault": true,
-    "formation": "4-1-1",
+    "formation": "1-1-2",
     "players": [
       {
         "id": "angelo-iodice",
@@ -146,15 +160,17 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "francisco-ferreira", 
         "name": "Francisco Ferreira",
-        "number": 300,
-        "position": "forward",
+        "number": 3,
+        "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "ricardo-mesquita",
@@ -162,64 +178,72 @@
         "number": 7,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "bruno-gandres",
         "name": "Bruno Gandres", 
-        "number": 4,
-        "position": "forward",
+        "number": 2,
+        "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "marcio-veiga",
         "name": "Márcio Veiga",
-        "number": 5,
+        "number": 4,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "carlos-daniel-silva",
         "name": "Carlos Daniel Silva",
-        "number": 7,
+        "number": 5,
         "position": "defender",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "joao-noronha",
         "name": "João Noronha",
-        "number": 8,
+        "number": 6,
         "position": "defender",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "joao-manuel-amorim",
         "name": "João Manuel Amorim",
-        "number": 9,
+        "number": 8,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "sandro-carvalho",
         "name": "Sandro Carvalho",
-        "number": 10,
+        "number": 9,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "ricardo-moreira",
         "name": "Ricardo Moreira",
-        "number": 6,
+        "number": 10,
         "position": "midfielder",
         "status": "injured",
         "injury": "Big injury",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   },
@@ -229,7 +253,7 @@
     "league": "CTW",
     "fullName": "Ctrl+Shift+Golo (CTW)",
     "groupId": "group-c",
-    "formation": "4-1-1",
+    "formation": "2-1-1",
     "players": [
       {
         "id": "golo-gk",
@@ -237,7 +261,8 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "golo-def1",
@@ -245,7 +270,8 @@
         "number": 2,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "golo-def2",
@@ -253,7 +279,8 @@
         "number": 3,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "golo-mid",
@@ -261,7 +288,8 @@
         "number": 4,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "golo-fwd",
@@ -269,7 +297,8 @@
         "number": 5,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "golo-sub1",
@@ -277,7 +306,8 @@
         "number": 6,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   },
@@ -287,7 +317,7 @@
     "league": "CTW",
     "fullName": "Dataki (CTW)",
     "groupId": "group-c",
-    "formation": "4-1-1",
+    "formation": "2-1-1",
     "players": [
       {
         "id": "dataki-gk",
@@ -295,7 +325,8 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "dataki-def1",
@@ -303,7 +334,8 @@
         "number": 2,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "dataki-def2",
@@ -311,7 +343,8 @@
         "number": 3,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "dataki-mid",
@@ -319,7 +352,8 @@
         "number": 4,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "dataki-fwd",
@@ -327,7 +361,8 @@
         "number": 5,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "dataki-sub1",
@@ -335,7 +370,8 @@
         "number": 6,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   },
@@ -345,7 +381,7 @@
     "league": "CSW",
     "fullName": "Francesinha United (CSW)",
     "groupId": "group-c",
-    "formation": "4-1-1",
+    "formation": "2-1-1",
     "players": [
       {
         "id": "francesinha-gk",
@@ -353,7 +389,8 @@
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "francesinha-def1",
@@ -361,7 +398,8 @@
         "number": 2,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": true
       },
       {
         "id": "francesinha-def2",
@@ -369,7 +407,8 @@
         "number": 3,
         "position": "defender",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "francesinha-mid",
@@ -377,7 +416,8 @@
         "number": 4,
         "position": "midfielder",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "francesinha-fwd",
@@ -385,7 +425,8 @@
         "number": 5,
         "position": "forward",
         "status": "fit",
-        "isStarter": true
+        "isStarter": true,
+        "isCaptain": false
       },
       {
         "id": "francesinha-sub1",
@@ -393,7 +434,8 @@
         "number": 6,
         "position": "defender",
         "status": "fit",
-        "isStarter": false
+        "isStarter": false,
+        "isCaptain": false
       }
     ]
   }

@@ -3591,6 +3591,9 @@ function updateTeamLineup() {
 
 // Update players on the field
 function updateFieldPlayers(team) {
+    // Validate and fix formation if needed
+    const validatedFormation = validateFutsalFormation(team.formation);
+    
     const starters = team.players.filter(player => player.isStarter);
     
     // Update goalkeeper
@@ -3600,25 +3603,102 @@ function updateFieldPlayers(team) {
         updatePlayerName('goalkeeper-name', goalkeeper);
     }
     
-    // Update field positions based on formation
-    const defenders = starters.filter(p => p.position === 'defender');
-    const midfielders = starters.filter(p => p.position === 'midfielder');
-    const forwards = starters.filter(p => p.position === 'forward');
+    // Get formation structure
+    const formationParts = validatedFormation.split('-').map(Number);
+    const [defenders, midfielders, forwards] = formationParts;
     
-    // Update defenders (positions 2-3)
-    defenders.forEach((player, index) => {
-        const positionId = `position-${2 + index}`;
-        updatePlayerIcon(positionId, player);
-    });
+    // Clear all field positions first
+    clearFieldPositions();
     
-    // Update midfielder (position 4)
-    if (midfielders.length > 0) {
-        updatePlayerIcon('position-4', midfielders[0]);
+    // Get players by position
+    const defenderPlayers = starters.filter(p => p.position === 'defender').slice(0, defenders);
+    const midfielderPlayers = starters.filter(p => p.position === 'midfielder').slice(0, midfielders);
+    const forwardPlayers = starters.filter(p => p.position === 'forward').slice(0, forwards);
+    
+    // Position defenders
+    positionPlayers('defender', defenderPlayers, defenders);
+    
+    // Position midfielders  
+    positionPlayers('midfielder', midfielderPlayers, midfielders);
+    
+    // Position forwards
+    positionPlayers('forward', forwardPlayers, forwards);
+}
+
+// Validate futsal formation
+function validateFutsalFormation(formation) {
+    const validFormations = ['1-1-2', '1-2-1', '2-1-1', '2-2-0', '0-2-2'];
+    
+    if (validFormations.includes(formation)) {
+        return formation;
     }
     
-    // Update forward (position 5)
-    if (forwards.length > 0) {
-        updatePlayerIcon('position-5', forwards[0]);
+    // Default futsal formation
+    return '2-0-2';
+}
+
+// Clear all field positions
+function clearFieldPositions() {
+    for (let i = 2; i <= 5; i++) {
+        const position = document.getElementById(`position-${i}`);
+        if (position) {
+            position.style.display = 'none';
+        }
+    }
+}
+
+// Position players based on formation and available players
+function positionPlayers(positionType, players, maxPlayers) {
+    if (players.length === 0) return;
+    
+    // Get available positions based on formation
+    const availablePositions = getAvailablePositions(positionType, maxPlayers);
+    
+    // Position players in available spots
+    players.slice(0, maxPlayers).forEach((player, index) => {
+        if (availablePositions[index]) {
+            const positionElement = document.getElementById(availablePositions[index]);
+            if (positionElement) {
+                positionElement.style.display = 'block';
+                updatePlayerIcon(availablePositions[index], player);
+            }
+        }
+    });
+}
+
+// Get available positions based on formation needs
+function getAvailablePositions(positionType, count) {
+    const allPositions = {
+        'defender': ['position-2', 'position-3'],
+        'midfielder': ['position-3', 'position-4'], 
+        'forward': ['position-4', 'position-5']
+    };
+    
+    const positions = allPositions[positionType] || [];
+    
+    // Return positions based on count needed
+    if (count === 1) {
+        // For 1 player, use the preferred position (first in array)
+        return [positions[0]];
+    } else if (count === 2) {
+        // For 2 players, use both available positions
+        return positions;
+    }
+    
+    return positions.slice(0, count);
+}
+
+// Get position IDs for each position type (keeping for compatibility)
+function getPositionsForType(positionType) {
+    switch (positionType) {
+        case 'defender':
+            return ['position-2', 'position-3'];
+        case 'midfielder':
+            return ['position-4'];
+        case 'forward':
+            return ['position-5'];
+        default:
+            return [];
     }
 }
 
@@ -3640,6 +3720,13 @@ function updatePlayerIcon(positionId, player) {
         
         // Update position class
         playerIcon.className = `player-icon ${player.position}`;
+        
+        // Add captain indicator if needed
+        if (player.isCaptain) {
+            playerIcon.classList.add('player-captain');
+        } else {
+            playerIcon.classList.remove('player-captain');
+        }
         
         // Add injury indicator if needed
         if (player.status === 'injured') {
@@ -3689,6 +3776,9 @@ function createBenchPlayerElement(player) {
     
     const playerIcon = document.createElement('div');
     playerIcon.className = `bench-player-icon ${player.position}`;
+    if (player.isCaptain) {
+        playerIcon.classList.add('player-captain');
+    }
     playerIcon.textContent = player.number;
     
     const playerInfo = document.createElement('div');
