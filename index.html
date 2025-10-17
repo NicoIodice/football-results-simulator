@@ -65,6 +65,13 @@
                     </select>
                 </div>
                 
+                <div class="tactics-selector">
+                    <label for="selected-tactics">Formation:</label>
+                    <select id="selected-tactics" onchange="updateFormation()">
+                        <!-- Tactics will be populated by JavaScript -->
+                    </select>
+                </div>
+                
                 <div id="team-lineup-content">
                     <div class="football-field">
                         <!-- Goalkeeper Area -->
@@ -94,6 +101,18 @@
                                     </div>
                                     <div class="player-name">Defender</div>
                                 </div>
+                                <div class="player-position" id="position-8" style="display: none;">
+                                    <div class="player-icon defender">
+                                        <span class="player-number">8</span>
+                                    </div>
+                                    <div class="player-name">Defender</div>
+                                </div>
+                                <div class="player-position" id="position-9" style="display: none;">
+                                    <div class="player-icon defender">
+                                        <span class="player-number">9</span>
+                                    </div>
+                                    <div class="player-name">Defender</div>
+                                </div>
                             </div>
                             
                             <div class="formation-line midfield">
@@ -109,6 +128,18 @@
                                     </div>
                                     <div class="player-name">Midfielder</div>
                                 </div>
+                                <div class="player-position" id="position-10" style="display: none;">
+                                    <div class="player-icon midfielder">
+                                        <span class="player-number">10</span>
+                                    </div>
+                                    <div class="player-name">Midfielder</div>
+                                </div>
+                                <div class="player-position" id="position-11" style="display: none;">
+                                    <div class="player-icon midfielder">
+                                        <span class="player-number">11</span>
+                                    </div>
+                                    <div class="player-name">Midfielder</div>
+                                </div>
                             </div>
                             
                             <div class="formation-line attack">
@@ -121,6 +152,18 @@
                                 <div class="player-position" id="position-7" style="display: none;">
                                     <div class="player-icon forward">
                                         <span class="player-number">7</span>
+                                    </div>
+                                    <div class="player-name">Forward</div>
+                                </div>
+                                <div class="player-position" id="position-12" style="display: none;">
+                                    <div class="player-icon forward">
+                                        <span class="player-number">12</span>
+                                    </div>
+                                    <div class="player-name">Forward</div>
+                                </div>
+                                <div class="player-position" id="position-13" style="display: none;">
+                                    <div class="player-icon forward">
+                                        <span class="player-number">13</span>
                                     </div>
                                     <div class="player-name">Forward</div>
                                 </div>

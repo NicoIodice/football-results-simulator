@@ -2128,10 +2128,59 @@ tr.first-place .goal-diff-negative {
     border: 2px solid #3498db;
     border-radius: 6px;
     background-color: white;
-    font-size: 1rem;
+    font-size: 14px;
+    font-weight: 500;
     color: #2c3e50;
+    min-width: 200px;
     cursor: pointer;
     transition: border-color 0.3s ease;
+}
+
+.team-selector select:hover {
+    border-color: #2980b9;
+}
+
+.team-selector select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Tactics selector styling */
+.tactics-selector {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tactics-selector label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 100px;
+}
+
+.tactics-selector select {
+    padding: 8px 12px;
+    border: 2px solid #e74c3c;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+    min-width: 200px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.tactics-selector select:hover {
+    border-color: #c0392b;
+}
+
+.tactics-selector select:focus {
+    outline: none;
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
 }
 
 .team-selector select:focus {
@@ -2347,6 +2396,16 @@ tr.first-place .goal-diff-negative {
     align-items: center;
     padding: 0 40px;
     gap: 80px;
+    flex-wrap: wrap;
+}
+
+/* Responsive gap for formations with more players */
+.formation-line:has(.player-position:nth-child(3)) {
+    gap: 60px;
+}
+
+.formation-line:has(.player-position:nth-child(4)) {
+    gap: 40px;
 }
 
 .formation-line.defense {

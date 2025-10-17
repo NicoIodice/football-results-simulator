@@ -4006,6 +4006,9 @@ function updateTeamLineup() {
     
     console.log('Updating lineup for team:', team.name);
     
+    // Populate tactics selector for this team
+    populateTacticsSelector(selectedTeamId);
+    
     // Update field players
     updateFieldPlayers(team);
     
@@ -4063,7 +4066,15 @@ function validateFutsalFormation(formation) {
 
 // Clear all field positions
 function clearFieldPositions() {
+    // Clear original positions (2-7)
     for (let i = 2; i <= 7; i++) {
+        const position = document.getElementById(`position-${i}`);
+        if (position) {
+            position.style.display = 'none';
+        }
+    }
+    // Clear additional positions (8-13)
+    for (let i = 8; i <= 13; i++) {
         const position = document.getElementById(`position-${i}`);
         if (position) {
             position.style.display = 'none';
@@ -4073,7 +4084,8 @@ function clearFieldPositions() {
 
 // Position players based on formation and available players
 function positionPlayers(positionType, players, maxPlayers) {
-    if (players.length === 0) return;
+    // Early return if no players needed for this position
+    if (maxPlayers === 0 || players.length === 0) return;
     
     // Get available positions based on formation
     const availablePositions = getAvailablePositions(positionType, maxPlayers);
@@ -4093,22 +4105,14 @@ function positionPlayers(positionType, players, maxPlayers) {
 // Get available positions based on formation needs
 function getAvailablePositions(positionType, count) {
     const allPositions = {
-        'defender': ['position-2', 'position-3'],     // Only defensive positions
-        'midfielder': ['position-4', 'position-6'],   // Midfield positions  
-        'forward': ['position-5', 'position-7']       // Only attacking positions
+        'defender': ['position-2', 'position-3', 'position-8', 'position-9'],     // 4 defensive positions
+        'midfielder': ['position-4', 'position-6', 'position-10', 'position-11'], // 4 midfield positions  
+        'forward': ['position-5', 'position-7', 'position-12', 'position-13']     // 4 attacking positions
     };
     
     const positions = allPositions[positionType] || [];
     
-    // Return positions based on count needed
-    if (count === 1) {
-        // For 1 player, use the first available position for that type
-        return [positions[0]];
-    } else if (count === 2) {
-        // For 2 players, use available positions for that type
-        return positions.slice(0, 2);
-    }
-    
+    // Return the number of positions needed
     return positions.slice(0, count);
 }
 
@@ -4776,6 +4780,74 @@ function createBenchPlayerElement(player) {
     }
     
     return playerDiv;
+}
+
+// TACTICS SYSTEM FOR TEAMS TAB
+const ALL_TACTICS = [
+    '0-0-4', '0-1-3', '0-2-2', '0-3-1', '0-4-0',
+    '1-0-3', '1-1-2', '1-2-1', '1-3-0',
+    '2-0-2', '2-1-1', '2-2-0',
+    '3-0-1', '3-1-0',
+    '4-0-0'
+];
+
+// Populate tactics selector based on current team
+function populateTacticsSelector(selectedTeamId) {
+    const selector = document.getElementById('selected-tactics');
+    if (!selector) return;
+    
+    selector.innerHTML = '';
+    
+    // Get current team data
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    const currentFormation = team ? team.formation : '2-1-1';
+    
+    // Add all tactics options
+    ALL_TACTICS.forEach(tactic => {
+        const option = document.createElement('option');
+        option.value = tactic;
+        option.textContent = formatTacticDisplay(tactic);
+        if (tactic === currentFormation) {
+            option.selected = true;
+        }
+        selector.appendChild(option);
+    });
+}
+
+// Format tactic for display
+function formatTacticDisplay(tactic) {
+    const [defenders, midfielders, forwards] = tactic.split('-');
+    return `${tactic} (${defenders}D-${midfielders}M-${forwards}F)`;
+}
+
+// Handle formation change
+function updateFormation() {
+    const selectedTeamId = document.getElementById('selected-team-lineup').value;
+    const selectedTactic = document.getElementById('selected-tactics').value;
+    
+    if (!selectedTeamId || !selectedTactic) return;
+    
+    const team = teamsData.find(t => t.id === selectedTeamId);
+    if (!team) return;
+    
+    console.log(`Updating formation to ${selectedTactic} for team ${team.name}`);
+    
+    // Update team formation temporarily (not saving to data)
+    team.formation = selectedTactic;
+    
+    // Re-render the field with new formation
+    updateFieldPlayers(team);
+}
+
+// Override the validateFutsalFormation to accept all tactics
+function validateFutsalFormation(formation) {
+    // Accept any formation from our tactics list
+    if (ALL_TACTICS.includes(formation)) {
+        return formation;
+    }
+    
+    // Default formation if invalid
+    return '2-1-1';
 }
 
 // Initialize teams tab when page loads
