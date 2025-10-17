@@ -251,6 +251,24 @@
                     <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
                 </div>
                 
+                <!-- Forecast Controls -->
+                <div class="forecast-controls">
+                    <div class="control-row">
+                        <div class="group-selector">
+                            <label for="forecast-group-select">Group:</label>
+                            <select id="forecast-group-select" onchange="updateForecastForGroup()">
+                                <!-- Groups will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div class="gameweek-selector">
+                            <label for="forecast-gameweek-select">Gameweek:</label>
+                            <select id="forecast-gameweek-select" onchange="updateForecastForGameweek()">
+                                <!-- Gameweeks will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="forecast-content">
                     <!-- Forecast content will be populated by JavaScript -->
                 </div>

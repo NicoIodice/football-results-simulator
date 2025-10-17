@@ -7,6 +7,10 @@ let goals = [];
 let defaults = {}; // Add defaults configuration
 let selectedGroupId = null;
 
+// Forecast-specific variables
+let selectedForecastGroupId = null;
+let selectedForecastGameweek = null;
+
 // Admin configuration
 const ADMIN_CONFIG = {
     role: 'admin',
@@ -2786,6 +2790,11 @@ function updateForecast() {
     const forecastContent = document.getElementById('forecast-content');
     forecastContent.innerHTML = '<div class="loading">🔮 Analyzing team performance and generating predictions...</div>';
     
+    // Initialize forecast controls if not done yet
+    if (!selectedForecastGroupId) {
+        populateForecastControls();
+    }
+    
     try {
         const forecast = generateForecast();
         forecastContent.innerHTML = forecast;
@@ -2795,12 +2804,114 @@ function updateForecast() {
     }
 }
 
+// Populate forecast controls (group and gameweek selectors)
+function populateForecastControls() {
+    populateForecastGroupSelector();
+    populateForecastGameweekSelector();
+}
+
+// Populate group selector for forecast
+function populateForecastGroupSelector() {
+    const selector = document.getElementById('forecast-group-select');
+    if (!selector) return;
+    
+    selector.innerHTML = '';
+    
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        selector.appendChild(option);
+    });
+    
+    // Set default group (current selected group or first group)
+    selectedForecastGroupId = selectedGroupId || (groups.length > 0 ? groups[0].id : null);
+    if (selectedForecastGroupId) {
+        selector.value = selectedForecastGroupId;
+    }
+}
+
+// Populate gameweek selector for forecast
+function populateForecastGameweekSelector() {
+    const selector = document.getElementById('forecast-gameweek-select');
+    if (!selector || !selectedForecastGroupId) return;
+    
+    selector.innerHTML = '';
+    
+    // Get all gameweeks for the selected group
+    const groupFixtures = fixtures.filter(f => f.groupId === selectedForecastGroupId);
+    const gameweeks = [...new Set(groupFixtures.map(f => f.gameweek))].sort((a, b) => a - b);
+    
+    // Add "Current" option for next gameweek
+    const currentGameweek = findNextGameweek();
+    if (currentGameweek) {
+        const currentOption = document.createElement('option');
+        currentOption.value = 'current';
+        currentOption.textContent = `Current (Gameweek ${currentGameweek.gameweek})`;
+        selector.appendChild(currentOption);
+    }
+    
+    // Add all gameweeks
+    gameweeks.forEach(gameweek => {
+        const option = document.createElement('option');
+        option.value = gameweek;
+        option.textContent = `Gameweek ${gameweek}`;
+        selector.appendChild(option);
+    });
+    
+    // Set default to current gameweek
+    selectedForecastGameweek = 'current';
+    selector.value = 'current';
+}
+
+// Handle group selection change
+function updateForecastForGroup() {
+    const selector = document.getElementById('forecast-group-select');
+    selectedForecastGroupId = selector.value;
+    
+    // Update gameweek selector for new group
+    populateForecastGameweekSelector();
+    
+    // Regenerate forecast
+    updateForecast();
+}
+
+// Handle gameweek selection change
+function updateForecastForGameweek() {
+    const selector = document.getElementById('forecast-gameweek-select');
+    selectedForecastGameweek = selector.value;
+    
+    // Regenerate forecast
+    updateForecast();
+}
+
 function generateForecast() {
+    // Use forecast-specific group selection for calculations
+    const originalGroupId = selectedGroupId;
+    if (selectedForecastGroupId) {
+        selectedGroupId = selectedForecastGroupId;
+    }
+    
     const currentStandings = calculateStandings();
     const teamAnalysis = analyzeAllTeams(currentStandings);
-    const nextGameweek = findNextGameweek();
-    const matchPredictions = nextGameweek ? generateMatchPredictions(nextGameweek, teamAnalysis) : null;
+    
+    // Get the selected gameweek for predictions
+    let selectedGameweek;
+    if (selectedForecastGameweek === 'current') {
+        selectedGameweek = findNextGameweek();
+    } else if (selectedForecastGameweek) {
+        selectedGameweek = findGameweekByNumber(parseInt(selectedForecastGameweek));
+    } else {
+        selectedGameweek = findNextGameweek();
+    }
+    
+    const matchPredictions = selectedGameweek ? generateMatchPredictionsForGameweek(selectedGameweek, teamAnalysis) : null;
     const championshipForecast = generateChampionshipForecast(currentStandings, teamAnalysis);
+    
+    // Restore original group selection
+    selectedGroupId = originalGroupId;
+    
+    const groupName = groups.find(g => g.id === selectedForecastGroupId)?.name || 'Selected Group';
     
     return `
         <div class="forecast-section">
@@ -2815,10 +2926,10 @@ function generateForecast() {
         ${matchPredictions ? `
         <div class="forecast-section">
             <div class="forecast-header">
-                ⚽ Next Gameweek Predictions (Gameweek ${nextGameweek.gameweek})
+                ⚽ Match Predictions for ${groupName} - Gameweek ${selectedGameweek.gameweek}
             </div>
             <div class="forecast-content">
-                ${generateMatchPredictionsHTML(matchPredictions)}
+                ${generateMatchPredictionsHTML(matchPredictions, selectedGameweek)}
             </div>
         </div>
         ` : ''}
@@ -2974,6 +3085,45 @@ function calculateMomentum(team) {
     if (momentum < 0) return { direction: "Declining", strength: "Slight", color: "#e67e22", icon: "⬇️" };
     
     return { direction: "Stable", strength: "Neutral", color: "#95a5a6", icon: "➡️" };
+}
+
+// Helper function to find gameweek by number
+function findGameweekByNumber(gameweekNumber) {
+    const groupFixtures = fixtures.filter(f => f.groupId === selectedForecastGroupId && f.gameweek === gameweekNumber);
+    
+    if (groupFixtures.length === 0) return null;
+    
+    return {
+        gameweek: gameweekNumber,
+        matches: groupFixtures
+    };
+}
+
+// Generate match predictions for a specific gameweek (including completed games)
+function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
+    return gameweek.matches.map(match => {
+        const homeTeam = teamAnalysis.find(t => t.id === match.homeTeam);
+        const awayTeam = teamAnalysis.find(t => t.id === match.awayTeam);
+        
+        if (!homeTeam || !awayTeam) return null;
+        
+        const prediction = predictMatch(homeTeam, awayTeam);
+        
+        // Check if this match has already been played
+        const actualResult = results.find(r => 
+            r.homeTeam === match.homeTeam && 
+            r.awayTeam === match.awayTeam && 
+            r.gameweek === match.gameweek
+        );
+        
+        return {
+            match,
+            homeTeam,
+            awayTeam,
+            prediction,
+            actualResult
+        };
+    }).filter(p => p !== null);
 }
 
 function generateMatchPredictions(nextGameweek, teamAnalysis) {
@@ -3178,24 +3328,46 @@ function generateTeamAnalysisHTML(teamAnalysis) {
     `;
 }
 
-function generateMatchPredictionsHTML(predictions) {
+function generateMatchPredictionsHTML(predictions, gameweek) {
     return `
         <div class="match-predictions">
             ${predictions.map(pred => `
-                <div class="match-prediction-card">
+                <div class="match-prediction-card ${pred.actualResult ? 'completed-match' : 'upcoming-match'}">
+                    <div class="match-header">
+                        <div class="match-status">
+                            ${pred.actualResult ? 
+                                `<span class="completed-badge">✅ Completed</span>` : 
+                                `<span class="upcoming-badge">🕒 Upcoming</span>`
+                            }
+                        </div>
+                    </div>
+                    
                     <div class="match-teams">
                         <div class="team-prediction home-team">
                             <h4>${pred.homeTeam.name}</h4>
                             <div class="team-form">Form: ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text}</div>
-                            <div class="win-probability">${pred.prediction.homeWinProb}%</div>
+                            <div class="win-probability">Predicted: ${pred.prediction.homeWinProb}%</div>
                         </div>
                         
                         <div class="match-center">
                             <div class="vs-divider">VS</div>
-                            <div class="predicted-score">${pred.prediction.predictedScore}</div>
-                            <div class="prediction-confidence">
-                                ${pred.prediction.confidence}% confidence
-                            </div>
+                            ${pred.actualResult ? `
+                                <div class="actual-score">
+                                    <strong>${pred.actualResult.homeScore} - ${pred.actualResult.awayScore}</strong>
+                                    <small>Actual Result</small>
+                                </div>
+                                <div class="predicted-score">
+                                    Predicted: ${pred.prediction.predictedScore}
+                                </div>
+                                <div class="prediction-accuracy">
+                                    ${getPredictionAccuracy(pred.prediction, pred.actualResult)}
+                                </div>
+                            ` : `
+                                <div class="predicted-score">${pred.prediction.predictedScore}</div>
+                                <div class="prediction-confidence">
+                                    ${pred.prediction.confidence}% confidence
+                                </div>
+                            `}
                             <div class="draw-probability">
                                 Draw: ${pred.prediction.drawProb}%
                             </div>
@@ -3204,7 +3376,7 @@ function generateMatchPredictionsHTML(predictions) {
                         <div class="team-prediction away-team">
                             <h4>${pred.awayTeam.name}</h4>
                             <div class="team-form">Form: ${pred.awayTeam.formDescription.icon} ${pred.awayTeam.formDescription.text}</div>
-                            <div class="win-probability">${pred.prediction.awayWinProb}%</div>
+                            <div class="win-probability">Predicted: ${pred.prediction.awayWinProb}%</div>
                         </div>
                     </div>
                     
@@ -3215,6 +3387,23 @@ function generateMatchPredictionsHTML(predictions) {
             `).join('')}
         </div>
     `;
+}
+
+// Helper function to evaluate prediction accuracy
+function getPredictionAccuracy(prediction, actualResult) {
+    const actualHomeWin = actualResult.homeScore > actualResult.awayScore;
+    const actualAwayWin = actualResult.awayScore > actualResult.homeScore;
+    const actualDraw = actualResult.homeScore === actualResult.awayScore;
+    
+    const predictedHomeWin = prediction.homeWinProb > prediction.awayWinProb && prediction.homeWinProb > prediction.drawProb;
+    const predictedAwayWin = prediction.awayWinProb > prediction.homeWinProb && prediction.awayWinProb > prediction.drawProb;
+    const predictedDraw = prediction.drawProb > prediction.homeWinProb && prediction.drawProb > prediction.awayWinProb;
+    
+    if ((actualHomeWin && predictedHomeWin) || (actualAwayWin && predictedAwayWin) || (actualDraw && predictedDraw)) {
+        return '<span class="prediction-correct">✅ Prediction Correct!</span>';
+    } else {
+        return '<span class="prediction-wrong">❌ Prediction Wrong</span>';
+    }
 }
 
 function generateChampionshipForecastHTML(forecast) {

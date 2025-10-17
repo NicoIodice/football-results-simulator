@@ -1066,6 +1066,58 @@ tr.first-place .goal-diff-negative {
     color: #28a745;
 }
 
+/* Forecast Controls */
+.forecast-controls {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+}
+
+.forecast-controls .control-row {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+}
+
+.forecast-controls .group-selector,
+.forecast-controls .gameweek-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.forecast-controls label {
+    font-weight: 600;
+    color: #2c3e50;
+    white-space: nowrap;
+}
+
+.forecast-controls select {
+    padding: 8px 12px;
+    border: 2px solid #9b59b6;
+    border-radius: 6px;
+    background-color: white;
+    font-size: 14px;
+    font-weight: 500;
+    color: #2c3e50;
+    min-width: 150px;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.forecast-controls select:hover {
+    border-color: #8e44ad;
+}
+
+.forecast-controls select:focus {
+    outline: none;
+    border-color: #9b59b6;
+    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+}
+
 /* Forecast Styles */
 .forecast-section {
     margin: 20px 0;
@@ -1261,6 +1313,68 @@ tr.first-place .goal-diff-negative {
     border-radius: 6px;
     font-size: 0.9em;
     color: #2c3e50;
+}
+
+/* New styles for completed matches and prediction accuracy */
+.completed-match {
+    border-left: 4px solid #27ae60;
+}
+
+.upcoming-match {
+    border-left: 4px solid #3498db;
+}
+
+.match-header {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.completed-badge {
+    background: #27ae60;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.upcoming-badge {
+    background: #3498db;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: 600;
+}
+
+.actual-score {
+    font-size: 2em;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 8px 0;
+}
+
+.actual-score small {
+    display: block;
+    font-size: 0.4em;
+    color: #7f8c8d;
+    font-weight: normal;
+    margin-top: 4px;
+}
+
+.prediction-accuracy {
+    margin: 8px 0;
+    font-size: 0.9em;
+}
+
+.prediction-correct {
+    color: #27ae60;
+    font-weight: 600;
+}
+
+.prediction-wrong {
+    color: #e74c3c;
+    font-weight: 600;
 }
 
 .championship-forecast {
