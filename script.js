@@ -281,6 +281,9 @@ async function loadData() {
         populateGroupSelector();
         updateTeamSelectorForGroup();
         updateAllTabs();
+        
+        // Load team player data for Teams tab
+        await loadPlayersData();
     } catch (error) {
         console.error('Error loading data:', error);
     }
