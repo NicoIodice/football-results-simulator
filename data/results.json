@@ -188,5 +188,35 @@
     "gameweek": 4,
     "groupId": "group-c",
     "played": true
+  },
+  {
+    "matchId": "match-a6",
+    "homeTeam": "desesperados-fc",
+    "awayTeam": "shadow-x",
+    "homeScore": 9,
+    "awayScore": 7,
+    "gameweek": 3,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-b5",
+    "homeTeam": "critigals",
+    "awayTeam": "fc-zerolhos",
+    "homeScore": 1,
+    "awayScore": 19,
+    "gameweek": 3,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
+    "matchId": "match-b6",
+    "homeTeam": "borussia-doutromundo",
+    "awayTeam": "borg-coimbra",
+    "homeScore": 6,
+    "awayScore": 4,
+    "gameweek": 3,
+    "groupId": "group-b",
+    "played": true
   }
 ]

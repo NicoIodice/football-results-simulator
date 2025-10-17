@@ -3086,8 +3086,6 @@ function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
         
         if (!homeTeam || !awayTeam) return null;
         
-        const prediction = predictMatch(homeTeam, awayTeam);
-        
         // Check if this match has already been played
         // Use the gameweek number from the gameweek object, not from the individual match
         const actualResult = results.find(r => 
@@ -3095,6 +3093,12 @@ function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
             r.awayTeam === match.awayTeam && 
             r.gameweek === gameweek.gameweek
         );
+        
+        // For completed matches, use a static prediction that doesn't change based on current form
+        // For upcoming matches, use the current dynamic prediction
+        const prediction = actualResult ? 
+            predictMatchStatic(homeTeam, awayTeam, match.id) : 
+            predictMatch(homeTeam, awayTeam);
         
         return {
             match,
@@ -3176,6 +3180,68 @@ function predictMatch(homeTeam, awayTeam) {
         awayWinProb,
         predictedScore: `${homeGoals}-${awayGoals}`,
         reasoning: generatePredictionReasoning(homeTeam, awayTeam, strengthDiff)
+    };
+}
+
+// Static prediction function for completed matches - uses base stats only, not affected by recent form changes
+function predictMatchStatic(homeTeam, awayTeam, matchId) {
+    // Create a deterministic prediction based on the match ID and base team stats
+    // This ensures the prediction doesn't change when teams' current form changes
+    const homeAdvantage = 0.3;
+    
+    // Use only base performance rating, not recent form, for consistency
+    const homeStrength = homeTeam.performanceRating + homeAdvantage;
+    const awayStrength = awayTeam.performanceRating;
+    
+    const strengthDiff = homeStrength - awayStrength;
+    
+    // Calculate probabilities (same logic as main function)
+    let homeWinProb, drawProb, awayWinProb;
+    
+    if (strengthDiff > 2) {
+        homeWinProb = 65; drawProb = 25; awayWinProb = 10;
+    } else if (strengthDiff > 1) {
+        homeWinProb = 55; drawProb = 30; awayWinProb = 15;
+    } else if (strengthDiff > 0) {
+        homeWinProb = 45; drawProb = 35; awayWinProb = 20;
+    } else if (strengthDiff > -1) {
+        homeWinProb = 35; drawProb = 35; awayWinProb = 30;
+    } else if (strengthDiff > -2) {
+        homeWinProb = 25; drawProb = 30; awayWinProb = 45;
+    } else {
+        homeWinProb = 15; drawProb = 25; awayWinProb = 60;
+    }
+    
+    // Predict most likely result
+    let predictedResult, confidence;
+    if (homeWinProb > drawProb && homeWinProb > awayWinProb) {
+        predictedResult = 'home';
+        confidence = homeWinProb;
+    } else if (awayWinProb > drawProb) {
+        predictedResult = 'away';
+        confidence = awayWinProb;
+    } else {
+        predictedResult = 'draw';
+        confidence = drawProb;
+    }
+    
+    // Use base attacking strength for score prediction
+    const baseHomeAttack = Math.max(1, Math.round(homeTeam.attackingStrength));
+    const baseAwayAttack = Math.max(1, Math.round(awayTeam.attackingStrength));
+    
+    // Add some deterministic variation based on match ID to make predictions unique
+    const matchSeed = matchId.charCodeAt(matchId.length - 1) % 3;
+    const homeGoals = Math.max(0, baseHomeAttack + (strengthDiff > 0 ? 1 : 0) + (matchSeed === 0 ? -1 : 0));
+    const awayGoals = Math.max(0, baseAwayAttack + (strengthDiff < 0 ? 1 : 0) + (matchSeed === 2 ? -1 : 0));
+    
+    return {
+        result: predictedResult,
+        confidence,
+        homeWinProb,
+        drawProb,
+        awayWinProb,
+        predictedScore: `${homeGoals}-${awayGoals}`,
+        reasoning: `Prediction based on pre-match analysis: ${homeTeam.name} vs ${awayTeam.name}. Home advantage and base performance ratings considered.`
     };
 }
 
