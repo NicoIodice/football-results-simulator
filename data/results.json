@@ -228,5 +228,25 @@
     "gameweek": 4,
     "groupId": "group-a",
     "played": true
+  },
+  {
+    "matchId": "match-c11",
+    "homeTeam": "logan-fc",
+    "awayTeam": "dataki",
+    "homeScore": 1,
+    "awayScore": 3,
+    "gameweek": 4,
+    "groupId": "group-c",
+    "played": true
+  },
+  {
+    "matchId": "match-c12",
+    "homeTeam": "sporting-esgaios",
+    "awayTeam": "francesinha-united",
+    "homeScore": 12,
+    "awayScore": 2,
+    "gameweek": 4,
+    "groupId": "group-c",
+    "played": true
   }
 ]
