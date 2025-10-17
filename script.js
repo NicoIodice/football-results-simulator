@@ -768,6 +768,120 @@ function calculateStandings() {
     return standings;
 }
 
+// Calculate standings excluding results from a specific gameweek (for prediction purposes)
+function calculateStandingsExcludingGameweek(excludeGameweek) {
+    const standings = [];
+    
+    // Get teams and results for the selected group
+    const groupTeams = getTeamsForGroup();
+    const groupResults = getResultsForGroup();
+    
+    // Initialize standings for each team in the group
+    groupTeams.forEach(team => {
+        standings.push({
+            id: team.id,
+            name: team.name,
+            fullName: team.fullName,
+            played: 0,
+            wins: 0,
+            losses: 0,
+            draws: 0,
+            goalsFor: 0,
+            goalsAgainst: 0,
+            goalDifference: 0,
+            points: 0,
+            matchHistory: [],
+            headToHeadWins: {} // Store wins against each opponent
+        });
+    });
+    
+    // Process results for the group, excluding the specified gameweek
+    groupResults.forEach(result => {
+        if (result.played && result.gameweek !== excludeGameweek) {
+            const homeTeam = standings.find(team => team.id === result.homeTeam);
+            const awayTeam = standings.find(team => team.id === result.awayTeam);
+            
+            if (homeTeam && awayTeam) {
+                // Initialize head-to-head records if not exists
+                if (!homeTeam.headToHeadWins[awayTeam.id]) homeTeam.headToHeadWins[awayTeam.id] = 0;
+                if (!awayTeam.headToHeadWins[homeTeam.id]) awayTeam.headToHeadWins[homeTeam.id] = 0;
+                
+                // Update match counts
+                homeTeam.played++;
+                awayTeam.played++;
+                
+                // Update goals
+                homeTeam.goalsFor += result.homeScore;
+                homeTeam.goalsAgainst += result.awayScore;
+                awayTeam.goalsFor += result.awayScore;
+                awayTeam.goalsAgainst += result.homeScore;
+                
+                // Determine result and update wins/losses/draws
+                if (result.homeScore > result.awayScore) {
+                    // Home team wins
+                    homeTeam.wins++;
+                    homeTeam.points += 3;
+                    homeTeam.matchHistory.push('W');
+                    homeTeam.headToHeadWins[awayTeam.id]++;
+                    awayTeam.losses++;
+                    awayTeam.matchHistory.push('L');
+                } else if (result.homeScore < result.awayScore) {
+                    // Away team wins
+                    awayTeam.wins++;
+                    awayTeam.points += 3;
+                    awayTeam.matchHistory.push('W');
+                    awayTeam.headToHeadWins[homeTeam.id]++;
+                    homeTeam.losses++;
+                    homeTeam.matchHistory.push('L');
+                } else {
+                    // Draw
+                    homeTeam.draws++;
+                    homeTeam.points += 1;
+                    homeTeam.matchHistory.push('D');
+                    awayTeam.draws++;
+                    awayTeam.points += 1;
+                    awayTeam.matchHistory.push('D');
+                }
+                
+                // Calculate goal difference
+                homeTeam.goalDifference = homeTeam.goalsFor - homeTeam.goalsAgainst;
+                awayTeam.goalDifference = awayTeam.goalsFor - awayTeam.goalsAgainst;
+            }
+        }
+    });
+    
+    // Sort standings with tie-breaker rules (same as calculateStandings)
+    standings.sort((a, b) => {
+        // 1st: Points
+        if (a.points !== b.points) {
+            return b.points - a.points;
+        }
+        
+        // 2nd: Goal difference
+        if (a.goalDifference !== b.goalDifference) {
+            return b.goalDifference - a.goalDifference;
+        }
+        
+        // 3rd: Total goals scored
+        if (a.goalsFor !== b.goalsFor) {
+            return b.goalsFor - a.goalsFor;
+        }
+        
+        // 4th: Head-to-head wins
+        const aHeadToHeadWins = Object.values(a.headToHeadWins).reduce((sum, wins) => sum + wins, 0);
+        const bHeadToHeadWins = Object.values(b.headToHeadWins).reduce((sum, wins) => sum + wins, 0);
+        
+        if (aHeadToHeadWins !== bHeadToHeadWins) {
+            return bHeadToHeadWins - aHeadToHeadWins;
+        }
+        
+        // Final tie-breaker: alphabetical order
+        return a.name.localeCompare(b.name);
+    });
+    
+    return standings;
+}
+
 // Update standings table
 function updateStandings() {
     const standings = calculateStandings();
@@ -3080,9 +3194,14 @@ function findCurrentGameweekForGroup(groupId) {
 // Helper function to find gameweek by number
 // Generate match predictions for a specific gameweek (including completed games)
 function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
+    // Create team analysis excluding current gameweek results for more accurate predictions
+    const currentGameweekNumber = gameweek.gameweek;
+    const standingsExcludingCurrentGameweek = calculateStandingsExcludingGameweek(currentGameweekNumber);
+    const teamAnalysisForPrediction = analyzeAllTeams(standingsExcludingCurrentGameweek);
+    
     return gameweek.matches.map(match => {
-        const homeTeam = teamAnalysis.find(t => t.id === match.homeTeam);
-        const awayTeam = teamAnalysis.find(t => t.id === match.awayTeam);
+        const homeTeam = teamAnalysisForPrediction.find(t => t.id === match.homeTeam);
+        const awayTeam = teamAnalysisForPrediction.find(t => t.id === match.awayTeam);
         
         if (!homeTeam || !awayTeam) return null;
         
@@ -3094,11 +3213,8 @@ function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
             r.gameweek === gameweek.gameweek
         );
         
-        // For completed matches, use a static prediction that doesn't change based on current form
-        // For upcoming matches, use the current dynamic prediction
-        const prediction = actualResult ? 
-            predictMatchStatic(homeTeam, awayTeam, match.id) : 
-            predictMatch(homeTeam, awayTeam);
+        // Always use prediction based on pre-current-gameweek data
+        const prediction = predictMatch(homeTeam, awayTeam);
         
         return {
             match,
@@ -3180,68 +3296,6 @@ function predictMatch(homeTeam, awayTeam) {
         awayWinProb,
         predictedScore: `${homeGoals}-${awayGoals}`,
         reasoning: generatePredictionReasoning(homeTeam, awayTeam, strengthDiff)
-    };
-}
-
-// Static prediction function for completed matches - uses base stats only, not affected by recent form changes
-function predictMatchStatic(homeTeam, awayTeam, matchId) {
-    // Create a deterministic prediction based on the match ID and base team stats
-    // This ensures the prediction doesn't change when teams' current form changes
-    const homeAdvantage = 0.3;
-    
-    // Use only base performance rating, not recent form, for consistency
-    const homeStrength = homeTeam.performanceRating + homeAdvantage;
-    const awayStrength = awayTeam.performanceRating;
-    
-    const strengthDiff = homeStrength - awayStrength;
-    
-    // Calculate probabilities (same logic as main function)
-    let homeWinProb, drawProb, awayWinProb;
-    
-    if (strengthDiff > 2) {
-        homeWinProb = 65; drawProb = 25; awayWinProb = 10;
-    } else if (strengthDiff > 1) {
-        homeWinProb = 55; drawProb = 30; awayWinProb = 15;
-    } else if (strengthDiff > 0) {
-        homeWinProb = 45; drawProb = 35; awayWinProb = 20;
-    } else if (strengthDiff > -1) {
-        homeWinProb = 35; drawProb = 35; awayWinProb = 30;
-    } else if (strengthDiff > -2) {
-        homeWinProb = 25; drawProb = 30; awayWinProb = 45;
-    } else {
-        homeWinProb = 15; drawProb = 25; awayWinProb = 60;
-    }
-    
-    // Predict most likely result
-    let predictedResult, confidence;
-    if (homeWinProb > drawProb && homeWinProb > awayWinProb) {
-        predictedResult = 'home';
-        confidence = homeWinProb;
-    } else if (awayWinProb > drawProb) {
-        predictedResult = 'away';
-        confidence = awayWinProb;
-    } else {
-        predictedResult = 'draw';
-        confidence = drawProb;
-    }
-    
-    // Use base attacking strength for score prediction
-    const baseHomeAttack = Math.max(1, Math.round(homeTeam.attackingStrength));
-    const baseAwayAttack = Math.max(1, Math.round(awayTeam.attackingStrength));
-    
-    // Add some deterministic variation based on match ID to make predictions unique
-    const matchSeed = matchId.charCodeAt(matchId.length - 1) % 3;
-    const homeGoals = Math.max(0, baseHomeAttack + (strengthDiff > 0 ? 1 : 0) + (matchSeed === 0 ? -1 : 0));
-    const awayGoals = Math.max(0, baseAwayAttack + (strengthDiff < 0 ? 1 : 0) + (matchSeed === 2 ? -1 : 0));
-    
-    return {
-        result: predictedResult,
-        confidence,
-        homeWinProb,
-        drawProb,
-        awayWinProb,
-        predictedScore: `${homeGoals}-${awayGoals}`,
-        reasoning: `Prediction based on pre-match analysis: ${homeTeam.name} vs ${awayTeam.name}. Home advantage and base performance ratings considered.`
     };
 }
 
