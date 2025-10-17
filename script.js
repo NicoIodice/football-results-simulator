@@ -2974,7 +2974,7 @@ function generateForecast() {
     // Determine if we're showing completed matches for review or upcoming predictions
     const now = new Date();
     const currentDayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const isAfterWeekEnd = currentDayOfWeek >= 1; // Monday or later
+    const isNextMondayOrLater = currentDayOfWeek === 1; // Only Monday, not the whole week
     
     const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     const currentDayName = dayNames[currentDayOfWeek];
@@ -2992,10 +2992,10 @@ function generateForecast() {
             );
         });
         
-        if (allMatchesCompleted && !isAfterWeekEnd) {
+        if (allMatchesCompleted && !isNextMondayOrLater) {
             headerText = `🔍 Prediction Review for ${groupName} - Gameweek ${currentGameweek.gameweek}`;
             statusMessage = `<div class="status-message review-mode">📈 All matches completed! Reviewing prediction accuracy until Monday (today is ${currentDayName}).</div>`;
-        } else if (allMatchesCompleted && isAfterWeekEnd) {
+        } else if (allMatchesCompleted && isNextMondayOrLater) {
             headerText = `⚽ Match Predictions for ${groupName} - Gameweek ${currentGameweek.gameweek}`;
             statusMessage = `<div class="status-message archive-mode">📚 Previous gameweek results (today is ${currentDayName} - review period ended).</div>`;
         } else {
@@ -3186,9 +3186,14 @@ function calculateMomentum(team) {
 function findCurrentGameweekForGroup(groupId) {
     if (!groupId) return null;
     
+    console.log('DEBUG: Finding current gameweek for group:', groupId);
+    
     // Get all gameweek objects for this group
     const groupGameweeks = fixtures.filter(gw => gw.groupId === groupId);
     const groupResults = results.filter(r => r.groupId === groupId);
+    
+    console.log('DEBUG: Available gameweeks:', groupGameweeks.map(gw => gw.gameweek));
+    console.log('DEBUG: Results count:', groupResults.length);
     
     if (groupGameweeks.length === 0) return null;
     
@@ -3198,44 +3203,80 @@ function findCurrentGameweekForGroup(groupId) {
     // Get current date and calculate if we're past Sunday 23:59
     const now = new Date();
     const currentDayOfWeek = now.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const isAfterWeekEnd = currentDayOfWeek >= 1; // Monday or later
     
-    // Find the first gameweek with unplayed matches
-    let nextGameweekWithUnplayedMatches = null;
-    let lastCompletedGameweek = null;
+    // Only consider it "after week end" if it's Monday AND we've completed the current gameweek
+    // The idea is: complete gameweek on any day = stay for review until next Monday
+    const isNextMondayOrLater = currentDayOfWeek === 1; // Only Monday, not the whole week
     
-    for (const gameweekObj of groupGameweeks) {
-        // Check if any match in this gameweek is unplayed
-        const hasUnplayedMatches = gameweekObj.matches.some(match => {
-            return !groupResults.some(result => 
+    console.log('DEBUG: Current day of week:', currentDayOfWeek, 'isNextMondayOrLater:', isNextMondayOrLater);
+    
+    // Find the most advanced gameweek that has had any matches played
+    let actualCurrentGameweek = null;
+    let nextAvailableGameweek = null;
+    
+    // Find the highest gameweek number that has at least one match played
+    for (let i = groupGameweeks.length - 1; i >= 0; i--) {
+        const gameweekObj = groupGameweeks[i];
+        const hasAnyMatchPlayed = gameweekObj.matches.some(match => {
+            return groupResults.some(result => 
                 result.gameweek === gameweekObj.gameweek &&
                 result.homeTeam === match.homeTeam &&
                 result.awayTeam === match.awayTeam
             );
         });
         
-        if (hasUnplayedMatches) {
-            nextGameweekWithUnplayedMatches = gameweekObj;
+        console.log('DEBUG: Checking gameweek', gameweekObj.gameweek, 'hasAnyMatchPlayed:', hasAnyMatchPlayed);
+        
+        if (hasAnyMatchPlayed) {
+            // This is the most advanced gameweek with matches played
+            actualCurrentGameweek = gameweekObj;
+            console.log('DEBUG: Found actual current gameweek:', actualCurrentGameweek.gameweek);
             break;
-        } else {
-            lastCompletedGameweek = gameweekObj;
         }
     }
     
-    // Determine which gameweek to show based on day of week
+    // If no gameweek has matches played yet, use the first gameweek
+    if (!actualCurrentGameweek) {
+        actualCurrentGameweek = groupGameweeks[0];
+        console.log('DEBUG: No played gameweeks found, using first:', actualCurrentGameweek.gameweek);
+    }
+    
+    // Find the next gameweek after the actual current one
+    const currentGameweekIndex = groupGameweeks.findIndex(gw => gw.gameweek === actualCurrentGameweek.gameweek);
+    if (currentGameweekIndex < groupGameweeks.length - 1) {
+        nextAvailableGameweek = groupGameweeks[currentGameweekIndex + 1];
+    }
+    
+    // Decision logic based on completion and day of week
     let currentGameweek = null;
     
-    if (nextGameweekWithUnplayedMatches) {
-        // There are unplayed matches - show this gameweek
-        currentGameweek = nextGameweekWithUnplayedMatches;
-    } else if (lastCompletedGameweek && !isAfterWeekEnd) {
-        // All matches completed but still in the same week (Sunday or earlier)
-        // Show the last completed gameweek for prediction review
-        currentGameweek = lastCompletedGameweek;
+    const currentGameweekAllComplete = actualCurrentGameweek.matches.every(match => {
+        return groupResults.some(result => 
+            result.gameweek === actualCurrentGameweek.gameweek &&
+            result.homeTeam === match.homeTeam &&
+            result.awayTeam === match.awayTeam
+        );
+    });
+    
+    console.log('DEBUG: actualCurrentGameweek:', actualCurrentGameweek.gameweek, 'allComplete:', currentGameweekAllComplete);
+    console.log('DEBUG: nextAvailableGameweek:', nextAvailableGameweek?.gameweek || 'none');
+    
+    if (!currentGameweekAllComplete) {
+        // Current gameweek has unplayed matches - always show it
+        currentGameweek = actualCurrentGameweek;
+        console.log('DEBUG: Showing current gameweek (has unplayed matches):', currentGameweek.gameweek);
+    } else if (currentGameweekAllComplete && !isNextMondayOrLater) {
+        // Current gameweek is complete but it's not Monday yet - stay for review
+        currentGameweek = actualCurrentGameweek;
+        console.log('DEBUG: Showing current gameweek for review (not Monday yet):', currentGameweek.gameweek);
+    } else if (currentGameweekAllComplete && isNextMondayOrLater && nextAvailableGameweek) {
+        // Current gameweek is complete, it's Monday, and there's a next gameweek - advance
+        currentGameweek = nextAvailableGameweek;
+        console.log('DEBUG: Advancing to next gameweek (Monday):', currentGameweek.gameweek);
     } else {
-        // All matches completed and we're past Sunday (Monday or later)
-        // Show the latest gameweek (this might be the last one available)
-        currentGameweek = groupGameweeks[groupGameweeks.length - 1];
+        // Fallback: stay on current gameweek
+        currentGameweek = actualCurrentGameweek;
+        console.log('DEBUG: Fallback to current gameweek:', currentGameweek.gameweek);
     }
     
     // Return the gameweek object with all matches
