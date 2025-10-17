@@ -1135,6 +1135,36 @@ tr.first-place .goal-diff-negative {
     border-bottom: 2px solid #3498db;
 }
 
+/* Status Messages for Forecast */
+.status-message {
+    margin: 10px 0 20px 0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-message.prediction-mode {
+    background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+    color: #1565c0;
+    border-left: 4px solid #2196f3;
+}
+
+.status-message.review-mode {
+    background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+    color: #7b1fa2;
+    border-left: 4px solid #9c27b0;
+}
+
+.status-message.archive-mode {
+    background: linear-gradient(135deg, #f1f8e9, #dcedc8);
+    color: #388e3c;
+    border-left: 4px solid #4caf50;
+}
+
 .team-analysis-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
