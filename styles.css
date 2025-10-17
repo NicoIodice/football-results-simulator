@@ -1082,8 +1082,7 @@ tr.first-place .goal-diff-negative {
     flex-wrap: wrap;
 }
 
-.forecast-controls .group-selector,
-.forecast-controls .gameweek-selector {
+.forecast-controls .group-selector {
     display: flex;
     align-items: center;
     gap: 10px;

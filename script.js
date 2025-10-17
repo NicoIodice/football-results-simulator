@@ -9,7 +9,6 @@ let selectedGroupId = null;
 
 // Forecast-specific variables
 let selectedForecastGroupId = null;
-let selectedForecastGameweek = null;
 
 // Admin configuration
 const ADMIN_CONFIG = {
@@ -2804,10 +2803,9 @@ function updateForecast() {
     }
 }
 
-// Populate forecast controls (group and gameweek selectors)
+// Populate forecast controls (group selector only)
 function populateForecastControls() {
     populateForecastGroupSelector();
-    populateForecastGameweekSelector();
 }
 
 // Populate group selector for forecast
@@ -2831,55 +2829,10 @@ function populateForecastGroupSelector() {
     }
 }
 
-// Populate gameweek selector for forecast
-function populateForecastGameweekSelector() {
-    const selector = document.getElementById('forecast-gameweek-select');
-    if (!selector || !selectedForecastGroupId) return;
-    
-    selector.innerHTML = '';
-    
-    // Get all gameweeks for the selected group
-    const groupFixtures = fixtures.filter(f => f.groupId === selectedForecastGroupId);
-    const gameweeks = [...new Set(groupFixtures.map(f => f.gameweek))].sort((a, b) => a - b);
-    
-    // Add "Current" option for next gameweek
-    const currentGameweek = findNextGameweek();
-    if (currentGameweek) {
-        const currentOption = document.createElement('option');
-        currentOption.value = 'current';
-        currentOption.textContent = `Current (Gameweek ${currentGameweek.gameweek})`;
-        selector.appendChild(currentOption);
-    }
-    
-    // Add all gameweeks
-    gameweeks.forEach(gameweek => {
-        const option = document.createElement('option');
-        option.value = gameweek;
-        option.textContent = `Gameweek ${gameweek}`;
-        selector.appendChild(option);
-    });
-    
-    // Set default to current gameweek
-    selectedForecastGameweek = 'current';
-    selector.value = 'current';
-}
-
 // Handle group selection change
 function updateForecastForGroup() {
     const selector = document.getElementById('forecast-group-select');
     selectedForecastGroupId = selector.value;
-    
-    // Update gameweek selector for new group
-    populateForecastGameweekSelector();
-    
-    // Regenerate forecast
-    updateForecast();
-}
-
-// Handle gameweek selection change
-function updateForecastForGameweek() {
-    const selector = document.getElementById('forecast-gameweek-select');
-    selectedForecastGameweek = selector.value;
     
     // Regenerate forecast
     updateForecast();
@@ -2895,17 +2848,10 @@ function generateForecast() {
     const currentStandings = calculateStandings();
     const teamAnalysis = analyzeAllTeams(currentStandings);
     
-    // Get the selected gameweek for predictions
-    let selectedGameweek;
-    if (selectedForecastGameweek === 'current') {
-        selectedGameweek = findNextGameweek();
-    } else if (selectedForecastGameweek) {
-        selectedGameweek = findGameweekByNumber(parseInt(selectedForecastGameweek));
-    } else {
-        selectedGameweek = findNextGameweek();
-    }
+    // Always get the current gameweek for the selected group
+    const currentGameweek = findCurrentGameweekForGroup(selectedForecastGroupId);
     
-    const matchPredictions = selectedGameweek ? generateMatchPredictionsForGameweek(selectedGameweek, teamAnalysis) : null;
+    const matchPredictions = currentGameweek ? generateMatchPredictionsForGameweek(currentGameweek, teamAnalysis) : null;
     const championshipForecast = generateChampionshipForecast(currentStandings, teamAnalysis);
     
     // Restore original group selection
@@ -2926,10 +2872,10 @@ function generateForecast() {
         ${matchPredictions ? `
         <div class="forecast-section">
             <div class="forecast-header">
-                ⚽ Match Predictions for ${groupName} - Gameweek ${selectedGameweek.gameweek}
+                ⚽ Match Predictions for ${groupName} - Current Gameweek ${currentGameweek.gameweek}
             </div>
             <div class="forecast-content">
-                ${generateMatchPredictionsHTML(matchPredictions, selectedGameweek)}
+                ${generateMatchPredictionsHTML(matchPredictions, currentGameweek)}
             </div>
         </div>
         ` : ''}
@@ -3087,18 +3033,51 @@ function calculateMomentum(team) {
     return { direction: "Stable", strength: "Neutral", color: "#95a5a6", icon: "➡️" };
 }
 
-// Helper function to find gameweek by number
-function findGameweekByNumber(gameweekNumber) {
-    const groupFixtures = fixtures.filter(f => f.groupId === selectedForecastGroupId && f.gameweek === gameweekNumber);
+// Helper function to find current gameweek for a specific group
+function findCurrentGameweekForGroup(groupId) {
+    if (!groupId) return null;
     
-    if (groupFixtures.length === 0) return null;
+    // Get all gameweek objects for this group
+    const groupGameweeks = fixtures.filter(gw => gw.groupId === groupId);
+    const groupResults = results.filter(r => r.groupId === groupId);
     
+    if (groupGameweeks.length === 0) return null;
+    
+    // Sort gameweeks by number
+    groupGameweeks.sort((a, b) => a.gameweek - b.gameweek);
+    
+    // Find the current gameweek by looking for the first gameweek with unplayed matches
+    let currentGameweek = null;
+    
+    for (const gameweekObj of groupGameweeks) {
+        // Check if any match in this gameweek is unplayed
+        const hasUnplayedMatches = gameweekObj.matches.some(match => {
+            return !groupResults.some(result => 
+                result.gameweek === gameweekObj.gameweek &&
+                result.homeTeam === match.homeTeam &&
+                result.awayTeam === match.awayTeam
+            );
+        });
+        
+        if (hasUnplayedMatches) {
+            currentGameweek = gameweekObj;
+            break;
+        }
+    }
+    
+    // If all matches are played, use the latest gameweek
+    if (!currentGameweek) {
+        currentGameweek = groupGameweeks[groupGameweeks.length - 1];
+    }
+    
+    // Return the gameweek object with all matches
     return {
-        gameweek: gameweekNumber,
-        matches: groupFixtures
+        gameweek: currentGameweek.gameweek,
+        matches: currentGameweek.matches
     };
 }
 
+// Helper function to find gameweek by number
 // Generate match predictions for a specific gameweek (including completed games)
 function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
     return gameweek.matches.map(match => {
