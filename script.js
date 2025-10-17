@@ -3089,10 +3089,11 @@ function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
         const prediction = predictMatch(homeTeam, awayTeam);
         
         // Check if this match has already been played
+        // Use the gameweek number from the gameweek object, not from the individual match
         const actualResult = results.find(r => 
             r.homeTeam === match.homeTeam && 
             r.awayTeam === match.awayTeam && 
-            r.gameweek === match.gameweek
+            r.gameweek === gameweek.gameweek
         );
         
         return {
@@ -3315,7 +3316,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     <div class="match-header">
                         <div class="match-status">
                             ${pred.actualResult ? 
-                                `<span class="completed-badge">✅ Completed</span>` : 
+                                `<span class="completed-badge">✅ Match Played</span>` : 
                                 `<span class="upcoming-badge">🕒 Upcoming</span>`
                             }
                         </div>
@@ -3325,18 +3326,30 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         <div class="team-prediction home-team">
                             <h4>${pred.homeTeam.name}</h4>
                             <div class="team-form">Form: ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text}</div>
-                            <div class="win-probability">Predicted: ${pred.prediction.homeWinProb}%</div>
+                            <div class="win-probability">
+                                ${pred.actualResult ? 
+                                    `Predicted: ${pred.prediction.homeWinProb}%` :
+                                    `${pred.prediction.homeWinProb}%`
+                                }
+                            </div>
+                            ${pred.actualResult ? `
+                                <div class="actual-result-text">
+                                    <span class="actual-score-text">Actual: ${pred.actualResult.homeScore > pred.actualResult.awayScore ? 'Won' : pred.actualResult.homeScore === pred.actualResult.awayScore ? 'Draw' : 'Lost'}</span>
+                                </div>
+                            ` : ''}
                         </div>
                         
                         <div class="match-center">
                             <div class="vs-divider">VS</div>
                             ${pred.actualResult ? `
-                                <div class="actual-score">
-                                    <strong>${pred.actualResult.homeScore} - ${pred.actualResult.awayScore}</strong>
-                                    <small>Actual Result</small>
-                                </div>
-                                <div class="predicted-score">
-                                    Predicted: ${pred.prediction.predictedScore}
+                                <div class="match-result-display">
+                                    <div class="predicted-vs-actual">
+                                        <span class="predicted-score-small">Predicted: ${pred.prediction.predictedScore}</span>
+                                    </div>
+                                    <div class="actual-score-large">
+                                        <span class="actual-score-main">${pred.actualResult.homeScore} - ${pred.actualResult.awayScore}</span>
+                                        <small class="actual-label">Actual Result</small>
+                                    </div>
                                 </div>
                                 <div class="prediction-accuracy">
                                     ${getPredictionAccuracy(pred.prediction, pred.actualResult)}
@@ -3355,7 +3368,17 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         <div class="team-prediction away-team">
                             <h4>${pred.awayTeam.name}</h4>
                             <div class="team-form">Form: ${pred.awayTeam.formDescription.icon} ${pred.awayTeam.formDescription.text}</div>
-                            <div class="win-probability">Predicted: ${pred.prediction.awayWinProb}%</div>
+                            <div class="win-probability">
+                                ${pred.actualResult ? 
+                                    `Predicted: ${pred.prediction.awayWinProb}%` :
+                                    `${pred.prediction.awayWinProb}%`
+                                }
+                            </div>
+                            ${pred.actualResult ? `
+                                <div class="actual-result-text">
+                                    <span class="actual-score-text">Actual: ${pred.actualResult.awayScore > pred.actualResult.homeScore ? 'Won' : pred.actualResult.homeScore === pred.actualResult.awayScore ? 'Draw' : 'Lost'}</span>
+                                </div>
+                            ` : ''}
                         </div>
                     </div>
                     

@@ -1346,6 +1346,51 @@ tr.first-place .goal-diff-negative {
     font-weight: 600;
 }
 
+.match-result-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.predicted-vs-actual {
+    font-size: 0.8em;
+    color: #7f8c8d;
+}
+
+.predicted-score-small {
+    font-style: italic;
+}
+
+.actual-score-large {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.actual-score-main {
+    font-size: 2em;
+    font-weight: bold;
+    color: #27ae60;
+    margin: 4px 0;
+}
+
+.actual-label {
+    font-size: 0.7em;
+    color: #7f8c8d;
+    font-weight: normal;
+}
+
+.actual-result-text {
+    margin-top: 8px;
+    font-size: 0.85em;
+}
+
+.actual-score-text {
+    color: #27ae60;
+    font-weight: 600;
+}
+
 .actual-score {
     font-size: 2em;
     font-weight: bold;
