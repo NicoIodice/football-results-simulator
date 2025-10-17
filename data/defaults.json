@@ -6,6 +6,13 @@
     "teams": true,
     "fixtures": true
   },
+  "subTabs": {
+    "standings": {
+      "enabled": true,
+      "leagueStandings": true,
+      "knockoutStage": true
+    }
+  },
   "defaultGroup": "group-c",
   "defaultTeam": "sporting-esgaios",
   "ui": {

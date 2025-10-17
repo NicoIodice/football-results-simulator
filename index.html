@@ -26,32 +26,121 @@
         <main>
             <!-- Standings Tab -->
             <div id="standings" class="tab-content active">
-                <h2>League Standings</h2>
-                <div class="group-selector">
-                    <label for="selected-group">Select Group:</label>
-                    <select id="selected-group" onchange="updateStandingsForGroup()">
-                        <!-- Groups will be populated by JavaScript -->
-                    </select>
+                <h2>Championship Overview</h2>
+                
+                <!-- Sub-tabs for Standings -->
+                <div class="sub-tabs">
+                    <button class="sub-tab-button active" onclick="showStandingsSubTab('league-standings')">League Standings</button>
+                    <button class="sub-tab-button" onclick="showStandingsSubTab('knockout-stage')">Knockout</button>
                 </div>
-                <div class="table-container">
-                    <table id="standings-table">
-                        <thead>
-                            <tr>
-                                <th>Rank</th>
-                                <th>Team</th>
-                                <th>Matches</th>
-                                <th>W-L-D</th>
-                                <th title="Total goals scored minus goals given up">Goals Diff (TB1)</th>
-                                <th title="Number of total goals scored per team">Total Goals (TB2)</th>
-                                <th title="The highest number of points obtained by the tied teams in the matches they played against each other">Head-to-Head (TB3)</th>
-                                <th>Match History</th>
-                                <th>Points</th>
-                            </tr>
-                        </thead>
-                        <tbody id="standings-body">
-                            <!-- Standings will be populated by JavaScript -->
-                        </tbody>
-                    </table>
+                
+                <!-- League Standings Sub-tab -->
+                <div id="league-standings" class="sub-tab-content active">
+                    <div class="group-selector">
+                        <label for="selected-group">Select Group:</label>
+                        <select id="selected-group" onchange="updateStandingsForGroup()">
+                            <!-- Groups will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table id="standings-table">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team</th>
+                                    <th>Matches</th>
+                                    <th>W-L-D</th>
+                                    <th title="Total goals scored minus goals given up">Goals Diff (TB1)</th>
+                                    <th title="Number of total goals scored per team">Total Goals (TB2)</th>
+                                    <th title="The highest number of points obtained by the tied teams in the matches they played against each other">Head-to-Head (TB3)</th>
+                                    <th>Match History</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="standings-body">
+                                <!-- Standings will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Knockout Stage Sub-tab -->
+                <div id="knockout-stage" class="sub-tab-content">
+                    <div class="knockout-header">
+                        <h3>🏆 Semi-Finals & Finals</h3>
+                        <p class="knockout-date">📅 November 7th, 2025 - Starting at 4:00 PM</p>
+                    </div>
+                    
+                    <div class="knockout-bracket">
+                        <!-- Semi-Finals -->
+                        <div class="knockout-round semi-finals">
+                            <h4>Semi-Finals</h4>
+                            <div class="matches-container">
+                                <div class="knockout-match">
+                                    <div class="match-participants">
+                                        <div class="participant">
+                                            <div id="group-a-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Group A</div>
+                                        </div>
+                                        <div class="vs-text">VS</div>
+                                        <div class="participant">
+                                            <div id="group-d-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Group D</div>
+                                        </div>
+                                    </div>
+                                    <div class="match-label">Semi-Final 1</div>
+                                </div>
+                                
+                                <div class="knockout-match">
+                                    <div class="match-participants">
+                                        <div class="participant">
+                                            <div id="group-b-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Group B</div>
+                                        </div>
+                                        <div class="vs-text">VS</div>
+                                        <div class="participant">
+                                            <div id="group-c-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Group C</div>
+                                        </div>
+                                    </div>
+                                    <div class="match-label">Semi-Final 2</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Finals -->
+                        <div class="knockout-round final">
+                            <h4>Final</h4>
+                            <div class="matches-container">
+                                <div class="knockout-match final-match">
+                                    <div class="match-participants">
+                                        <div class="participant">
+                                            <div id="semifinal-1-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Semi-Final 1</div>
+                                        </div>
+                                        <div class="vs-text">VS</div>
+                                        <div class="participant">
+                                            <div id="semifinal-2-winner" class="team-box">
+                                                <span class="team-name">TBD</span>
+                                            </div>
+                                            <div class="team-label">Winner of Semi-Final 2</div>
+                                        </div>
+                                    </div>
+                                    <div class="match-label">Championship Final</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

@@ -652,6 +652,32 @@ function applyTabVisibilitySettings() {
     if (firstVisibleTab) {
         showTab(firstVisibleTab);
     }
+    
+    // Apply sub-tab configurations if they exist in defaults
+    if (defaults.subTabs && defaults.subTabs.standings) {
+        const subTabConfig = defaults.subTabs.standings;
+        const subTabsContainer = document.querySelector('.sub-tabs');
+        
+        // Hide/show sub-tabs container based on configuration
+        if (subTabsContainer) {
+            subTabsContainer.style.display = subTabConfig.enabled !== false ? '' : 'none';
+        }
+        
+        // Configure individual sub-tab buttons
+        if (subTabConfig.knockoutStage !== undefined) {
+            const knockoutButton = document.querySelector('button[onclick="showStandingsSubTab(\'knockout-stage\')"]');
+            if (knockoutButton) {
+                knockoutButton.style.display = subTabConfig.knockoutStage !== false ? '' : 'none';
+            }
+        }
+        
+        if (subTabConfig.leagueStandings !== undefined) {
+            const leagueButton = document.querySelector('button[onclick="showStandingsSubTab(\'league-standings\')"]');
+            if (leagueButton) {
+                leagueButton.style.display = subTabConfig.leagueStandings !== false ? '' : 'none';
+            }
+        }
+    }
 }
 
 // Calculate standings with tie-breaker rules
@@ -965,6 +991,9 @@ function updateStandings() {
 
         tbody.appendChild(row);
     });
+    
+    // Update knockout stage bracket with current group winners
+    updateKnockoutStage();
 }
 
 // Generate match history HTML
@@ -5261,3 +5290,99 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load players data when page loads
     loadPlayersData();
 });
+
+// Sub-tab functionality for Standings
+function showStandingsSubTab(tabId) {
+    // Hide all sub-tab contents
+    const subTabContents = document.querySelectorAll('.sub-tab-content');
+    subTabContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all sub-tab buttons
+    const subTabButtons = document.querySelectorAll('.sub-tab-button');
+    subTabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected sub-tab content
+    const selectedContent = document.getElementById(tabId);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    const clickedButton = event.target;
+    clickedButton.classList.add('active');
+    
+    // Update knockout stage if that's the selected tab
+    if (tabId === 'knockout-stage') {
+        updateKnockoutStage();
+    }
+}
+
+// Function to get the winner of each group
+function getGroupWinner(groupId) {
+    // Save current group selection
+    const originalGroupId = selectedGroupId;
+    
+    // Temporarily change to the target group
+    selectedGroupId = groupId;
+    
+    // Calculate standings for this group
+    const standings = calculateStandings();
+    
+    // Get the winner (first place team)
+    const winner = standings.length > 0 ? standings[0] : null;
+    
+    // Restore original group selection
+    selectedGroupId = originalGroupId;
+    
+    return winner;
+}
+
+// Function to update the knockout stage with current group winners
+function updateKnockoutStage() {
+    console.log('DEBUG: Updating knockout stage');
+    
+    // Get winners for each group
+    const groupAWinner = getGroupWinner('group-a');
+    const groupBWinner = getGroupWinner('group-b');
+    const groupCWinner = getGroupWinner('group-c');
+    const groupDWinner = getGroupWinner('group-d');
+    
+    console.log('DEBUG: Group winners:', {
+        'Group A': groupAWinner?.name,
+        'Group B': groupBWinner?.name,
+        'Group C': groupCWinner?.name,
+        'Group D': groupDWinner?.name
+    });
+    
+    // Update Semi-Final 1 (Group A vs Group D)
+    const groupABox = document.getElementById('group-a-winner');
+    const groupDBox = document.getElementById('group-d-winner');
+    
+    if (groupABox && groupAWinner) {
+        groupABox.querySelector('.team-name').textContent = groupAWinner.name;
+        groupABox.title = `${groupAWinner.fullName || groupAWinner.name} - ${groupAWinner.points} points`;
+    }
+    
+    if (groupDBox && groupDWinner) {
+        groupDBox.querySelector('.team-name').textContent = groupDWinner.name;
+        groupDBox.title = `${groupDWinner.fullName || groupDWinner.name} - ${groupDWinner.points} points`;
+    }
+    
+    // Update Semi-Final 2 (Group B vs Group C)
+    const groupBBox = document.getElementById('group-b-winner');
+    const groupCBox = document.getElementById('group-c-winner');
+    
+    if (groupBBox && groupBWinner) {
+        groupBBox.querySelector('.team-name').textContent = groupBWinner.name;
+        groupBBox.title = `${groupBWinner.fullName || groupBWinner.name} - ${groupBWinner.points} points`;
+    }
+    
+    if (groupCBox && groupCWinner) {
+        groupCBox.querySelector('.team-name').textContent = groupCWinner.name;
+        groupCBox.title = `${groupCWinner.fullName || groupCWinner.name} - ${groupCWinner.points} points`;
+    }
+}

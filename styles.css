@@ -3122,3 +3122,239 @@ tr.first-place .goal-diff-negative {
         gap: 5px;
     }
 }
+
+/* Sub-tabs for Standings */
+.sub-tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ecf0f1;
+    gap: 0;
+}
+
+.sub-tab-button {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #7f8c8d;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.sub-tab-button:hover {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.sub-tab-button.active {
+    color: #2c3e50;
+    border-bottom-color: #3498db;
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.sub-tab-content {
+    display: none;
+}
+
+.sub-tab-content.active {
+    display: block;
+}
+
+/* Knockout Stage Styles */
+.knockout-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.knockout-header h3 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+    font-size: 1.8rem;
+}
+
+.knockout-date {
+    color: #7f8c8d;
+    font-size: 1.1rem;
+    font-weight: 500;
+    margin: 0;
+}
+
+.knockout-bracket {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.knockout-round {
+    margin-bottom: 40px;
+}
+
+.knockout-round h4 {
+    text-align: center;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-radius: 8px;
+    border-left: 4px solid #3498db;
+}
+
+.matches-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.knockout-match {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 2px solid #ecf0f1;
+    transition: all 0.3s ease;
+    min-width: 300px;
+    flex: 1;
+    max-width: 450px;
+}
+
+.knockout-match:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    border-color: #3498db;
+}
+
+.final-match {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.match-participants {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.participant {
+    text-align: center;
+    flex: 1;
+}
+
+.team-box {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    padding: 15px 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.team-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
+}
+
+.team-name {
+    font-weight: bold;
+    font-size: 1rem;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.team-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    font-style: italic;
+    margin-top: 5px;
+}
+
+.vs-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+    margin: 0 15px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    border: 2px solid #e74c3c;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.match-label {
+    text-align: center;
+    font-weight: bold;
+    color: #2c3e50;
+    font-size: 1rem;
+    padding: 8px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+}
+
+/* Special styling for finals */
+.final .team-box {
+    background: linear-gradient(135deg, #e67e22, #d35400);
+}
+
+.final .vs-text {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border-color: #c0392b;
+}
+
+.final .match-label {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    color: white;
+    border: none;
+    font-size: 1.1rem;
+}
+
+/* Responsive design for knockout stage */
+@media (max-width: 768px) {
+    .matches-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .knockout-match {
+        min-width: 280px;
+        max-width: 100%;
+    }
+    
+    .match-participants {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .vs-text {
+        margin: 10px 0;
+    }
+    
+    .sub-tabs {
+        flex-direction: column;
+    }
+    
+    .sub-tab-button {
+        border-bottom: none;
+        border-right: 3px solid transparent;
+        text-align: left;
+    }
+    
+    .sub-tab-button.active {
+        border-right-color: #3498db;
+        border-bottom-color: transparent;
+    }
+}
