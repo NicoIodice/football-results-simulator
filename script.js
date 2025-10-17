@@ -10,7 +10,7 @@ let selectedGroupId = null;
 // Admin configuration
 const ADMIN_CONFIG = {
     role: 'admin',
-    validateTime: true // Enable/disable time validation for adding results
+    validateTime: false // Enable/disable time validation for adding results
 };
 
 // Configuration for simulation type
@@ -316,33 +316,45 @@ function updateTeamSelectorForGroup() {
     const teamSelect = document.getElementById('selected-team');
     if (!teamSelect) return;
     
-    const groupTeams = getTeamsForGroup();
     const currentSelection = teamSelect.value;
     
     teamSelect.innerHTML = '';
     
-    groupTeams.forEach(team => {
-        const option = document.createElement('option');
-        option.value = team.id;
-        option.textContent = team.name;
-        teamSelect.appendChild(option);
+    // Create hierarchical structure with optgroups for all groups (like Teams tab)
+    groups.forEach(group => {
+        const groupTeams = teams.filter(team => team.groupId === group.id);
+        
+        if (groupTeams.length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = group.name;
+            
+            groupTeams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.id;
+                option.textContent = team.name;
+                optgroup.appendChild(option);
+            });
+            
+            teamSelect.appendChild(optgroup);
+        }
     });
     
-    // Try to maintain current selection if team exists in new group
-    if (groupTeams.some(team => team.id === currentSelection)) {
+    // Try to maintain current selection if team exists
+    const allTeams = teams;
+    if (allTeams.some(team => team.id === currentSelection)) {
         teamSelect.value = currentSelection;
-    } else if (groupTeams.length > 0) {
+    } else if (allTeams.length > 0) {
         // Use default team from defaults.json, fallback to team marked as default, otherwise first team
         const defaultTeamId = defaults.defaultTeam;
-        const defaultTeamFromConfig = groupTeams.find(team => team.id === defaultTeamId);
-        const defaultTeamFromData = groupTeams.find(team => team.isDefault === true);
+        const defaultTeamFromConfig = allTeams.find(team => team.id === defaultTeamId);
+        const defaultTeamFromData = allTeams.find(team => team.isDefault === true);
         
         if (defaultTeamFromConfig) {
             teamSelect.value = defaultTeamFromConfig.id;
         } else if (defaultTeamFromData) {
             teamSelect.value = defaultTeamFromData.id;
         } else {
-            teamSelect.value = groupTeams[0].id;
+            teamSelect.value = allTeams[0].id;
         }
     }
 }
@@ -1134,8 +1146,7 @@ function createMatchElement(match, showGroupIndicator) {
 // AI-Powered Simulator functionality
 async function updateSimulation() {
     const selectedTeamId = document.getElementById('selected-team').value;
-    const groupTeams = getTeamsForGroup();
-    const selectedTeam = groupTeams.find(t => t.id === selectedTeamId);
+    const selectedTeam = teams.find(t => t.id === selectedTeamId); // Use all teams, not just group teams
     
     if (!selectedTeam) return;
     
@@ -1206,6 +1217,13 @@ async function generateAISimulation(teamId, team) {
         throw new Error('OpenAI client not initialized');
     }
 
+    // Set the selected group to the team's group for proper calculations
+    const teamData = teams.find(t => t.id === teamId);
+    if (!teamData) throw new Error('Team not found');
+    
+    const originalGroupId = selectedGroupId;
+    selectedGroupId = teamData.groupId; // Temporarily switch to team's group
+
     const currentStandings = calculateStandings();
     const teamStanding = currentStandings.find(t => t.id === teamId);
     const currentPosition = currentStandings.findIndex(t => t.id === teamId) + 1;
@@ -1217,8 +1235,14 @@ async function generateAISimulation(teamId, team) {
     
     try {
         const aiInsights = await queryOpenAI(contextData);
-        return generateAISimulationHTML(teamId, team, currentStandings, remainingMatches, aiInsights);
+        const result = generateAISimulationHTML(teamId, team, currentStandings, remainingMatches, aiInsights);
+        
+        // Restore original group selection
+        selectedGroupId = originalGroupId;
+        return result;
     } catch (error) {
+        // Restore original group selection on error
+        selectedGroupId = originalGroupId;
         console.error('OpenAI API error:', error);
         throw error;
     }
@@ -1702,6 +1726,13 @@ function extractTextBetween(text, startKeyword, endKeywords) {
 
 function generateCustomSimulation(teamId, team) {
     // Custom championship analysis within points gap
+    // First, set the selected group to the team's group for proper calculations
+    const teamData = teams.find(t => t.id === teamId);
+    if (!teamData) return '<div class="error">Team not found</div>';
+    
+    const originalGroupId = selectedGroupId;
+    selectedGroupId = teamData.groupId; // Temporarily switch to team's group
+    
     const currentStandings = calculateStandings();
     const teamStanding = currentStandings.find(t => t.id === teamId);
     const currentPosition = currentStandings.findIndex(t => t.id === teamId) + 1;
@@ -1712,6 +1743,9 @@ function generateCustomSimulation(teamId, team) {
     
     // Calculate all possible scenarios
     const scenarios = calculateAdvancedScenarios(teamId, currentStandings, relevantTeams);
+    
+    // Restore original group selection
+    selectedGroupId = originalGroupId;
     
     return `
         <div class="simulation-section">
@@ -1941,7 +1975,8 @@ function calculateAdvancedScenarios(selectedTeamId, standings, relevantTeams) {
     
     if (!selectedMatch) {
         // Team doesn't play - analyze other teams' results only
-        return calculateRestGameweekScenarios(selectedTeamId, standings, relevantTeams, nextGameweek);
+        const nextGameweekMatches = getNextGameweekMatchesForTeams(relevantTeams, nextGameweek);
+        return calculateRestGameweekScenarios(selectedTeamId, standings, relevantTeams, nextGameweek, nextGameweekMatches);
     }
     
     // Get opponent info
@@ -3928,12 +3963,23 @@ function populateTeamLineupSelector() {
     // Clear existing options
     selector.innerHTML = '<option value="">Select a team...</option>';
     
-    // Add teams from teams data
-    teamsData.forEach(team => {
-        const option = document.createElement('option');
-        option.value = team.id;
-        option.textContent = team.name;
-        selector.appendChild(option);
+    // Create hierarchical structure with optgroups for each group
+    groups.forEach(group => {
+        const groupTeams = teamsData.filter(team => team.groupId === group.id);
+        
+        if (groupTeams.length > 0) {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = group.name;
+            
+            groupTeams.forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.id;
+                option.textContent = team.name;
+                optgroup.appendChild(option);
+            });
+            
+            selector.appendChild(optgroup);
+        }
     });
     
     // Set default team if available
