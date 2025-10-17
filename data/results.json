@@ -218,5 +218,15 @@
     "gameweek": 3,
     "groupId": "group-b",
     "played": true
+  },
+  {
+    "matchId": "match-a8",
+    "homeTeam": "critical-underdogs",
+    "awayTeam": "bestsellers",
+    "homeScore": 6,
+    "awayScore": 8,
+    "gameweek": 4,
+    "groupId": "group-a",
+    "played": true
   }
 ]
