@@ -1,5 +1,555 @@
 [
   {
+    "id": "desesperados-fc",
+    "name": "Desesperados FC",
+    "league": "CSW",
+    "fullName": "Desesperados FC (CSW)",
+    "groupId": "group-a",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "desesperados-gk",
+        "name": "Desesperados Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "desesperados-def1",
+        "name": "Desesperados Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "desesperados-def2",
+        "name": "Desesperados Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "desesperados-mid",
+        "name": "Desesperados Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "desesperados-fwd",
+        "name": "Desesperados Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "bestsellers",
+    "name": "BestSellers",
+    "league": "CTW",
+    "fullName": "BestSellers (CTW)",
+    "groupId": "group-a",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "bestsellers-gk",
+        "name": "BestSellers Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-def1",
+        "name": "BestSellers Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "bestsellers-def2",
+        "name": "BestSellers Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-mid",
+        "name": "BestSellers Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-fwd",
+        "name": "BestSellers Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "red-star-lx",
+    "name": "Red Star LX",
+    "league": "CTW",
+    "fullName": "Red Star LX (CTW)",
+    "groupId": "group-a",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "red-star-gk",
+        "name": "Red Star Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-def1",
+        "name": "Red Star Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "red-star-def2",
+        "name": "Red Star Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-mid",
+        "name": "Red Star Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-fwd",
+        "name": "Red Star Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "critical-underdogs",
+    "name": "Critical Underdogs",
+    "league": "CTW",
+    "fullName": "Critical Underdogs (CTW)",
+    "groupId": "group-a",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "critical-underdogs-gk",
+        "name": "Critical Underdogs Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critical-underdogs-def1",
+        "name": "Critical Underdogs Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "critical-underdogs-def2",
+        "name": "Critical Underdogs Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critical-underdogs-mid",
+        "name": "Critical Underdogs Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critical-underdogs-fwd",
+        "name": "Critical Underdogs Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "shadow-x",
+    "name": "Shadow X",
+    "league": "CTW",
+    "fullName": "Shadow X (CTW)",
+    "groupId": "group-a",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "shadow-x-gk",
+        "name": "Shadow X Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "shadow-x-def1",
+        "name": "Shadow X Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "shadow-x-def2",
+        "name": "Shadow X Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "shadow-x-mid",
+        "name": "Shadow X Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "shadow-x-fwd",
+        "name": "Shadow X Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "critigals",
+    "name": "CritiGals",
+    "league": "CSW",
+    "fullName": "CritiGals (CSW)",
+    "groupId": "group-b",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "critigals-gk",
+        "name": "CritiGals Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critigals-def1",
+        "name": "CritiGals Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "critigals-def2",
+        "name": "CritiGals Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critigals-mid",
+        "name": "CritiGals Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "critigals-fwd",
+        "name": "CritiGals Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "underdogs-fc",
+    "name": "UnderDogs FC",
+    "league": "CSW",
+    "fullName": "UnderDogs FC (CSW)",
+    "groupId": "group-b",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "underdogs-fc-gk",
+        "name": "UnderDogs FC Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "underdogs-fc-def1",
+        "name": "UnderDogs FC Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "underdogs-fc-def2",
+        "name": "UnderDogs FC Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "underdogs-fc-mid",
+        "name": "UnderDogs FC Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "underdogs-fc-fwd",
+        "name": "UnderDogs FC Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "borussia-doutromundo",
+    "name": "Borussia Doutromundo",
+    "league": "CSW",
+    "fullName": "Borussia Doutromundo (CSW)",
+    "groupId": "group-b",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "borussia-doutromundo-gk",
+        "name": "Borussia Doutromundo Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borussia-doutromundo-def1",
+        "name": "Borussia Doutromundo Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "borussia-doutromundo-def2",
+        "name": "Borussia Doutromundo Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borussia-doutromundo-mid",
+        "name": "Borussia Doutromundo Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borussia-doutromundo-fwd",
+        "name": "Borussia Doutromundo Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "fc-zerolhos",
+    "name": "FC ZÉrolhos",
+    "league": "CSW",
+    "fullName": "FC ZÉrolhos (CSW)",
+    "groupId": "group-b",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "fc-zerolhos-gk",
+        "name": "FC ZÉrolhos Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "fc-zerolhos-def1",
+        "name": "FC ZÉrolhos Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "fc-zerolhos-def2",
+        "name": "FC ZÉrolhos Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "fc-zerolhos-mid",
+        "name": "FC ZÉrolhos Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "fc-zerolhos-fwd",
+        "name": "FC ZÉrolhos Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
+    "id": "borg-coimbra",
+    "name": "Borg Coimbra",
+    "league": "CSW",
+    "fullName": "Borg Coimbra (CSW)",
+    "groupId": "group-b",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "borg-coimbra-gk",
+        "name": "Borg Coimbra Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borg-coimbra-def1",
+        "name": "Borg Coimbra Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "borg-coimbra-def2",
+        "name": "Borg Coimbra Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borg-coimbra-mid",
+        "name": "Borg Coimbra Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "borg-coimbra-fwd",
+        "name": "Borg Coimbra Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
+  },
+  {
     "id": "logan-fc",
     "name": "LOGAN FC",
     "league": "CTW",

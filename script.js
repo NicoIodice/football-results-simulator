@@ -4,6 +4,7 @@ let teams = [];
 let fixtures = [];
 let results = [];
 let goals = [];
+let defaults = {}; // Add defaults configuration
 let selectedGroupId = null;
 
 // Admin configuration
@@ -15,7 +16,7 @@ const ADMIN_CONFIG = {
 // Configuration for simulation type
 const SIMULATION_CONFIG = {
     useOpenAI: false, // Switch to enable/disable OpenAI analysis (default off)
-    pointsGapLimit: 3 // Only analyze teams within this points gap
+    pointsGapLimit: 3 // Only analyze teams within this points gap - will be updated from defaults.json
 };
 
 // OpenRouter API configuration (formerly OpenAI)
@@ -245,7 +246,8 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Load JSON data
 async function loadData() {
     try {
-        const [groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse] = await Promise.all([
+        const [defaultsResponse, groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse] = await Promise.all([
+            fetch('data/defaults.json'),
             fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
@@ -253,18 +255,26 @@ async function loadData() {
             fetch('data/goals.json')
         ]);
         
+        defaults = await defaultsResponse.json();
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await resultsResponse.json();
         goals = await goalsResponse.json();
         
-        // Set the first group as default
-        if (groups.length > 0) {
-            selectedGroupId = groups[0].id;
+        // Set default group based on defaults.json
+        selectedGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
+        
+        // Update simulation config from defaults
+        if (defaults.simulation) {
+            SIMULATION_CONFIG.pointsGapLimit = defaults.simulation.pointsGapLimit || 3;
         }
         
         console.log('Data loaded successfully');
+        
+        // Apply tab visibility settings
+        applyTabVisibilitySettings();
+        
         populateGroupSelector();
         updateTeamSelectorForGroup();
         updateAllTabs();
@@ -322,9 +332,18 @@ function updateTeamSelectorForGroup() {
     if (groupTeams.some(team => team.id === currentSelection)) {
         teamSelect.value = currentSelection;
     } else if (groupTeams.length > 0) {
-        // Default to team marked as default, otherwise first team
-        const defaultTeam = groupTeams.find(team => team.isDefault === true);
-        teamSelect.value = defaultTeam ? defaultTeam.id : groupTeams[0].id;
+        // Use default team from defaults.json, fallback to team marked as default, otherwise first team
+        const defaultTeamId = defaults.defaultTeam;
+        const defaultTeamFromConfig = groupTeams.find(team => team.id === defaultTeamId);
+        const defaultTeamFromData = groupTeams.find(team => team.isDefault === true);
+        
+        if (defaultTeamFromConfig) {
+            teamSelect.value = defaultTeamFromConfig.id;
+        } else if (defaultTeamFromData) {
+            teamSelect.value = defaultTeamFromData.id;
+        } else {
+            teamSelect.value = groupTeams[0].id;
+        }
     }
 }
 
@@ -580,6 +599,43 @@ function showTab(tabName) {
         case 'forecast':
             updateForecast();
             break;
+    }
+}
+
+// Apply tab visibility settings from defaults.json
+function applyTabVisibilitySettings() {
+    if (!defaults.tabVisibility) return;
+    
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    // Map of tab names to their selectors
+    const tabMapping = {
+        'standings': { button: 'button[onclick="showTab(\'standings\')"]', content: '#standings' },
+        'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' },
+        'forecast': { button: 'button[onclick="showTab(\'forecast\')"]', content: '#forecast' },
+        'teams': { button: 'button[onclick="showTab(\'teams\')"]', content: '#teams' },
+        'fixtures': { button: 'button[onclick="showTab(\'fixtures\')"]', content: '#fixtures' }
+    };
+    
+    // Apply visibility settings
+    Object.keys(tabMapping).forEach(tabName => {
+        const isVisible = defaults.tabVisibility[tabName] !== false; // Default to visible if not specified
+        const button = document.querySelector(tabMapping[tabName].button);
+        const content = document.querySelector(tabMapping[tabName].content);
+        
+        if (button) {
+            button.style.display = isVisible ? '' : 'none';
+        }
+        if (content && !isVisible) {
+            content.style.display = 'none';
+        }
+    });
+    
+    // Show first visible tab by default
+    const firstVisibleTab = Object.keys(defaults.tabVisibility).find(tab => defaults.tabVisibility[tab] !== false);
+    if (firstVisibleTab) {
+        showTab(firstVisibleTab);
     }
 }
 
@@ -3638,9 +3694,15 @@ function populateTeamLineupSelector() {
     });
     
     // Set default team if available
-    const defaultTeam = teamsData.find(team => team.id === 'sporting-esgaios' || team.isDefault);
-    if (defaultTeam) {
-        selector.value = defaultTeam.id;
+    const defaultTeamId = defaults.defaultTeam;
+    const defaultTeamFromConfig = teamsData.find(team => team.id === defaultTeamId);
+    const defaultTeamFromData = teamsData.find(team => team.isDefault);
+    
+    if (defaultTeamFromConfig) {
+        selector.value = defaultTeamFromConfig.id;
+        updateTeamLineup();
+    } else if (defaultTeamFromData) {
+        selector.value = defaultTeamFromData.id;
         updateTeamLineup();
     }
 }

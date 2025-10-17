@@ -1,5 +1,29 @@
 [
   {
+    "id": "group-a",
+    "name": "Group A",
+    "description": "Lisbon",
+    "teams": [
+      "desesperados-fc",
+      "bestsellers",
+      "red-star-lx",
+      "critical-underdogs",
+      "shadow-x"
+    ]
+  },
+  {
+    "id": "group-b",
+    "name": "Group B",
+    "description": "Coimbra",
+    "teams": [
+      "critigals",
+      "underdogs-fc",
+      "borussia-doutromundo",
+      "fc-zerolhos",
+      "borg-coimbra"
+    ]
+  },
+  {
     "id": "group-c",
     "name": "Group C",
     "description": "Porto/Braga",

@@ -1,6 +1,96 @@
 [
   {
-    "matchId": "match-1",
+    "matchId": "match-a3",
+    "homeTeam": "critical-underdogs",
+    "awayTeam": "shadow-x",
+    "homeScore": 7,
+    "awayScore": 8,
+    "gameweek": 2,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-a4",
+    "homeTeam": "red-star-lx",
+    "awayTeam": "desesperados-fc",
+    "homeScore": 6,
+    "awayScore": 12,
+    "gameweek": 2,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-a1",
+    "homeTeam": "desesperados-fc",
+    "awayTeam": "bestsellers",
+    "homeScore": 4,
+    "awayScore": 5,
+    "gameweek": 1,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-a2",
+    "homeTeam": "red-star-lx",
+    "awayTeam": "critical-underdogs",
+    "homeScore": 7,
+    "awayScore": 5,
+    "gameweek": 1,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-a5",
+    "homeTeam": "red-star-lx",
+    "awayTeam": "bestsellers",
+    "homeScore": 6,
+    "awayScore": 7,
+    "gameweek": 3,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-b4",
+    "homeTeam": "underdogs-fc",
+    "awayTeam": "borg-coimbra",
+    "homeScore": 2,
+    "awayScore": 6,
+    "gameweek": 2,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
+    "matchId": "match-b2",
+    "homeTeam": "borussia-doutromundo",
+    "awayTeam": "fc-zerolhos",
+    "homeScore": 6,
+    "awayScore": 5,
+    "gameweek": 1,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
+    "matchId": "match-b1",
+    "homeTeam": "critigals",
+    "awayTeam": "underdogs-fc",
+    "homeScore": 2,
+    "awayScore": 23,
+    "gameweek": 1,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
+    "matchId": "match-b7",
+    "homeTeam": "critigals",
+    "awayTeam": "borg-coimbra",
+    "homeScore": 0,
+    "awayScore": 21,
+    "gameweek": 4,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
+    "matchId": "match-c1",
     "homeTeam": "logan-fc",
     "awayTeam": "critical-techballers",
     "homeScore": 4,
@@ -10,7 +100,7 @@
     "played": true
   },
   {
-    "matchId": "match-2",
+    "matchId": "match-c2",
     "homeTeam": "sporting-esgaios",
     "awayTeam": "ctrl-shift-golo",
     "homeScore": 1,
@@ -20,7 +110,7 @@
     "played": true
   },
   {
-    "matchId": "match-3",
+    "matchId": "match-c3",
     "homeTeam": "dataki",
     "awayTeam": "francesinha-united",
     "homeScore": 5,
@@ -30,7 +120,7 @@
     "played": true
   },
   {
-    "matchId": "match-4",
+    "matchId": "match-c4",
     "homeTeam": "logan-fc",
     "awayTeam": "sporting-esgaios",
     "homeScore": 2,
@@ -40,7 +130,7 @@
     "played": true
   },
   {
-    "matchId": "match-5",
+    "matchId": "match-c5",
     "homeTeam": "ctrl-shift-golo",
     "awayTeam": "francesinha-united",
     "homeScore": 5,
@@ -50,7 +140,7 @@
     "played": true
   },
   {
-    "matchId": "match-6",
+    "matchId": "match-c6",
     "homeTeam": "critical-techballers",
     "awayTeam": "dataki",
     "homeScore": 0,
@@ -60,7 +150,7 @@
     "played": true
   },
   {
-    "matchId": "match-7",
+    "matchId": "match-c7",
     "homeTeam": "critical-techballers",
     "awayTeam": "francesinha-united",
     "homeScore": 5,
@@ -70,7 +160,7 @@
     "played": true
   },
   {
-    "matchId": "match-8",
+    "matchId": "match-c8",
     "homeTeam": "logan-fc",
     "awayTeam": "ctrl-shift-golo",
     "homeScore": 2,
@@ -80,7 +170,7 @@
     "played": true
   },
   {
-    "matchId": "match-9",
+    "matchId": "match-c9",
     "homeTeam": "sporting-esgaios",
     "awayTeam": "dataki",
     "homeScore": 2,
@@ -90,7 +180,7 @@
     "played": true
   },
   {
-    "matchId": "match-10",
+    "matchId": "match-c10",
     "homeTeam": "critical-techballers",
     "awayTeam": "ctrl-shift-golo",
     "homeScore": 2,

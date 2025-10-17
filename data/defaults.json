@@ -1,0 +1,19 @@
+{
+  "tabVisibility": {
+    "standings": true,
+    "simulator": true,
+    "forecast": true,
+    "teams": true,
+    "fixtures": true
+  },
+  "defaultGroup": "group-c",
+  "defaultTeam": "sporting-esgaios",
+  "ui": {
+    "showLoadingMask": true,
+    "enableDebugMode": false
+  },
+  "simulation": {
+    "pointsGapLimit": 3,
+    "maxScenarios": 10
+  }
+}

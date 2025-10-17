@@ -1,24 +1,224 @@
 [
   {
     "gameweek": 1,
+    "groupId": "group-a",
+    "matches": [
+      {
+        "id": "match-a1",
+        "homeTeam": "desesperados-fc",
+        "awayTeam": "bestsellers",
+        "date": "2025-09-25",
+        "time": "18:00"
+      },
+      {
+        "id": "match-a2",
+        "homeTeam": "red-star-lx",
+        "awayTeam": "critical-underdogs",
+        "date": "2025-09-25",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 2,
+    "groupId": "group-a",
+    "matches": [
+      {
+        "id": "match-a3",
+        "homeTeam": "critical-underdogs",
+        "awayTeam": "shadow-x",
+        "date": "2025-10-02",
+        "time": "18:00"
+      },
+      {
+        "id": "match-a4",
+        "homeTeam": "red-star-lx",
+        "awayTeam": "desesperados-fc",
+        "date": "2025-10-02",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 3,
+    "groupId": "group-a",
+    "matches": [
+      {
+        "id": "match-a5",
+        "homeTeam": "red-star-lx",
+        "awayTeam": "bestsellers",
+        "date": "2025-10-09",
+        "time": "18:00"
+      },
+      {
+        "id": "match-a6",
+        "homeTeam": "desesperados-fc",
+        "awayTeam": "shadow-x",
+        "date": "2025-10-09",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 4,
+    "groupId": "group-a",
+    "matches": [
+      {
+        "id": "match-a7",
+        "homeTeam": "red-star-lx",
+        "awayTeam": "shadow-x",
+        "date": "2025-10-16",
+        "time": "18:00"
+      },
+      {
+        "id": "match-a8",
+        "homeTeam": "critical-underdogs",
+        "awayTeam": "bestsellers",
+        "date": "2025-10-16",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 5,
+    "groupId": "group-a",
+    "matches": [
+      {
+        "id": "match-a9",
+        "homeTeam": "critical-underdogs",
+        "awayTeam": "desesperados-fc",
+        "date": "2025-10-23",
+        "time": "18:00"
+      },
+      {
+        "id": "match-a10",
+        "homeTeam": "bestsellers",
+        "awayTeam": "shadow-x",
+        "date": "2025-10-23",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 1,
+    "groupId": "group-b",
+    "matches": [
+      {
+        "id": "match-b1",
+        "homeTeam": "critigals",
+        "awayTeam": "underdogs-fc",
+        "date": "2025-09-23",
+        "time": "18:00"
+      },
+      {
+        "id": "match-b2",
+        "homeTeam": "borussia-doutromundo",
+        "awayTeam": "fc-zerolhos",
+        "date": "2025-09-24",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 2,
+    "groupId": "group-b",
+    "matches": [
+      {
+        "id": "match-b3",
+        "homeTeam": "critigals",
+        "awayTeam": "borussia-doutromundo",
+        "date": "2025-10-21",
+        "time": "20:00"
+      },
+      {
+        "id": "match-b4",
+        "homeTeam": "underdogs-fc",
+        "awayTeam": "borg-coimbra",
+        "date": "2025-10-01",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 3,
+    "groupId": "group-b",
+    "matches": [
+      {
+        "id": "match-b5",
+        "homeTeam": "critigals",
+        "awayTeam": "fc-zerolhos",
+        "date": "2025-10-07",
+        "time": "18:00"
+      },
+      {
+        "id": "match-b6",
+        "homeTeam": "borussia-doutromundo",
+        "awayTeam": "borg-coimbra",
+        "date": "2025-10-08",
+        "time": "19:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 4,
+    "groupId": "group-b",
+    "matches": [
+      {
+        "id": "match-b7",
+        "homeTeam": "critigals",
+        "awayTeam": "borg-coimbra",
+        "date": "2025-10-14",
+        "time": "18:00"
+      },
+      {
+        "id": "match-b8",
+        "homeTeam": "underdogs-fc",
+        "awayTeam": "fc-zerolhos",
+        "date": "2025-10-17",
+        "time": "18:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 5,
+    "groupId": "group-b",
+    "matches": [
+      {
+        "id": "match-b9",
+        "homeTeam": "underdogs-fc",
+        "awayTeam": "borussia-doutromundo",
+        "date": "2025-10-22",
+        "time": "18:00"
+      },
+      {
+        "id": "match-b10",
+        "homeTeam": "fc-zerolhos",
+        "awayTeam": "borg-coimbra",
+        "date": "2025-10-24",
+        "time": "18:00"
+      }
+    ]
+  },
+  {
+    "gameweek": 1,
     "groupId": "group-c",
     "matches": [
       {
-        "id": "match-1",
+        "id": "match-c1",
         "homeTeam": "logan-fc",
         "awayTeam": "critical-techballers",
         "date": "2025-09-23",
         "time": "19:00"
       },
       {
-        "id": "match-2",
+        "id": "match-c2",
         "homeTeam": "sporting-esgaios",
         "awayTeam": "ctrl-shift-golo",
         "date": "2025-09-26",
         "time": "18:00"
       },
       {
-        "id": "match-3",
+        "id": "match-c3",
         "homeTeam": "dataki",
         "awayTeam": "francesinha-united",
         "date": "2025-09-26",
@@ -31,21 +231,21 @@
     "groupId": "group-c",
     "matches": [
       {
-        "id": "match-4",
+        "id": "match-c4",
         "homeTeam": "logan-fc",
         "awayTeam": "sporting-esgaios",
         "date": "2025-09-30",
         "time": "19:00"
       },
       {
-        "id": "match-5",
+        "id": "match-c5",
         "homeTeam": "ctrl-shift-golo",
         "awayTeam": "francesinha-united",
         "date": "2025-10-03",
         "time": "18:00"
       },
       {
-        "id": "match-6",
+        "id": "match-c6",
         "homeTeam": "critical-techballers",
         "awayTeam": "dataki",
         "date": "2025-10-03",
@@ -58,21 +258,21 @@
     "groupId": "group-c",
     "matches": [
       {
-        "id": "match-7",
+        "id": "match-c7",
         "homeTeam": "critical-techballers",
         "awayTeam": "francesinha-united",
         "date": "2025-10-07",
         "time": "19:00"
       },
       {
-        "id": "match-8",
+        "id": "match-c8",
         "homeTeam": "logan-fc",
         "awayTeam": "ctrl-shift-golo",
         "date": "2025-10-10",
         "time": "18:00"
       },
       {
-        "id": "match-9",
+        "id": "match-c9",
         "homeTeam": "sporting-esgaios",
         "awayTeam": "dataki",
         "date": "2025-10-10",
@@ -85,21 +285,21 @@
     "groupId": "group-c",
     "matches": [
       {
-        "id": "match-10",
+        "id": "match-c10",
         "homeTeam": "critical-techballers",
         "awayTeam": "ctrl-shift-golo",
         "date": "2025-10-14",
         "time": "19:00"
       },
       {
-        "id": "match-11",
+        "id": "match-c11",
         "homeTeam": "logan-fc",
         "awayTeam": "dataki",
         "date": "2025-10-17",
         "time": "18:00"
       },
       {
-        "id": "match-12",
+        "id": "match-c12",
         "homeTeam": "sporting-esgaios",
         "awayTeam": "francesinha-united",
         "date": "2025-10-17",
@@ -112,21 +312,21 @@
     "groupId": "group-c",
     "matches": [
       {
-        "id": "match-13",
+        "id": "match-c13",
         "homeTeam": "logan-fc",
         "awayTeam": "francesinha-united",
         "date": "2025-10-21",
         "time": "19:00"
       },
       {
-        "id": "match-14",
+        "id": "match-c14",
         "homeTeam": "critical-techballers",
         "awayTeam": "sporting-esgaios",
         "date": "2025-10-24",
         "time": "18:00"
       },
       {
-        "id": "match-15",
+        "id": "match-c15",
         "homeTeam": "ctrl-shift-golo",
         "awayTeam": "dataki",
         "date": "2025-10-24",
