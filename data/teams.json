@@ -988,5 +988,60 @@
         "isCaptain": false
       }
     ]
+  },
+  {
+    "id": "southampton-fc",
+    "name": "Southampton FC",
+    "league": "CTW",
+    "fullName": "Southampton FC (CTW)",
+    "groupId": "group-d",
+    "formation": "2-1-1",
+    "players": [
+      {
+        "id": "southampton-gk",
+        "name": "Southampton Keeper",
+        "number": 1,
+        "position": "goalkeeper",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "southampton-def1",
+        "name": "Southampton Defender 1",
+        "number": 2,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": true
+      },
+      {
+        "id": "southampton-def2",
+        "name": "Southampton Defender 2",
+        "number": 3,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "southampton-mid",
+        "name": "Southampton Midfielder",
+        "number": 4,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "southampton-fwd",
+        "name": "Southampton Forward",
+        "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      }
+    ]
   }
 ]

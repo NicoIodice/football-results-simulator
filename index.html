@@ -154,6 +154,31 @@
             <!-- Fixtures Tab -->
             <div id="fixtures" class="tab-content">
                 <h2>Fixtures & Results</h2>
+                
+                <!-- Today's Games Header Card -->
+                <div id="todays-games-header" class="todays-games-card" style="display: none;">
+                    <h3>🏆 Today's Matches</h3>
+                    <div id="todays-games-list"></div>
+                </div>
+                
+                <!-- Fixtures Controls -->
+                <div class="fixtures-controls">
+                    <div class="control-row">
+                        <div class="checkbox-control">
+                            <label for="show-all-fixtures">
+                                <input type="checkbox" id="show-all-fixtures" onchange="toggleAllFixtures()">
+                                Show All Fixtures
+                            </label>
+                        </div>
+                        <div class="group-selector">
+                            <label for="fixtures-group-select">Group:</label>
+                            <select id="fixtures-group-select" onchange="updateFixturesForGroup()">
+                                <!-- Groups will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
                 <div id="fixtures-content">
                     <!-- Fixtures will be populated by JavaScript -->
                 </div>

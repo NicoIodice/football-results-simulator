@@ -858,94 +858,277 @@ function updateAllTabs() {
 }
 
 // Update fixtures (merged calendar and results)
+// Update fixtures with new enhanced functionality
 function updateFixtures() {
+    populateFixturesGroupSelector();
+    updateTodaysGamesHeader();
+    renderFixtures();
+}
+
+// Populate group selector for fixtures
+function populateFixturesGroupSelector() {
+    const groupSelect = document.getElementById('fixtures-group-select');
+    if (!groupSelect) return;
+    
+    groupSelect.innerHTML = '';
+    
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = `${group.name} - ${group.description}`;
+        if (group.id === selectedGroupId) {
+            option.selected = true;
+        }
+        groupSelect.appendChild(option);
+    });
+}
+
+// Update today's games header
+function updateTodaysGamesHeader() {
+    const todaysGamesHeader = document.getElementById('todays-games-header');
+    const todaysGamesList = document.getElementById('todays-games-list');
+    
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+    
+    // Find all matches scheduled for today
+    const todaysMatches = [];
+    fixtures.forEach(gameweek => {
+        gameweek.matches.forEach(match => {
+            if (match.date === todayStr) {
+                const homeTeam = teams.find(t => t.id === match.homeTeam);
+                const awayTeam = teams.find(t => t.id === match.awayTeam);
+                const group = groups.find(g => g.id === gameweek.groupId);
+                todaysMatches.push({
+                    ...match,
+                    homeTeam,
+                    awayTeam,
+                    group,
+                    gameweek: gameweek.gameweek
+                });
+            }
+        });
+    });
+    
+    if (todaysMatches.length > 0) {
+        todaysGamesList.innerHTML = '';
+        todaysMatches.forEach(match => {
+            const matchItem = document.createElement('div');
+            matchItem.className = 'todays-match-item';
+            matchItem.innerHTML = `
+                <div class="todays-match-teams">
+                    ${match.homeTeam.name} vs ${match.awayTeam.name}
+                    <span class="fixture-group-indicator">${match.group.name}</span>
+                </div>
+                <div class="todays-match-time">${match.time}</div>
+            `;
+            todaysGamesList.appendChild(matchItem);
+        });
+        todaysGamesHeader.style.display = 'block';
+    } else {
+        todaysGamesHeader.style.display = 'none';
+    }
+}
+
+// Toggle between all fixtures and group-specific fixtures
+function toggleAllFixtures() {
+    const showAllCheckbox = document.getElementById('show-all-fixtures');
+    const groupSelect = document.getElementById('fixtures-group-select');
+    
+    if (showAllCheckbox.checked) {
+        groupSelect.disabled = true;
+    } else {
+        groupSelect.disabled = false;
+    }
+    
+    renderFixtures();
+}
+
+// Update fixtures when group changes
+function updateFixturesForGroup() {
+    const showAllCheckbox = document.getElementById('show-all-fixtures');
+    if (!showAllCheckbox.checked) {
+        renderFixtures();
+    }
+}
+
+// Render fixtures based on current settings
+function renderFixtures() {
     const fixturesContent = document.getElementById('fixtures-content');
+    const showAllCheckbox = document.getElementById('show-all-fixtures');
+    const groupSelect = document.getElementById('fixtures-group-select');
+    
     fixturesContent.innerHTML = '';
     
-    // For now, show all fixtures (not filtered by group)
-    fixtures.forEach(gameweek => {
-        const gameweekDiv = document.createElement('div');
-        gameweekDiv.className = 'gameweek-section';
-        
-        const headerDiv = document.createElement('div');
-        headerDiv.className = 'gameweek-header';
-        headerDiv.textContent = `Gameweek ${gameweek.gameweek}`;
-        
-        const matchesDiv = document.createElement('div');
-        matchesDiv.className = 'gameweek-matches';
-        
-        gameweek.matches.forEach(match => {
-            const homeTeam = teams.find(t => t.id === match.homeTeam);
-            const awayTeam = teams.find(t => t.id === match.awayTeam);
-            const result = results.find(r => r.matchId === match.id && r.played);
-            
-            const matchDiv = document.createElement('div');
-            matchDiv.className = 'match-item';
-            
-            const date = new Date(match.date);
-            const formattedDate = date.toLocaleDateString('en-US', { 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
+    let fixturesToShow = [];
+    
+    if (showAllCheckbox && showAllCheckbox.checked) {
+        // Show all fixtures ordered by date
+        fixtures.forEach(gameweek => {
+            gameweek.matches.forEach(match => {
+                fixturesToShow.push({
+                    ...match,
+                    gameweek: gameweek.gameweek,
+                    groupId: gameweek.groupId
+                });
             });
-            
-            const scoreDisplay = result ? 
-                `${result.homeScore} - ${result.awayScore}` : 
-                ` - `;
-            
-            // Check if match is today or tomorrow
-            const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(today.getDate() + 1);
-            
-            const matchDate = new Date(match.date);
-            
-            // Compare dates by creating date strings in YYYY-MM-DD format
-            const todayStr = today.getFullYear() + '-' + 
-                           String(today.getMonth() + 1).padStart(2, '0') + '-' + 
-                           String(today.getDate()).padStart(2, '0');
-            const tomorrowStr = tomorrow.getFullYear() + '-' + 
-                              String(tomorrow.getMonth() + 1).padStart(2, '0') + '-' + 
-                              String(tomorrow.getDate()).padStart(2, '0');
-            
-            const isToday = match.date === todayStr;
-            const isTomorrow = match.date === tomorrowStr;
-            
-            let matchIndicator = '';
-            if (!result) { // Only show indicators for upcoming matches
-                if (isToday) {
-                    matchIndicator = '<span class="match-indicator today">Today</span>';
-                } else if (isTomorrow) {
-                    matchIndicator = '<span class="match-indicator tomorrow">Tomorrow</span>';
-                }
-            }
-            
-            const scoreClass = result ? 'completed' : 'upcoming';
-            
-            // Admin add result button
-            const addResultButton = (!result && ADMIN_CONFIG.role === 'admin') ? 
-                `<button class="add-result-btn" onclick="showAddResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}')">+</button>` : '';
-            
-            matchDiv.innerHTML = `
-                <div class="match-teams">
-                    ${homeTeam.name} <span class="match-vs">vs</span> ${awayTeam.name}
-                    ${matchIndicator}
-                </div>
-                <div class="match-datetime-container">
-                    ${addResultButton}
-                    <div class="match-datetime">${formattedDate} - ${match.time}</div>
-                </div>
-                <div class="match-score ${scoreClass}">${scoreDisplay}</div>
-            `;
-            
-            matchesDiv.appendChild(matchDiv);
         });
         
-        gameweekDiv.appendChild(headerDiv);
-        gameweekDiv.appendChild(matchesDiv);
-        fixturesContent.appendChild(gameweekDiv);
+        // Sort by date
+        fixturesToShow.sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Group by date for display
+        const matchesByDate = {};
+        fixturesToShow.forEach(match => {
+            if (!matchesByDate[match.date]) {
+                matchesByDate[match.date] = [];
+            }
+            matchesByDate[match.date].push(match);
+        });
+        
+        Object.keys(matchesByDate).forEach(date => {
+            renderDateSection(date, matchesByDate[date], true);
+        });
+        
+    } else {
+        // Show fixtures for selected group only
+        const selectedGroupId = groupSelect ? groupSelect.value : this.selectedGroupId;
+        const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === selectedGroupId);
+        
+        groupFixtures.forEach(gameweek => {
+            renderGameweekSection(gameweek, false);
+        });
+    }
+}
+
+// Render a date section (for all fixtures view)
+function renderDateSection(date, matches, showGroupIndicator) {
+    const fixturesContent = document.getElementById('fixtures-content');
+    
+    const dateDiv = document.createElement('div');
+    dateDiv.className = 'gameweek-section';
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'gameweek-header';
+    
+    const dateObj = new Date(date);
+    const formattedDate = dateObj.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
     });
+    
+    headerDiv.textContent = formattedDate;
+    
+    const matchesDiv = document.createElement('div');
+    matchesDiv.className = 'gameweek-matches';
+    
+    matches.forEach(match => {
+        const matchDiv = createMatchElement(match, showGroupIndicator);
+        matchesDiv.appendChild(matchDiv);
+    });
+    
+    dateDiv.appendChild(headerDiv);
+    dateDiv.appendChild(matchesDiv);
+    fixturesContent.appendChild(dateDiv);
+}
+
+// Render a gameweek section (for group-specific view)
+function renderGameweekSection(gameweek, showGroupIndicator) {
+    const fixturesContent = document.getElementById('fixtures-content');
+    
+    const gameweekDiv = document.createElement('div');
+    gameweekDiv.className = 'gameweek-section';
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.className = 'gameweek-header';
+    headerDiv.textContent = `Gameweek ${gameweek.gameweek}`;
+    
+    const matchesDiv = document.createElement('div');
+    matchesDiv.className = 'gameweek-matches';
+    
+    gameweek.matches.forEach(match => {
+        const matchWithGameweek = {
+            ...match,
+            gameweek: gameweek.gameweek,
+            groupId: gameweek.groupId
+        };
+        const matchDiv = createMatchElement(matchWithGameweek, showGroupIndicator);
+        matchesDiv.appendChild(matchDiv);
+    });
+    
+    gameweekDiv.appendChild(headerDiv);
+    gameweekDiv.appendChild(matchesDiv);
+    fixturesContent.appendChild(gameweekDiv);
+}
+
+// Create a match element
+function createMatchElement(match, showGroupIndicator) {
+    const homeTeam = teams.find(t => t.id === match.homeTeam);
+    const awayTeam = teams.find(t => t.id === match.awayTeam);
+    const result = results.find(r => r.matchId === match.id && r.played);
+    const group = groups.find(g => g.id === match.groupId);
+    
+    const matchDiv = document.createElement('div');
+    matchDiv.className = 'match-item';
+    
+    const date = new Date(match.date);
+    const formattedDate = date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+    });
+    
+    const scoreDisplay = result ? 
+        `${result.homeScore} - ${result.awayScore}` : 
+        ` - `;
+    
+    // Check if match is today
+    const today = new Date();
+    const todayStr = today.getFullYear() + '-' + 
+                   String(today.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(today.getDate()).padStart(2, '0');
+    
+    const isToday = match.date === todayStr;
+    
+    let matchIndicator = '';
+    if (!result && isToday) {
+        matchIndicator = '<span class="match-indicator today">Today</span>';
+    }
+    
+    const scoreClass = result ? 'completed' : 'upcoming';
+    
+    // Group indicator (only show in all fixtures view)
+    const groupIndicator = showGroupIndicator ? 
+        `<span class="fixture-group-indicator">${group.name}</span>` : '';
+    
+    // Admin add result button (only for today's matches without results)
+    const addResultButton = (!result && ADMIN_CONFIG.role === 'admin') ? 
+        `<button class="add-result-btn" onclick="showAddResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}')">+</button>` : '';
+    
+    // Edit result button (only for today's matches with results, until midnight)
+    const editResultButton = (result && isToday && ADMIN_CONFIG.role === 'admin') ? 
+        `<button class="edit-result-btn" onclick="showEditResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}', ${result.homeScore}, ${result.awayScore})">Edit</button>` : '';
+    
+    matchDiv.innerHTML = `
+        <div class="match-teams">
+            ${homeTeam.name} <span class="match-vs">vs</span> ${awayTeam.name}
+            ${matchIndicator}
+            ${groupIndicator}
+        </div>
+        <div class="match-datetime-container">
+            ${addResultButton}
+            ${editResultButton}
+            <div class="match-datetime">${formattedDate} - ${match.time}</div>
+        </div>
+        <div class="match-score ${scoreClass}">${scoreDisplay}</div>
+    `;
+    
+    return matchDiv;
 }
 
 // AI-Powered Simulator functionality
@@ -3215,6 +3398,42 @@ function hideAddResultModal() {
     currentMatch = null;
 }
 
+function showEditResultModal(matchId, homeTeamName, awayTeamName, matchDate, matchTime, homeScore, awayScore) {
+    // Find match details from fixtures
+    const match = findMatchById(matchId);
+    if (!match) return;
+    
+    currentMatch = {
+        id: matchId,
+        homeTeam: match.homeTeam,
+        awayTeam: match.awayTeam,
+        homeTeamName: homeTeamName,
+        awayTeamName: awayTeamName,
+        date: matchDate,
+        time: matchTime,
+        gameweek: match.gameweek,
+        groupId: match.groupId,
+        isEdit: true
+    };
+    
+    // Populate modal
+    document.getElementById('modal-teams').textContent = `${homeTeamName} vs ${awayTeamName}`;
+    document.getElementById('modal-datetime').textContent = `${matchDate} at ${matchTime}`;
+    document.getElementById('homeTeamLabel').textContent = homeTeamName;
+    document.getElementById('awayTeamLabel').textContent = awayTeamName;
+    
+    // Pre-populate form with existing scores
+    document.getElementById('homeScore').value = homeScore;
+    document.getElementById('awayScore').value = awayScore;
+    
+    // Change modal title for editing
+    document.querySelector('.modal-header h3').textContent = 'Edit Match Result';
+    document.querySelector('.btn-primary').textContent = 'Update Result';
+    
+    // Show modal
+    document.getElementById('addResultModal').style.display = 'block';
+}
+
 function findMatchById(matchId) {
     for (const gameweek of fixtures) {
         for (const match of gameweek.matches) {
@@ -3266,32 +3485,56 @@ function submitResult(event) {
         return;
     }
     
-    // Create new result
-    const newResult = {
-        matchId: currentMatch.id,
-        homeTeam: currentMatch.homeTeam,
-        awayTeam: currentMatch.awayTeam,
-        homeScore: homeScore,
-        awayScore: awayScore,
-        gameweek: currentMatch.gameweek,
-        groupId: currentMatch.groupId,
-        played: true
-    };
-    
-    // Add to results array (only in memory for current session)
-    results.push(newResult);
-    
-    // Trigger download of updated results.json
-    downloadUpdatedResults();
-    
-    // Hide modal
-    hideAddResultModal();
-    
-    // Show success toast with instructions based on device type
-    if (isMobileDevice()) {
-        showToast('Result added! Data stored in session (will be lost on refresh)', 'success');
+    if (currentMatch.isEdit) {
+        // Edit existing result
+        const existingResultIndex = results.findIndex(r => r.matchId === currentMatch.id);
+        if (existingResultIndex !== -1) {
+            results[existingResultIndex].homeScore = homeScore;
+            results[existingResultIndex].awayScore = awayScore;
+        }
+        
+        // Trigger download of updated results.json
+        downloadUpdatedResults();
+        
+        // Hide modal and reset title
+        hideAddResultModal();
+        document.querySelector('.modal-header h3').textContent = 'Add Match Result';
+        document.querySelector('.btn-primary').textContent = 'Add Result';
+        
+        // Show success toast
+        if (isMobileDevice()) {
+            showToast('Result updated! Data stored in session (will be lost on refresh)', 'success');
+        } else {
+            showToast('Result updated! Check Downloads → Replace data/results.json → Refresh page', 'success');
+        }
     } else {
-        showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
+        // Create new result
+        const newResult = {
+            matchId: currentMatch.id,
+            homeTeam: currentMatch.homeTeam,
+            awayTeam: currentMatch.awayTeam,
+            homeScore: homeScore,
+            awayScore: awayScore,
+            gameweek: currentMatch.gameweek,
+            groupId: currentMatch.groupId,
+            played: true
+        };
+        
+        // Add to results array (only in memory for current session)
+        results.push(newResult);
+        
+        // Trigger download of updated results.json
+        downloadUpdatedResults();
+        
+        // Hide modal
+        hideAddResultModal();
+        
+        // Show success toast with instructions based on device type
+        if (isMobileDevice()) {
+            showToast('Result added! Data stored in session (will be lost on refresh)', 'success');
+        } else {
+            showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
+        }
     }
     
     // Update all displays

@@ -35,5 +35,13 @@
       "dataki",
       "francesinha-united"
     ]
+  },
+  {
+    "id": "group-d",
+    "name": "Group D",
+    "description": "Southampton",
+    "teams": [
+      "southampton-fc"
+    ]
   }
 ]
