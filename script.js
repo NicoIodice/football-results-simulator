@@ -3629,10 +3629,169 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     <div class="prediction-reasoning">
                         <strong>Analysis:</strong> ${pred.prediction.reasoning}
                     </div>
+                    
+                    ${!pred.actualResult ? generateGoalScorerPredictionsHTML(
+                        pred.homeTeam.id, 
+                        pred.awayTeam.id, 
+                        parseInt(pred.prediction.predictedScore.split(' - ')[0]), 
+                        parseInt(pred.prediction.predictedScore.split(' - ')[1])
+                    ) : ''}
                 </div>
             `).join('')}
         </div>
     `;
+}
+
+// Get goal scorer statistics for a team
+function getTeamGoalScorers(teamId) {
+    const teamGoals = goals.filter(goal => goal.teamId === teamId);
+    const scorerStats = {};
+    
+    teamGoals.forEach(goal => {
+        if (!scorerStats[goal.playerId]) {
+            scorerStats[goal.playerId] = {
+                name: goal.playerName,
+                goals: 0,
+                penalties: 0,
+                regularGoals: 0
+            };
+        }
+        
+        scorerStats[goal.playerId].goals++;
+        if (goal.goalType === 'penalti') {
+            scorerStats[goal.playerId].penalties++;
+        } else {
+            scorerStats[goal.playerId].regularGoals++;
+        }
+    });
+    
+    // Convert to array and sort by goals
+    return Object.values(scorerStats).sort((a, b) => b.goals - a.goals);
+}
+
+// Check if team has goal scorer data
+function hasGoalScorerData(teamId) {
+    return goals.some(goal => goal.teamId === teamId);
+}
+
+// Predict likely goal scorers for a match
+function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predictedAwayScore) {
+    const predictions = {
+        home: [],
+        away: []
+    };
+    
+    // Home team predictions
+    if (hasGoalScorerData(homeTeamId) && predictedHomeScore > 0) {
+        const homeScorers = getTeamGoalScorers(homeTeamId);
+        const totalHomeGoals = homeScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
+        
+        if (homeScorers.length > 0 && totalHomeGoals > 0) {
+            homeScorers.forEach(scorer => {
+                const probability = (scorer.goals / totalHomeGoals * 100);
+                if (probability >= 15) { // Only show players with decent probability
+                    predictions.home.push({
+                        name: scorer.name,
+                        probability: Math.round(probability),
+                        goals: scorer.goals,
+                        penalties: scorer.penalties
+                    });
+                }
+            });
+        }
+    }
+    
+    // Away team predictions
+    if (hasGoalScorerData(awayTeamId) && predictedAwayScore > 0) {
+        const awayScorers = getTeamGoalScorers(awayTeamId);
+        const totalAwayGoals = awayScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
+        
+        if (awayScorers.length > 0 && totalAwayGoals > 0) {
+            awayScorers.forEach(scorer => {
+                const probability = (scorer.goals / totalAwayGoals * 100);
+                if (probability >= 15) { // Only show players with decent probability
+                    predictions.away.push({
+                        name: scorer.name,
+                        probability: Math.round(probability),
+                        goals: scorer.goals,
+                        penalties: scorer.penalties
+                    });
+                }
+            });
+        }
+    }
+    
+    return predictions;
+}
+
+// Generate goal scorer predictions HTML
+function generateGoalScorerPredictionsHTML(homeTeamId, awayTeamId, predictedHomeScore, predictedAwayScore) {
+    const scorerPredictions = predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predictedAwayScore);
+    
+    if (scorerPredictions.home.length === 0 && scorerPredictions.away.length === 0) {
+        return '';
+    }
+    
+    // Generate unique ID for this match's scorer predictions
+    const uniqueId = `scorer-${homeTeamId}-${awayTeamId}-${Date.now()}`;
+    
+    return `
+        <div class="goal-scorer-predictions">
+            <div class="scorer-section">
+                <div class="scorer-header" onclick="toggleScorerPredictions('${uniqueId}')">
+                    <h5>⚽ Likely Goal Scorers</h5>
+                    <span class="scorer-toggle" id="toggle-${uniqueId}">▼</span>
+                </div>
+                <div class="scorer-predictions-grid collapsed" id="${uniqueId}">
+                    ${scorerPredictions.home.length > 0 ? `
+                        <div class="team-scorers home-scorers">
+                            <h6>Home Team</h6>
+                            ${scorerPredictions.home.map(scorer => `
+                                <div class="scorer-prediction">
+                                    <span class="scorer-name">${scorer.name}</span>
+                                    <span class="scorer-probability">${scorer.probability}%</span>
+                                    <small class="scorer-stats">${scorer.goals}g${scorer.penalties > 0 ? `, ${scorer.penalties}p` : ''}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                    
+                    ${scorerPredictions.away.length > 0 ? `
+                        <div class="team-scorers away-scorers">
+                            <h6>Away Team</h6>
+                            ${scorerPredictions.away.map(scorer => `
+                                <div class="scorer-prediction">
+                                    <span class="scorer-name">${scorer.name}</span>
+                                    <span class="scorer-probability">${scorer.probability}%</span>
+                                    <small class="scorer-stats">${scorer.goals}g${scorer.penalties > 0 ? `, ${scorer.penalties}p` : ''}</small>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Toggle goal scorer predictions visibility
+function toggleScorerPredictions(uniqueId) {
+    const content = document.getElementById(uniqueId);
+    const toggle = document.getElementById(`toggle-${uniqueId}`);
+    
+    if (!content || !toggle) return;
+    
+    if (content.classList.contains('collapsed')) {
+        // Expand
+        content.classList.remove('collapsed');
+        content.classList.add('expanded');
+        toggle.textContent = '▲';
+    } else {
+        // Collapse
+        content.classList.remove('expanded');
+        content.classList.add('collapsed');
+        toggle.textContent = '▼';
+    }
 }
 
 // Helper function to evaluate prediction accuracy
