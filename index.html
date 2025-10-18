@@ -16,22 +16,47 @@
         </header>
 
         <nav class="tabs">
-            <button class="tab-button active" onclick="showTab('standings')">Standings</button>
+            <button class="tab-button active" onclick="showTab('forecast')">Forecast</button>
+            <button class="tab-button" onclick="showTab('standings')">Overview</button>
             <button class="tab-button" onclick="showTab('teams')">Teams</button>
             <button class="tab-button" onclick="showTab('fixtures')">Fixtures</button>
             <button class="tab-button" onclick="showTab('simulator')">Simulator</button>
-            <button class="tab-button" onclick="showTab('forecast')">Forecast</button>
         </nav>
 
         <main>
-            <!-- Standings Tab -->
-            <div id="standings" class="tab-content active">
+            <!-- Forecast Tab -->
+            <div id="forecast" class="tab-content active">
+                <h2>🔮 Championship Forecast & Predictions</h2>
+                <div class="forecast-description">
+                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
+                </div>
+                
+                <!-- Forecast Controls -->
+                <div class="forecast-controls">
+                    <div class="control-row">
+                        <div class="group-selector">
+                            <label for="forecast-group-select">Group:</label>
+                            <select id="forecast-group-select" onchange="updateForecastForGroup()">
+                                <!-- Groups will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="forecast-content">
+                    <!-- Forecast content will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Overview Tab (formerly Standings) -->
+            <div id="standings" class="tab-content">
                 <h2>Championship Overview</h2>
                 
-                <!-- Sub-tabs for Standings -->
+                <!-- Sub-tabs for Overview -->
                 <div class="sub-tabs">
                     <button class="sub-tab-button active" onclick="showStandingsSubTab('league-standings')">League Standings</button>
                     <button class="sub-tab-button" onclick="showStandingsSubTab('knockout-stage')">Knockout</button>
+                    <button class="sub-tab-button" onclick="showStandingsSubTab('statistics')">Statistics</button>
                 </div>
                 
                 <!-- League Standings Sub-tab -->
@@ -164,6 +189,69 @@
                                     <div class="match-label">Championship Final</div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Sub-tab -->
+                <div id="statistics" class="sub-tab-content">
+                    <!-- Statistics Controls -->
+                    <div class="statistics-controls">
+                        <div class="control-row">
+                            <div class="group-selector">
+                                <label for="statistics-group-select">Group:</label>
+                                <select id="statistics-group-select" onchange="updateStatisticsForGroup()">
+                                    <!-- Groups will be populated by JavaScript -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Team Performance Analysis Section -->
+                    <div class="statistics-section">
+                        <div class="statistics-header">
+                            📊 Team Performance Analysis
+                        </div>
+                        <div id="team-performance-content" class="statistics-content">
+                            <!-- Team Performance Analysis will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Statistical Insights Section -->
+                    <div class="statistics-section">
+                        <div class="statistics-header">
+                            📈 Statistical Insights
+                        </div>
+                        <div id="statistical-insights-content" class="statistics-content">
+                            <!-- Statistical Insights will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Top Scorers Section -->
+                    <div class="statistics-section">
+                        <div class="statistics-header">
+                            ⚽ Top Scorers
+                        </div>
+                        <div class="topscorers-controls">
+                            <div class="control-row">
+                                <div class="filter-selector">
+                                    <label for="topscorers-filter">Filter by:</label>
+                                    <select id="topscorers-filter" onchange="updateTopScorers()">
+                                        <option value="all">All Groups</option>
+                                        <option value="group">Current Group</option>
+                                        <option value="team">By Team</option>
+                                    </select>
+                                </div>
+                                <div class="team-selector" id="topscorers-team-selector" style="display: none;">
+                                    <label for="topscorers-team-select">Team:</label>
+                                    <select id="topscorers-team-select" onchange="updateTopScorers()">
+                                        <!-- Teams will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="topscorers-content" class="statistics-content">
+                            <!-- Top Scorers will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
@@ -358,29 +446,7 @@
                 </div>
             </div>
 
-            <!-- Forecast Tab -->
-            <div id="forecast" class="tab-content">
-                <h2>🔮 Championship Forecast & Predictions</h2>
-                <div class="forecast-description">
-                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
-                </div>
-                
-                <!-- Forecast Controls -->
-                <div class="forecast-controls">
-                    <div class="control-row">
-                        <div class="group-selector">
-                            <label for="forecast-group-select">Group:</label>
-                            <select id="forecast-group-select" onchange="updateForecastForGroup()">
-                                <!-- Groups will be populated by JavaScript -->
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="forecast-content">
-                    <!-- Forecast content will be populated by JavaScript -->
-                </div>
-            </div>
+
         </main>
     </div>
 

@@ -632,11 +632,11 @@ function applyTabVisibilitySettings() {
     
     // Map of tab names to their selectors
     const tabMapping = {
-        'standings': { button: 'button[onclick="showTab(\'standings\')"]', content: '#standings' },
-        'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' },
         'forecast': { button: 'button[onclick="showTab(\'forecast\')"]', content: '#forecast' },
+        'standings': { button: 'button[onclick="showTab(\'standings\')"]', content: '#standings' },
         'teams': { button: 'button[onclick="showTab(\'teams\')"]', content: '#teams' },
-        'fixtures': { button: 'button[onclick="showTab(\'fixtures\')"]', content: '#fixtures' }
+        'fixtures': { button: 'button[onclick="showTab(\'fixtures\')"]', content: '#fixtures' },
+        'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' }
     };
     
     // Apply visibility settings
@@ -1019,6 +1019,10 @@ function generateMatchHistoryHTML(history) {
 function updateAllTabs() {
     updateStandings();
     updateFixtures();
+    updateStatistics();
+    
+    // Initialize forecast controls
+    populateForecastControls();
 }
 
 // Update fixtures (merged calendar and results)
@@ -3043,15 +3047,6 @@ function generateForecast() {
     selectedGroupId = originalGroupId;
     
     return `
-        <div class="forecast-section">
-            <div class="forecast-header">
-                📊 Team Performance Analysis
-            </div>
-            <div class="forecast-content">
-                ${generateTeamAnalysisHTML(teamAnalysis)}
-            </div>
-        </div>
-        
         ${matchPredictions ? `
         <div class="forecast-section">
             <div class="forecast-header">
@@ -3070,15 +3065,6 @@ function generateForecast() {
             </div>
             <div class="forecast-content">
                 ${generateChampionshipForecastHTML(championshipForecast)}
-            </div>
-        </div>
-        
-        <div class="forecast-section">
-            <div class="forecast-header">
-                📈 Statistical Insights
-            </div>
-            <div class="forecast-content">
-                ${generateStatisticalInsightsHTML(currentStandings, teamAnalysis)}
             </div>
         </div>
     `;
@@ -5459,6 +5445,277 @@ document.addEventListener('DOMContentLoaded', function() {
     loadPlayersData();
 });
 
+// Statistics functionality
+let selectedStatisticsGroupId = null;
+
+function updateStatistics() {
+    populateStatisticsControls();
+    updateStatisticsForGroup();
+}
+
+function populateStatisticsControls() {
+    populateStatisticsGroupSelector();
+    populateTopScorersTeamSelector();
+}
+
+function populateStatisticsGroupSelector() {
+    const groupSelect = document.getElementById('statistics-group-select');
+    if (!groupSelect) return;
+    
+    groupSelect.innerHTML = '<option value="">All Groups</option>';
+    
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        groupSelect.appendChild(option);
+    });
+    
+    // Set default selection
+    if (!selectedStatisticsGroupId && groups.length > 0) {
+        selectedStatisticsGroupId = groups[0].id;
+        groupSelect.value = selectedStatisticsGroupId;
+    }
+}
+
+function populateTopScorersTeamSelector() {
+    const teamSelect = document.getElementById('topscorers-team-select');
+    if (!teamSelect) return;
+    
+    teamSelect.innerHTML = '';
+    
+    teams.forEach(team => {
+        const option = document.createElement('option');
+        option.value = team.id;
+        option.textContent = team.name;
+        teamSelect.appendChild(option);
+    });
+}
+
+function updateStatisticsForGroup() {
+    const groupSelect = document.getElementById('statistics-group-select');
+    if (groupSelect) {
+        selectedStatisticsGroupId = groupSelect.value || null;
+    }
+    
+    updateTeamPerformanceAnalysis();
+    updateStatisticalInsights();
+    updateTopScorers();
+}
+
+function updateTeamPerformanceAnalysis() {
+    const content = document.getElementById('team-performance-content');
+    if (!content) return;
+    
+    // Get standings for the selected group or all groups
+    let standings;
+    if (selectedStatisticsGroupId) {
+        const originalGroupId = selectedGroupId;
+        selectedGroupId = selectedStatisticsGroupId;
+        standings = calculateStandings();
+        selectedGroupId = originalGroupId;
+    } else {
+        // Show analysis for all teams across all groups
+        const allStandings = [];
+        const originalGroupId = selectedGroupId;
+        groups.forEach(group => {
+            selectedGroupId = group.id;
+            const groupStandings = calculateStandings();
+            allStandings.push(...groupStandings);
+        });
+        selectedGroupId = originalGroupId;
+        standings = allStandings;
+    }
+    
+    const teamAnalysis = analyzeAllTeams(standings);
+    content.innerHTML = generateTeamAnalysisHTML(teamAnalysis);
+}
+
+function updateStatisticalInsights() {
+    const content = document.getElementById('statistical-insights-content');
+    if (!content) return;
+    
+    // Get standings for the selected group or all groups
+    let standings;
+    if (selectedStatisticsGroupId) {
+        const originalGroupId = selectedGroupId;
+        selectedGroupId = selectedStatisticsGroupId;
+        standings = calculateStandings();
+        selectedGroupId = originalGroupId;
+    } else {
+        // Show insights for all teams across all groups
+        const allStandings = [];
+        const originalGroupId = selectedGroupId;
+        groups.forEach(group => {
+            selectedGroupId = group.id;
+            const groupStandings = calculateStandings();
+            allStandings.push(...groupStandings);
+        });
+        selectedGroupId = originalGroupId;
+        standings = allStandings;
+    }
+    
+    const teamAnalysis = analyzeAllTeams(standings);
+    content.innerHTML = generateStatisticalInsightsHTML(standings, teamAnalysis);
+}
+
+function updateTopScorers() {
+    const content = document.getElementById('topscorers-content');
+    const filterSelect = document.getElementById('topscorers-filter');
+    const teamSelector = document.getElementById('topscorers-team-selector');
+    const teamSelect = document.getElementById('topscorers-team-select');
+    
+    if (!content || !filterSelect) return;
+    
+    const filterValue = filterSelect.value;
+    
+    // Show/hide team selector based on filter
+    if (teamSelector) {
+        teamSelector.style.display = filterValue === 'team' ? 'block' : 'none';
+    }
+    
+    let topScorers = [];
+    
+    switch (filterValue) {
+        case 'all':
+            topScorers = getTopScorersAllGroups();
+            break;
+        case 'group':
+            topScorers = getTopScorersForGroup(selectedStatisticsGroupId);
+            break;
+        case 'team':
+            const selectedTeam = teamSelect ? teamSelect.value : null;
+            topScorers = getTopScorersForTeam(selectedTeam);
+            break;
+    }
+    
+    content.innerHTML = generateTopScorersHTML(topScorers, filterValue);
+}
+
+function getTopScorersAllGroups() {
+    const allGoals = [];
+    
+    goals.forEach(goal => {
+        const goalCount = goal.totalGoals || 1;
+        const existingPlayer = allGoals.find(g => g.playerId === goal.playerId);
+        
+        if (existingPlayer) {
+            existingPlayer.totalGoals += goalCount;
+        } else {
+            allGoals.push({
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                groupId: goal.groupId,
+                groupName: groups.find(g => g.id === goal.groupId)?.name || 'Unknown Group',
+                totalGoals: goalCount
+            });
+        }
+    });
+    
+    return allGoals.sort((a, b) => b.totalGoals - a.totalGoals).slice(0, 20);
+}
+
+function getTopScorersForGroup(groupId) {
+    if (!groupId) return getTopScorersAllGroups();
+    
+    const groupGoals = goals.filter(goal => goal.groupId === groupId);
+    const playersMap = new Map();
+    
+    groupGoals.forEach(goal => {
+        const goalCount = goal.totalGoals || 1;
+        const playerId = goal.playerId;
+        
+        if (playersMap.has(playerId)) {
+            playersMap.get(playerId).totalGoals += goalCount;
+        } else {
+            playersMap.set(playerId, {
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                groupId: goal.groupId,
+                groupName: groups.find(g => g.id === goal.groupId)?.name || 'Unknown Group',
+                totalGoals: goalCount
+            });
+        }
+    });
+    
+    return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
+}
+
+function getTopScorersForTeam(teamId) {
+    if (!teamId) return [];
+    
+    const teamGoals = goals.filter(goal => goal.teamId === teamId);
+    const playersMap = new Map();
+    
+    teamGoals.forEach(goal => {
+        const goalCount = goal.totalGoals || 1;
+        const playerId = goal.playerId;
+        
+        if (playersMap.has(playerId)) {
+            playersMap.get(playerId).totalGoals += goalCount;
+        } else {
+            playersMap.set(playerId, {
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                groupId: goal.groupId,
+                groupName: groups.find(g => g.id === goal.groupId)?.name || 'Unknown Group',
+                totalGoals: goalCount
+            });
+        }
+    });
+    
+    return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
+}
+
+function generateTopScorersHTML(topScorers, filterType) {
+    if (!topScorers || topScorers.length === 0) {
+        return '<p class="no-data">No goal scorers found.</p>';
+    }
+    
+    let title = 'Top Scorers';
+    switch (filterType) {
+        case 'all':
+            title = 'Top Scorers - All Groups';
+            break;
+        case 'group':
+            const groupName = groups.find(g => g.id === selectedStatisticsGroupId)?.name || 'Selected Group';
+            title = `Top Scorers - ${groupName}`;
+            break;
+        case 'team':
+            const teamSelect = document.getElementById('topscorers-team-select');
+            const teamId = teamSelect ? teamSelect.value : null;
+            const teamName = teams.find(t => t.id === teamId)?.name || 'Selected Team';
+            title = `Top Scorers - ${teamName}`;
+            break;
+    }
+    
+    return `
+        <h4>${title}</h4>
+        <div class="topscorers-list">
+            ${topScorers.map((scorer, index) => `
+                <div class="topscorer-card ${index < 3 ? 'top-3' : ''}">
+                    <div class="scorer-position">${index + 1}</div>
+                    <div class="scorer-info">
+                        <div class="scorer-name">${scorer.playerName}</div>
+                        <div class="scorer-team">${scorer.teamName}</div>
+                        ${filterType !== 'group' && filterType !== 'team' ? `<div class="scorer-group">${scorer.groupName}</div>` : ''}
+                    </div>
+                    <div class="scorer-goals">
+                        <span class="goals-count">${scorer.totalGoals}</span>
+                        <span class="goals-label">goal${scorer.totalGoals !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
 // Sub-tab functionality for Standings
 function showStandingsSubTab(tabId) {
     // Hide all sub-tab contents
@@ -5483,9 +5740,11 @@ function showStandingsSubTab(tabId) {
     const clickedButton = event.target;
     clickedButton.classList.add('active');
     
-    // Update knockout stage if that's the selected tab
+    // Update content based on sub-tab
     if (tabId === 'knockout-stage') {
         updateKnockoutStage();
+    } else if (tabId === 'statistics') {
+        updateStatistics();
     }
 }
 
