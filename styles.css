@@ -3505,18 +3505,38 @@ tr.first-place .goal-diff-negative {
 
 /* Statistics Section Styles */
 .statistics-controls {
-    background-color: #f8f9fa;
+    background: white;
     padding: 20px;
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .statistics-controls .control-row {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
     align-items: center;
+    gap: 20px;
     flex-wrap: wrap;
+}
+
+.statistics-controls .checkbox-control {
+    display: flex;
+    align-items: center;
+}
+
+.statistics-controls .checkbox-control label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.statistics-controls .checkbox-control input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #3498db;
 }
 
 .statistics-controls .group-selector,
@@ -3524,27 +3544,36 @@ tr.first-place .goal-diff-negative {
 .statistics-controls .team-selector {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
 }
 
-.statistics-controls label {
-    font-weight: 600;
-    color: #2c3e50;
+.statistics-controls .group-selector label,
+.statistics-controls .filter-selector label,
+.statistics-controls .team-selector label {
+    font-weight: 500;
+    min-width: 60px;
     white-space: nowrap;
 }
 
 .statistics-controls select {
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 2px solid #e0e0e0;
     border-radius: 5px;
-    background-color: white;
-    font-size: 14px;
-    color: #333;
+    background: white;
+    font-size: 1rem;
+    min-width: 150px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.statistics-controls select:hover {
+.statistics-controls select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+}
+
+.statistics-controls select:hover:not(:disabled) {
     border-color: #3498db;
 }
 
@@ -3577,16 +3606,80 @@ tr.first-place .goal-diff-negative {
 
 /* Top Scorers Styles */
 .topscorers-controls {
-    background-color: #f8f9fa;
+    background: white;
     padding: 15px 20px;
     border-bottom: 1px solid #e9ecef;
 }
 
 .topscorers-controls .control-row {
     display: flex;
-    gap: 20px;
+    justify-content: space-between;
     align-items: center;
+    gap: 20px;
     flex-wrap: wrap;
+}
+
+.topscorers-controls .checkbox-control {
+    display: flex;
+    align-items: center;
+}
+
+.topscorers-controls .checkbox-control label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.topscorers-controls .checkbox-control input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #3498db;
+}
+
+.topscorers-controls .filter-selector,
+.topscorers-controls .group-selector,
+.topscorers-controls .team-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.topscorers-controls .filter-selector label,
+.topscorers-controls .group-selector label,
+.topscorers-controls .team-selector label {
+    font-weight: 500;
+    min-width: 60px;
+    white-space: nowrap;
+}
+
+.topscorers-controls select {
+    padding: 8px 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    background: white;
+    font-size: 1rem;
+    min-width: 120px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.topscorers-controls select:disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+}
+
+.topscorers-controls select:hover:not(:disabled) {
+    border-color: #3498db;
+}
+
+.topscorers-controls select:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .topscorers-list {
@@ -3631,11 +3724,20 @@ tr.first-place .goal-diff-negative {
 }
 
 .scorer-position {
-    font-size: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 1.2rem;
     font-weight: bold;
     color: #2c3e50;
-    min-width: 30px;
+    min-width: 50px;
     text-align: center;
+}
+
+.scorer-position .position-number {
+    font-size: 1rem;
+    font-weight: bold;
 }
 
 .scorer-info {
@@ -3691,22 +3793,30 @@ tr.first-place .goal-diff-negative {
 
 /* Mobile responsiveness for statistics */
 @media (max-width: 768px) {
-    .statistics-controls .control-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 15px;
-    }
-    
-    .statistics-controls .group-selector,
-    .statistics-controls .filter-selector,
-    .statistics-controls .team-selector {
-        justify-content: space-between;
-    }
-    
+    .statistics-controls .control-row,
     .topscorers-controls .control-row {
         flex-direction: column;
         align-items: stretch;
         gap: 15px;
+    }
+    
+    .statistics-controls .checkbox-control,
+    .statistics-controls .group-selector,
+    .statistics-controls .filter-selector,
+    .statistics-controls .team-selector,
+    .topscorers-controls .checkbox-control,
+    .topscorers-controls .group-selector,
+    .topscorers-controls .filter-selector,
+    .topscorers-controls .team-selector {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    .statistics-controls select,
+    .topscorers-controls select {
+        min-width: auto;
+        flex: 1;
+        max-width: 200px;
     }
     
     .topscorer-card {
@@ -3715,8 +3825,12 @@ tr.first-place .goal-diff-negative {
     }
     
     .scorer-position {
-        font-size: 1.2rem;
-        min-width: 25px;
+        font-size: 1rem;
+        min-width: 40px;
+    }
+    
+    .scorer-position .position-number {
+        font-size: 0.9rem;
     }
     
     .scorer-name {

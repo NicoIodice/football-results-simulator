@@ -282,6 +282,9 @@ async function loadData() {
         updateTeamSelectorForGroup();
         updateAllTabs();
         
+        // Initialize knockout dates
+        initializeKnockoutDates();
+        
         // Load team player data for Teams tab
         await loadPlayersData();
     } catch (error) {
@@ -632,11 +635,11 @@ function applyTabVisibilitySettings() {
     
     // Map of tab names to their selectors
     const tabMapping = {
-        'forecast': { button: 'button[onclick="showTab(\'forecast\')"]', content: '#forecast' },
         'standings': { button: 'button[onclick="showTab(\'standings\')"]', content: '#standings' },
         'teams': { button: 'button[onclick="showTab(\'teams\')"]', content: '#teams' },
         'fixtures': { button: 'button[onclick="showTab(\'fixtures\')"]', content: '#fixtures' },
-        'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' }
+        'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' },
+        'forecast': { button: 'button[onclick="showTab(\'forecast\')"]', content: '#forecast' }
     };
     
     // Apply visibility settings
@@ -5455,6 +5458,7 @@ function updateStatistics() {
 
 function populateStatisticsControls() {
     populateStatisticsGroupSelector();
+    populateTopScorersGroupSelector();
     populateTopScorersTeamSelector();
 }
 
@@ -5462,7 +5466,7 @@ function populateStatisticsGroupSelector() {
     const groupSelect = document.getElementById('statistics-group-select');
     if (!groupSelect) return;
     
-    groupSelect.innerHTML = '<option value="">All Groups</option>';
+    groupSelect.innerHTML = '';
     
     groups.forEach(group => {
         const option = document.createElement('option');
@@ -5471,10 +5475,31 @@ function populateStatisticsGroupSelector() {
         groupSelect.appendChild(option);
     });
     
-    // Set default selection
-    if (!selectedStatisticsGroupId && groups.length > 0) {
-        selectedStatisticsGroupId = groups[0].id;
+    // Set default selection based on defaults.json
+    const defaultGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
+    if (defaultGroupId) {
+        selectedStatisticsGroupId = defaultGroupId;
         groupSelect.value = selectedStatisticsGroupId;
+    }
+}
+
+function populateTopScorersGroupSelector() {
+    const groupSelect = document.getElementById('topscorers-group-select');
+    if (!groupSelect) return;
+    
+    groupSelect.innerHTML = '';
+    
+    groups.forEach(group => {
+        const option = document.createElement('option');
+        option.value = group.id;
+        option.textContent = group.name;
+        groupSelect.appendChild(option);
+    });
+    
+    // Set default selection based on defaults.json
+    const defaultGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
+    if (defaultGroupId) {
+        groupSelect.value = defaultGroupId;
     }
 }
 
@@ -5490,6 +5515,73 @@ function populateTopScorersTeamSelector() {
         option.textContent = team.name;
         teamSelect.appendChild(option);
     });
+}
+
+function toggleAllStatistics() {
+    const checkbox = document.getElementById('show-all-statistics');
+    const groupSelect = document.getElementById('statistics-group-select');
+    
+    if (checkbox && groupSelect) {
+        groupSelect.disabled = checkbox.checked;
+        
+        if (checkbox.checked) {
+            selectedStatisticsGroupId = null;
+        } else {
+            // Set to default group when unchecked
+            const defaultGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
+            selectedStatisticsGroupId = defaultGroupId;
+            groupSelect.value = selectedStatisticsGroupId;
+        }
+        
+        updateTeamPerformanceAnalysis();
+        updateStatisticalInsights();
+    }
+}
+
+function toggleAllTopScorers() {
+    const checkbox = document.getElementById('show-all-topscorers');
+    const filterSelect = document.getElementById('topscorers-filter');
+    const groupSelector = document.getElementById('topscorers-group-selector');
+    const teamSelector = document.getElementById('topscorers-team-selector');
+    
+    if (checkbox && filterSelect && groupSelector) {
+        filterSelect.disabled = checkbox.checked;
+        
+        if (checkbox.checked) {
+            // Hide all specific selectors when showing all groups
+            groupSelector.style.display = 'none';
+            teamSelector.style.display = 'none';
+        } else {
+            // Show appropriate selector based on filter type
+            updateTopScorersFilter();
+        }
+        
+        updateTopScorers();
+    }
+}
+
+function updateTopScorersFilter() {
+    const filterSelect = document.getElementById('topscorers-filter');
+    const groupSelector = document.getElementById('topscorers-group-selector');
+    const teamSelector = document.getElementById('topscorers-team-selector');
+    const checkbox = document.getElementById('show-all-topscorers');
+    
+    if (!filterSelect || !groupSelector || !teamSelector || !checkbox) return;
+    
+    // Don't change visibility if checkbox is checked
+    if (checkbox.checked) return;
+    
+    const filterValue = filterSelect.value;
+    
+    if (filterValue === 'group') {
+        groupSelector.style.display = 'flex';
+        teamSelector.style.display = 'none';
+    } else if (filterValue === 'team') {
+        groupSelector.style.display = 'none';
+        teamSelector.style.display = 'flex';
+    }
+    
+    updateTopScorers();
 }
 
 function updateStatisticsForGroup() {
@@ -5561,35 +5653,36 @@ function updateStatisticalInsights() {
 
 function updateTopScorers() {
     const content = document.getElementById('topscorers-content');
+    const checkbox = document.getElementById('show-all-topscorers');
     const filterSelect = document.getElementById('topscorers-filter');
-    const teamSelector = document.getElementById('topscorers-team-selector');
+    const groupSelect = document.getElementById('topscorers-group-select');
     const teamSelect = document.getElementById('topscorers-team-select');
     
-    if (!content || !filterSelect) return;
-    
-    const filterValue = filterSelect.value;
-    
-    // Show/hide team selector based on filter
-    if (teamSelector) {
-        teamSelector.style.display = filterValue === 'team' ? 'block' : 'none';
-    }
+    if (!content || !checkbox || !filterSelect) return;
     
     let topScorers = [];
+    let filterType = '';
     
-    switch (filterValue) {
-        case 'all':
-            topScorers = getTopScorersAllGroups();
-            break;
-        case 'group':
-            topScorers = getTopScorersForGroup(selectedStatisticsGroupId);
-            break;
-        case 'team':
+    if (checkbox.checked) {
+        // Show all groups
+        topScorers = getTopScorersAllGroups();
+        filterType = 'all';
+    } else {
+        // Filter by specific criteria
+        const filterValue = filterSelect.value;
+        
+        if (filterValue === 'group') {
+            const selectedGroup = groupSelect ? groupSelect.value : null;
+            topScorers = getTopScorersForGroup(selectedGroup);
+            filterType = 'group';
+        } else if (filterValue === 'team') {
             const selectedTeam = teamSelect ? teamSelect.value : null;
             topScorers = getTopScorersForTeam(selectedTeam);
-            break;
+            filterType = 'team';
+        }
     }
     
-    content.innerHTML = generateTopScorersHTML(topScorers, filterValue);
+    content.innerHTML = generateTopScorersHTML(topScorers, filterType);
 }
 
 function getTopScorersAllGroups() {
@@ -5684,7 +5777,9 @@ function generateTopScorersHTML(topScorers, filterType) {
             title = 'Top Scorers - All Groups';
             break;
         case 'group':
-            const groupName = groups.find(g => g.id === selectedStatisticsGroupId)?.name || 'Selected Group';
+            const groupSelect = document.getElementById('topscorers-group-select');
+            const groupId = groupSelect ? groupSelect.value : null;
+            const groupName = groups.find(g => g.id === groupId)?.name || 'Selected Group';
             title = `Top Scorers - ${groupName}`;
             break;
         case 'team':
@@ -5695,23 +5790,40 @@ function generateTopScorersHTML(topScorers, filterType) {
             break;
     }
     
+    // Function to get medal emoji based on position
+    function getMedalEmoji(position) {
+        switch (position) {
+            case 1: return '🥇';
+            case 2: return '🥈';
+            case 3: return '🥉';
+            default: return '';
+        }
+    }
+    
     return `
         <h4>${title}</h4>
         <div class="topscorers-list">
-            ${topScorers.map((scorer, index) => `
+            ${topScorers.map((scorer, index) => {
+                const position = index + 1;
+                const medalEmoji = getMedalEmoji(position);
+                return `
                 <div class="topscorer-card ${index < 3 ? 'top-3' : ''}">
-                    <div class="scorer-position">${index + 1}</div>
+                    <div class="scorer-position">
+                        ${medalEmoji}
+                        <span class="position-number">${position}</span>
+                    </div>
                     <div class="scorer-info">
                         <div class="scorer-name">${scorer.playerName}</div>
                         <div class="scorer-team">${scorer.teamName}</div>
-                        ${filterType !== 'group' && filterType !== 'team' ? `<div class="scorer-group">${scorer.groupName}</div>` : ''}
+                        ${filterType === 'all' ? `<div class="scorer-group">${scorer.groupName}</div>` : ''}
                     </div>
                     <div class="scorer-goals">
                         <span class="goals-count">${scorer.totalGoals}</span>
                         <span class="goals-label">goal${scorer.totalGoals !== 1 ? 's' : ''}</span>
                     </div>
                 </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
     `;
 }
@@ -5768,9 +5880,34 @@ function getGroupWinner(groupId) {
     return winner;
 }
 
+// Initialize knockout dates from configuration
+function initializeKnockoutDates() {
+    const knockoutDateElement = document.getElementById('knockout-date');
+    if (knockoutDateElement && defaults.knockout && defaults.knockout.dateTimeFormatted) {
+        knockoutDateElement.textContent = defaults.knockout.dateTimeFormatted;
+    }
+    
+    // Optionally update the title if configured
+    const knockoutHeader = document.querySelector('.knockout-header h3');
+    if (knockoutHeader && defaults.knockout && defaults.knockout.title) {
+        knockoutHeader.textContent = defaults.knockout.title;
+    }
+}
+
 // Function to update the knockout stage with current group winners
 function updateKnockoutStage() {
     console.log('DEBUG: Updating knockout stage');
+    
+    // Load knockout date and title from defaults configuration (ensure it's always updated)
+    const knockoutDateElement = document.getElementById('knockout-date');
+    if (knockoutDateElement && defaults.knockout && defaults.knockout.dateTimeFormatted) {
+        knockoutDateElement.textContent = defaults.knockout.dateTimeFormatted;
+    }
+    
+    const knockoutHeader = document.querySelector('.knockout-header h3');
+    if (knockoutHeader && defaults.knockout && defaults.knockout.title) {
+        knockoutHeader.textContent = defaults.knockout.title;
+    }
     
     // Get winners for each group
     const groupAWinner = getGroupWinner('group-a');

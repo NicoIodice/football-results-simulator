@@ -15,6 +15,14 @@
   },
   "defaultGroup": "group-c",
   "defaultTeam": "sporting-esgaios",
+  "knockout": {
+    "date": "November 7th, 2025",
+    "startTime": "4:00 PM",
+    "dateTimeFormatted": "📅 November 7th, 2025 - Starting at 4:00 PM",
+    "title": "🏆 Semi-Finals & Finals",
+    "venue": "Stadium Complex",
+    "description": "Championship knockout stage featuring semi-finals, 3rd place playoff, and final"
+  },
   "ui": {
     "showLoadingMask": true,
     "enableDebugMode": false
