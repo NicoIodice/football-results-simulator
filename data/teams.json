@@ -8,8 +8,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "desesperados-gk",
-        "name": "Desesperados Keeper",
+        "id": "eduardo-marcal",
+        "name": "Eduardo Marçal",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -17,8 +17,8 @@
         "isCaptain": false
       },
       {
-        "id": "desesperados-def1",
-        "name": "Desesperados Defender 1",
+        "id": "andre-farinha-carvalho",
+        "name": "André Farinha Carvalho",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -26,8 +26,8 @@
         "isCaptain": true
       },
       {
-        "id": "desesperados-def2",
-        "name": "Desesperados Defender 2",
+        "id": "denil-baia",
+        "name": "Denil Baía",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -35,8 +35,8 @@
         "isCaptain": false
       },
       {
-        "id": "desesperados-mid",
-        "name": "Desesperados Midfielder",
+        "id": "guilherme-abreu",
+        "name": "Guilherme Abreu",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -44,12 +44,57 @@
         "isCaptain": false
       },
       {
-        "id": "desesperados-fwd",
-        "name": "Desesperados Forward",
+        "id": "goncalo-santos",
+        "name": "Gonçalo Santos",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "jose-costa",
+        "name": "José Costa",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "miguel-lopo-ferreira",
+        "name": "Miguel Lopo Ferreira",
+        "number": 7,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "pedro-salgado",
+        "name": "Pedro Salgado",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tiago-jesus",
+        "name": "Tiago Jesus",
+        "number": 9,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tomas-rodrigues",
+        "name": "Tomás Rodrigues",
+        "number": 10,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -283,8 +328,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "critigals-gk",
-        "name": "CritiGals Keeper",
+        "id": "renata-silva",
+        "name": "Renata Silva",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -292,8 +337,8 @@
         "isCaptain": false
       },
       {
-        "id": "critigals-def1",
-        "name": "CritiGals Defender 1",
+        "id": "ana-rita-pires",
+        "name": "Ana Rita Pires",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -301,8 +346,8 @@
         "isCaptain": true
       },
       {
-        "id": "critigals-def2",
-        "name": "CritiGals Defender 2",
+        "id": "catarina-proenca",
+        "name": "Catarina Proença",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -310,8 +355,8 @@
         "isCaptain": false
       },
       {
-        "id": "critigals-mid",
-        "name": "CritiGals Midfielder",
+        "id": "maria-guerra",
+        "name": "Maria Guerra",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -319,12 +364,57 @@
         "isCaptain": false
       },
       {
-        "id": "critigals-fwd",
-        "name": "CritiGals Forward",
+        "id": "jessica-correia",
+        "name": "Jéssica Correia",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "catia-alves",
+        "name": "Cátia Alves",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "anamta-khan",
+        "name": "Anamta Khan",
+        "number": 7,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "celia-goncalves",
+        "name": "Célia Gonçalves",
+        "number": 8,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "daniela-correia",
+        "name": "Daniela Correia",
+        "number": 9,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "eva-seica",
+        "name": "Eva Seiça",
+        "number": 10,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -338,8 +428,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "underdogs-fc-gk",
-        "name": "UnderDogs FC Keeper",
+        "id": "guilherme-imperial",
+        "name": "Guilherme Imperial",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -347,8 +437,8 @@
         "isCaptain": false
       },
       {
-        "id": "underdogs-fc-def1",
-        "name": "UnderDogs FC Defender 1",
+        "id": "elisio-alexandre-sousa",
+        "name": "Elísio Alexandre Sousa",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -356,8 +446,8 @@
         "isCaptain": true
       },
       {
-        "id": "underdogs-fc-def2",
-        "name": "UnderDogs FC Defender 2",
+        "id": "raul-rosero",
+        "name": "Raúl Rosero",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -365,8 +455,8 @@
         "isCaptain": false
       },
       {
-        "id": "underdogs-fc-mid",
-        "name": "UnderDogs FC Midfielder",
+        "id": "vitor-emanuel-santos",
+        "name": "Vitor Emanuel Santos",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -374,12 +464,39 @@
         "isCaptain": false
       },
       {
-        "id": "underdogs-fc-fwd",
-        "name": "UnderDogs FC Forward",
+        "id": "marcos-soares",
+        "name": "Marcos Soares",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "emanuel-barata",
+        "name": "Emanuel Barata",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "joao-bernardo-jorge",
+        "name": "João Bernardo Jorge",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "fabio-horta-oliveira",
+        "name": "Fábio Horta de Oliveira",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -393,8 +510,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "borussia-doutromundo-gk",
-        "name": "Borussia Doutromundo Keeper",
+        "id": "henrique-fonseca",
+        "name": "Henrique Fonseca",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -402,8 +519,8 @@
         "isCaptain": false
       },
       {
-        "id": "borussia-doutromundo-def1",
-        "name": "Borussia Doutromundo Defender 1",
+        "id": "adriano-tavares",
+        "name": "Adriano Tavares",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -411,8 +528,8 @@
         "isCaptain": true
       },
       {
-        "id": "borussia-doutromundo-def2",
-        "name": "Borussia Doutromundo Defender 2",
+        "id": "hugo-monteiro",
+        "name": "Hugo Monteiro",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -420,8 +537,8 @@
         "isCaptain": false
       },
       {
-        "id": "borussia-doutromundo-mid",
-        "name": "Borussia Doutromundo Midfielder",
+        "id": "hugo-marques",
+        "name": "Hugo Marques",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -429,12 +546,39 @@
         "isCaptain": false
       },
       {
-        "id": "borussia-doutromundo-fwd",
-        "name": "Borussia Doutromundo Forward",
+        "id": "nuno-silva",
+        "name": "Nuno Silva",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "gustavo-lemos",
+        "name": "Gustavo Lemos",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "daniel-santos",
+        "name": "Daniel Santos",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "fernando-costa",
+        "name": "Fernando Costa",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -448,8 +592,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "fc-zerolhos-gk",
-        "name": "FC ZÉrolhos Keeper",
+        "id": "joao-catalao-antunes",
+        "name": "João Catalão Antunes",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -457,8 +601,8 @@
         "isCaptain": false
       },
       {
-        "id": "fc-zerolhos-def1",
-        "name": "FC ZÉrolhos Defender 1",
+        "id": "damiao-santos",
+        "name": "Damião Santos",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -466,8 +610,8 @@
         "isCaptain": true
       },
       {
-        "id": "fc-zerolhos-def2",
-        "name": "FC ZÉrolhos Defender 2",
+        "id": "cesar-neves",
+        "name": "César Neves",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -475,8 +619,8 @@
         "isCaptain": false
       },
       {
-        "id": "fc-zerolhos-mid",
-        "name": "FC ZÉrolhos Midfielder",
+        "id": "mario-pires",
+        "name": "Mário Pires",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -484,12 +628,48 @@
         "isCaptain": false
       },
       {
-        "id": "fc-zerolhos-fwd",
-        "name": "FC ZÉrolhos Forward",
+        "id": "hugo-miguel-pereira",
+        "name": "Hugo Miguel Pereira",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "tiago-pedroso",
+        "name": "Tiago Pedroso",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tomas-martins",
+        "name": "Tomás Martins",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "pedro-cordeiro",
+        "name": "Pedro Cordeiro",
+        "number": 8,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "joao-jacinto",
+        "name": "João Jacinto",
+        "number": 9,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -503,8 +683,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "borg-coimbra-gk",
-        "name": "Borg Coimbra Keeper",
+        "id": "pedro-martins",
+        "name": "Pedro Martins",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -512,8 +692,8 @@
         "isCaptain": false
       },
       {
-        "id": "borg-coimbra-def1",
-        "name": "Borg Coimbra Defender 1",
+        "id": "alfonso-brandao",
+        "name": "Alfonso Brandão",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -521,8 +701,8 @@
         "isCaptain": true
       },
       {
-        "id": "borg-coimbra-def2",
-        "name": "Borg Coimbra Defender 2",
+        "id": "andre-rainho",
+        "name": "André Rainho",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -530,8 +710,8 @@
         "isCaptain": false
       },
       {
-        "id": "borg-coimbra-mid",
-        "name": "Borg Coimbra Midfielder",
+        "id": "diogo-campos",
+        "name": "Diogo Campos",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -539,12 +719,57 @@
         "isCaptain": false
       },
       {
-        "id": "borg-coimbra-fwd",
-        "name": "Borg Coimbra Forward",
+        "id": "jose-miguel-lopes",
+        "name": "José Miguel Lopes",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "pedro-lourenco",
+        "name": "Pedro Lourenço",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "sergio-santos",
+        "name": "Sérgio Santos",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "simao-santos",
+        "name": "Simão Santos",
+        "number": 8,
+        "position": "defender",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "rui-miguel-barbosa",
+        "name": "Rui Miguel Barbosa",
+        "number": 9,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tiago-alexandre-dias",
+        "name": "Tiago Alexandre Dias",
+        "number": 10,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
@@ -934,26 +1159,26 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "francesinha-gk",
-        "name": "Francesinha Keeper",
+        "id": "paulo-almeida-sousa",
+        "name": "Paulo Almeida Sousa",
         "number": 1,
         "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "francesinha-def1",
-        "name": "Francesinha Defender 1",
-        "number": 2,
-        "position": "defender",
         "status": "fit",
         "isStarter": true,
         "isCaptain": true
       },
       {
-        "id": "francesinha-def2",
-        "name": "Francesinha Defender 2",
+        "id": "bruno-goncalves",
+        "name": "Bruno Gonçalves",
+        "number": 2,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "diogo-pedrosa",
+        "name": "Diogo Pedrosa",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -961,8 +1186,8 @@
         "isCaptain": false
       },
       {
-        "id": "francesinha-mid",
-        "name": "Francesinha Midfielder",
+        "id": "filipe-moreira",
+        "name": "Filipe Moreira",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -970,8 +1195,8 @@
         "isCaptain": false
       },
       {
-        "id": "francesinha-fwd",
-        "name": "Francesinha Forward",
+        "id": "francisco-rodrigues",
+        "name": "Francisco Rodrigues",
         "number": 5,
         "position": "forward",
         "status": "fit",
@@ -979,10 +1204,37 @@
         "isCaptain": false
       },
       {
-        "id": "francesinha-sub1",
-        "name": "Francesinha Sub 1",
+        "id": "joao-romao",
+        "name": "João Romão",
         "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "jorge-diogo-lopes",
+        "name": "Jorge Diogo Lopes",
+        "number": 7,
         "position": "defender",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "jose-barreirinho",
+        "name": "José Barreirinho",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "luis-rodrigues",
+        "name": "Luís Rodrigues",
+        "number": 9,
+        "position": "midfielder",
         "status": "fit",
         "isStarter": false,
         "isCaptain": false
@@ -990,16 +1242,16 @@
     ]
   },
   {
-    "id": "southampton-fc",
-    "name": "Southampton FC",
+    "id": "fish-kicks-united",
+    "name": "Fish & Kicks United",
     "league": "CTW",
-    "fullName": "Southampton FC (CTW)",
+    "fullName": "Fish & Kicks United (CTW)",
     "groupId": "group-d",
     "formation": "2-1-1",
     "players": [
       {
-        "id": "southampton-gk",
-        "name": "Southampton Keeper",
+        "id": "joao-afonso-almeida",
+        "name": "João Afonso Almeida",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -1007,8 +1259,8 @@
         "isCaptain": false
       },
       {
-        "id": "southampton-def1",
-        "name": "Southampton Defender 1",
+        "id": "alexandre-gabriel",
+        "name": "Alexandre Gabriel",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -1016,8 +1268,8 @@
         "isCaptain": true
       },
       {
-        "id": "southampton-def2",
-        "name": "Southampton Defender 2",
+        "id": "alexander-read",
+        "name": "Alexander Read",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -1025,8 +1277,8 @@
         "isCaptain": false
       },
       {
-        "id": "southampton-mid",
-        "name": "Southampton Midfielder",
+        "id": "catarina-nunes",
+        "name": "Catarina Nunes",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -1034,12 +1286,30 @@
         "isCaptain": false
       },
       {
-        "id": "southampton-fwd",
-        "name": "Southampton Forward",
+        "id": "jacob-pembroke-burn",
+        "name": "Jacob Pembroke-Burn",
         "number": 5,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "joao-potes",
+        "name": "João Potes",
+        "number": 6,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "thomas-bromley",
+        "name": "Thomas Bromley",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
         "isCaptain": false
       }
     ]
