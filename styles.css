@@ -2494,7 +2494,7 @@ tr.first-place .goal-diff-negative {
 
 .tactics-selector select {
     padding: 8px 12px;
-    border: 2px solid #e74c3c;
+    border: 2px solid #ddd;
     border-radius: 6px;
     background-color: white;
     font-size: 14px;
@@ -2506,7 +2506,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .tactics-selector select:hover {
-    border-color: #c0392b;
+    border-color: #3498db;
 }
 
 .tactics-selector select:focus {

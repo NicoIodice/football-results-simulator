@@ -412,7 +412,9 @@ function calculateGoalStatistics() {
     // Count goals by player and team
     groupGoals.forEach(goal => {
         if (teamStats[goal.teamId]) {
-            teamStats[goal.teamId].totalGoals++;
+            // Use totalGoals if available, otherwise count as 1
+            const goalCount = goal.totalGoals || 1;
+            teamStats[goal.teamId].totalGoals += goalCount;
             
             if (!teamStats[goal.teamId].players[goal.playerId]) {
                 teamStats[goal.teamId].players[goal.playerId] = {
@@ -422,10 +424,11 @@ function calculateGoalStatistics() {
                 };
             }
             
-            teamStats[goal.teamId].players[goal.playerId].goals++;
+            teamStats[goal.teamId].players[goal.playerId].goals += goalCount;
             teamStats[goal.teamId].players[goal.playerId].matches.push({
                 matchId: goal.matchId,
-                goalType: goal.goalType
+                goalType: goal.goalType,
+                totalGoals: goalCount
             });
         }
     });
@@ -3660,11 +3663,14 @@ function getTeamGoalScorers(teamId) {
             };
         }
         
-        scorerStats[goal.playerId].goals++;
+        // Use totalGoals if available, otherwise count as 1
+        const goalCount = goal.totalGoals || 1;
+        scorerStats[goal.playerId].goals += goalCount;
+        
         if (goal.goalType === 'penalti') {
-            scorerStats[goal.playerId].penalties++;
+            scorerStats[goal.playerId].penalties += goalCount;
         } else {
-            scorerStats[goal.playerId].regularGoals++;
+            scorerStats[goal.playerId].regularGoals += goalCount;
         }
     });
     
