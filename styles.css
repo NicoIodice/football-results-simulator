@@ -3,7 +3,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-
+}
 /* Player icon drag cursor (placed after base styles) */
 .player-icon {
     cursor: grab;
@@ -5458,4 +5458,4 @@ body.dark-mode .dark-mode-toggle:hover {
         padding: 12px 25px;
         font-size: 1rem;
     }
-}/* End file */
+}
