@@ -1211,7 +1211,7 @@ function updateStandings() {
         
         row.innerHTML = `
             <td class="rank ${rankClass}">${index + 1}</td>
-            <td class="team-name">${team.name}</td>
+            <td class="team-name">${team.name} ${renderTeamBadge(team.id)}</td>
             <td class="stats">${team.played}</td>
             <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
             <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
@@ -1516,7 +1516,7 @@ function createMatchElement(match, showGroupIndicator) {
     
     matchDiv.innerHTML = `
         <div class="match-teams">
-            ${homeTeam.name} <span class="match-vs">vs</span> ${awayTeam.name}
+            ${homeTeam.name}${renderTeamBadge(homeTeam.id)} <span class="match-vs">vs</span> ${awayTeam.name}${renderTeamBadge(awayTeam.id)}
             ${matchIndicator}
             ${groupIndicator}
         </div>
@@ -2176,7 +2176,7 @@ function generateCustomSimulation(teamId, team) {
                             return `
                             <div class="team-item ${team.id === teamId ? 'current-team' : ''}">
                                 <span class="team-position">${team.position}</span>
-                                <span class="team-name">${team.name} ${matchIndicator}</span>
+                                <span class="team-name">${team.name} ${renderTeamBadge(team.id)} ${matchIndicator}</span>
                                 <span class="team-points">${team.points} pts</span>
                                 <span class="team-gap">${team.gap > 0 ? '+' : ''}${team.gap}</span>
                             </div>
@@ -2315,9 +2315,9 @@ function generateRemainingMatchHTML(match) {
     return `
         <div class="remaining-match">
             <div class="match-teams-sim">
-                <span class="team-home">${match.homeTeamName}</span>
+                <span class="team-home">${match.homeTeamName} ${renderTeamBadge(match.homeTeam)}</span>
                 <span class="vs-separator">vs</span>
-                <span class="team-away">${match.awayTeamName}</span>
+                <span class="team-away">${match.awayTeamName} ${renderTeamBadge(match.awayTeam)}</span>
             </div>
             <div class="match-date-sim">${formattedDate} - ${match.time}</div>
         </div>
@@ -3750,6 +3750,11 @@ function generateTeamAnalysisHTML(teamAnalysis) {
                     </div>
                     
                     <div class="team-metrics">
+                        <!-- League single row -->
+                        <div class="metric league-metric" style="display:flex; align-items:center; gap:8px; grid-column:1 / -1;">
+                            <span class="metric-label">League:</span>
+                            <span class="metric-value">${renderTeamBadge(team.id)}</span>
+                        </div>
                         <div class="metric">
                             <span class="metric-label">Form:</span>
                             <span class="metric-value" style="color: ${team.formDescription.color}">
@@ -3770,7 +3775,7 @@ function generateTeamAnalysisHTML(teamAnalysis) {
                             <span class="metric-label">Defense:</span>
                             <span class="metric-value">${team.defensiveStrength} conceded/game</span>
                         </div>
-                        <div class="metric">
+                        <div class="metric winrate-metric" style="grid-column:1 / -1;">
                             <span class="metric-label">Win Rate:</span>
                             <span class="metric-value">${team.winPercentage}%</span>
                         </div>
@@ -3798,7 +3803,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     
                     <div class="match-teams">
                         <div class="team-prediction home-team">
-                            <h4>${pred.homeTeam.name}</h4>
+                            <h4>${pred.homeTeam.name} ${renderTeamBadge(pred.homeTeam.id)}</h4>
                             <div class="team-form">Form: ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text}</div>
                             <div class="win-probability">
                                 ${pred.actualResult ? 
@@ -3840,7 +3845,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         </div>
                         
                         <div class="team-prediction away-team">
-                            <h4>${pred.awayTeam.name}</h4>
+                            <h4>${pred.awayTeam.name} ${renderTeamBadge(pred.awayTeam.id)}</h4>
                             <div class="team-form">Form: ${pred.awayTeam.formDescription.icon} ${pred.awayTeam.formDescription.text}</div>
                             <div class="win-probability">
                                 ${pred.actualResult ? 
@@ -4103,20 +4108,16 @@ function generateChampionshipForecastHTML(forecast) {
             <h3>Final Standings Projection</h3>
             <div class="projected-table">
                 ${forecast.projections.map((team, index) => {
-                    // Determine border color based on championship probability
                     let borderClass = '';
-                    if (team.championshipProbability >= 75) {
-                        borderClass = 'high-chance'; // Green
-                    } else if (team.championshipProbability >= 50) {
-                        borderClass = 'good-chance'; // Yellow
-                    } else if (team.championshipProbability >= 25) {
-                        borderClass = 'medium-chance'; // Orange
-                    }
-                    
+                    if (team.championshipProbability >= 75) borderClass = 'high-chance';
+                    else if (team.championshipProbability >= 50) borderClass = 'good-chance';
+                    else if (team.championshipProbability >= 25) borderClass = 'medium-chance';
+                    // Use standard-size badge per latest spec (no large badges in Final Standings Projection)
+                    const badge = renderTeamBadge(team.id);
                     return `
                         <div class="projected-position ${index === 0 ? 'champion' : index < 3 ? 'podium' : ''} ${borderClass}">
                             <div class="proj-rank">${index + 1}</div>
-                            <div class="proj-team">${team.name}</div>
+                            <div class="proj-team">${team.name} ${badge}</div>
                             <div class="proj-points">${team.projectedPoints} pts</div>
                             <div class="proj-probability">${team.championshipProbability}% chance</div>
                         </div>
@@ -6136,7 +6137,7 @@ function generateTopScorersHTML(topScorers, filterType) {
                     </div>
                     <div class="scorer-info">
                         <div class="scorer-name">${scorer.playerName}</div>
-                        <div class="scorer-team">${scorer.teamName}</div>
+                        <div class="scorer-team">${scorer.teamName} ${renderTeamBadge(scorer.teamId)}</div>
                         ${filterType === 'all' ? `<div class="scorer-group">${scorer.groupName}</div>` : ''}
                     </div>
                     <div class="scorer-goals">
@@ -6830,3 +6831,22 @@ function parsePredictedScore(scoreStr) {
     const away = parseInt(match[2], 10);
     return { home, away };
 }
+
+// Determine team company (CSW / CTW) from teams list using league field
+function getTeamCompany(teamId) {
+    const team = teams.find(t => t.id === teamId);
+    if (!team) return 'unknown';
+    const league = (team.league || '').toUpperCase();
+    if (league === 'CSW') return 'csw';
+    if (league === 'CTW') return 'ctw';
+    return 'unknown';
+}
+
+// Render HTML badge for team; large=true gives bigger badge for projection cards
+function renderTeamBadge(teamId, large = false) {
+    const company = getTeamCompany(teamId);
+    const label = company === 'csw' ? 'CSW' : company === 'ctw' ? 'CTW' : '?';
+    const sizeClass = large ? 'large' : '';
+    return `<span class="team-company-badge company-${company} ${sizeClass}" title="${company.toUpperCase()}">${label}</span>`;
+}
+
