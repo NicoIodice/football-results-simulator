@@ -133,7 +133,7 @@ function withErrorHandling(fn) {
 const OPENAI_CONFIG = {
     apiKey: null, // API key will be loaded from .env file
     baseURL: 'https://openrouter.ai/api/v1',
-    model: 'openai/gpt-oss-20b:free', //'openai/gpt-4o'
+    model: 'openai/gpt-4o', //'openai/gpt-4o'
     maxTokens: 500, // Limit response length to optimize costs
     temperature: 0.7,
     retryAttempts: 3,
@@ -146,7 +146,7 @@ let openaiInitialized = false; // Track initialization status
 // Load API key from config.json file
 async function loadOpenAIKeyFromConfig() {
     try {
-        const response = await fetch('config.json');
+        const response = await fetch('app-config.json');
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
