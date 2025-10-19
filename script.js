@@ -5163,6 +5163,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     playerIcon.removeEventListener('dragend', playerIcon._dragEndHandler);
     playerIcon.removeEventListener('touchstart', playerIcon._touchStartHandler);
     playerIcon.removeEventListener('touchend', playerIcon._touchEndHandler);
+
     
     // Create and store event handlers
     playerIcon._dragStartHandler = function(e) {
@@ -5225,6 +5226,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     
     playerIcon.addEventListener('touchstart', playerIcon._touchStartHandler);
     playerIcon.addEventListener('touchend', playerIcon._touchEndHandler);
+
     
     logger.log('Drag and drop setup completed for:', player.name, 'at position:', positionId);
 }
@@ -5619,7 +5621,6 @@ function removeDropZone(positionElement) {
 function swapPlayers(sourcePositionId, targetPositionId) {
     const selectedTeamId = document.getElementById('selected-team-lineup').value;
     if (!selectedTeamId) return;
-
     const team = teamsData.find(t => t.id === selectedTeamId);
     if (!team) return;
 
@@ -5635,32 +5636,45 @@ function swapPlayers(sourcePositionId, targetPositionId) {
     const sourcePlayer = team.players.find(p => p.id === sourcePlayerId);
     if (!sourcePlayer) return;
 
-    // If target is empty, move player
-    if (!targetPlayerIcon) {
-        targetElement.innerHTML = sourceElement.innerHTML;
-        sourceElement.innerHTML = '';
-    } else {
-        // Swap innerHTML
-        const temp = sourceElement.innerHTML;
-        sourceElement.innerHTML = targetElement.innerHTML;
-        targetElement.innerHTML = temp;
+    let targetPlayer = null;
+    if (targetPlayerIcon) {
+        const targetPlayerId = targetPlayerIcon.dataset.playerId;
+        targetPlayer = team.players.find(p => p.id === targetPlayerId);
     }
 
-    // Update isStarter flags: both source and target remain starters
-    // (No change needed unless you want to demote to bench on drag out)
-
-    // Reattach drag handlers for involved players
-    [sourceElement, targetElement].forEach(el => {
-        const icon = el.querySelector('.player-icon');
-        if (icon) {
-            const pid = icon.dataset.playerId;
-            const playerObj = team.players.find(p => p.id === pid);
-            if (playerObj) {
-                setupPlayerDragAndDrop(icon, el.id, playerObj);
-            }
+    // Field-to-field swap
+    if (sourcePlayer.isStarter && targetPlayer && targetPlayer.isStarter) {
+        // Swap their isStarterOrder (if you have it), or just swap their positions in the array
+        // For now, swap their isStarter flags and re-render
+        // Actually, both remain starters, just swap their positions visually
+        // To ensure correct order, swap their positions in the team.players array
+        const sourceIdx = team.players.indexOf(sourcePlayer);
+        const targetIdx = team.players.indexOf(targetPlayer);
+        if (sourceIdx !== -1 && targetIdx !== -1) {
+            [team.players[sourceIdx], team.players[targetIdx]] = [team.players[targetIdx], team.players[sourceIdx]];
         }
-    });
+    }
+    // Bench-to-field swap (replace field player)
+    else if (!sourcePlayer.isStarter && targetPlayer && targetPlayer.isStarter) {
+        targetPlayer.isStarter = false;
+        sourcePlayer.isStarter = true;
+        // Optionally, swap their positions in the array for order
+        const sourceIdx = team.players.indexOf(sourcePlayer);
+        const targetIdx = team.players.indexOf(targetPlayer);
+        if (sourceIdx !== -1 && targetIdx !== -1) {
+            [team.players[sourceIdx], team.players[targetIdx]] = [team.players[targetIdx], team.players[sourceIdx]];
+        }
+    }
+    // Field-to-empty-slot (move field player)
+    else if (sourcePlayer.isStarter && !targetPlayerIcon) {
+        // No change needed, just re-render
+    }
+    // Bench-to-empty-slot (move bench player to field)
+    else if (!sourcePlayer.isStarter && !targetPlayerIcon) {
+        sourcePlayer.isStarter = true;
+    }
 
+    updateTeamLineup();
     persistTeamState();
 }
 
@@ -6822,6 +6836,11 @@ function isWithinEditWindow(playedDate) {
 }
 
 function downloadKnockoutResults() {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    if (isMobile) {
+        showToast('Download is not available on mobile devices.', 'warning', 4000);
+        return;
+    }
     const dataStr = JSON.stringify(knockoutResults, null, 2);
     const dataBlob = new Blob([dataStr], {type: 'application/json'});
     const url = URL.createObjectURL(dataBlob);

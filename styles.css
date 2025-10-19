@@ -3,6 +3,15 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+
+/* Player icon drag cursor (placed after base styles) */
+.player-icon {
+    cursor: grab;
+}
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
 body {
@@ -634,6 +643,36 @@ tr.first-place .goal-diff-negative {
     display: flex;
     align-items: center;
     gap: 6px; /* tighter label-dropdown spacing */
+    justify-content: flex-start;
+}
+
+@media (max-width: 768px) {
+    /* Only affect teams tab formation/tactics selectors and statistics controls */
+    .teams-controls .tactics-selector,
+    .teams-controls .team-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+    }
+    .teams-controls .tactics-selector label,
+    .teams-controls .team-selector label {
+        margin-bottom: 4px;
+        width: 100%;
+        text-align: left;
+    }
+    .teams-controls .tactics-selector select,
+    .teams-controls .team-selector select {
+        width: 100%;
+        text-align: left;
+    }
+    .statistics-controls .group-selector,
+    .statistics-controls label,
+    .statistics-controls select {
+        text-align: left;
+        align-items: flex-start;
+        justify-content: flex-start;
+        width: 100%;
+    }
 }
 
 .group-selector-container {
@@ -1053,7 +1092,7 @@ tr.first-place .goal-diff-negative {
         overflow-wrap: break-word;
         text-align: center;
         width: 100%;
-        font-size: 15px;
+        font-size: 20px;
     }
     
     .match-datetime-container {
@@ -3208,16 +3247,14 @@ tr.first-place .goal-diff-negative {
 /* Slot-based formation system */
 /* --- Field slot layout: absolute positioning for perfect alignment --- */
 .football-field { position: relative; }
+
+/* Fixed slot layout: each slot is absolutely positioned within the line, always evenly spaced */
 .formation-line[data-line] {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 10%;
     width: 80%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 70px;
+    height: 80px;
+    top: 0;
     pointer-events: none;
     z-index: 2;
 }
@@ -3231,15 +3268,21 @@ tr.first-place .goal-diff-negative {
     top: 72%;
 }
 .formation-line[data-line] .line-slot {
-    flex: 1 1 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 68px;
+    height: 68px;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-width: 0;
-    min-height: 68px;
-    position: relative;
     pointer-events: auto;
 }
+.formation-line[data-line] .line-slot[data-slot="1"] { left: 0%; }
+.formation-line[data-line] .line-slot[data-slot="2"] { left: 18.75%; }
+.formation-line[data-line] .line-slot[data-slot="3"] { left: 37.5%; }
+.formation-line[data-line] .line-slot[data-slot="4"] { left: 56.25%; }
+.formation-line[data-line] .line-slot[data-slot="5"] { left: 75%; }
 /* Visual hint when slot is active target during drag */
 .formation-line[data-line] .line-slot.valid-target::after {
     content: '';
@@ -3311,27 +3354,27 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .formation-line.defense {
     margin-top: 20px;
     position: absolute;
-    bottom: -10px;
+    bottom: -20px;
     left: 50%;
-    transform: translateX(-47%);
+    transform: translateX(-50%);
     width: 100%;
 }
 
 .formation-line.midfield {
     margin: 20px 0;
     position: absolute;
-    bottom: 60px;
+    bottom: 40px;
     left: 50%;
-    transform: translateX(-47%);
+    transform: translateX(-50%);
     width: 100%;
 }
 
 .formation-line.attack {
     margin-bottom: 20px;
     position: absolute;
-    bottom: 150px;
+    bottom: 75px;
     left: 50%;
-    transform: translateX(-47%);
+    transform: translateX(-50%);
     width: 100%;
 }
 
@@ -3481,8 +3524,8 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     font-size: 0.8rem;
     font-weight: 600;
     color: #2c3e50;
-    text-align: left;
-    max-width: 80px;
+    /* text-align: left; */
+    /* max-width: 80px; */
     width: 100%;
     word-wrap: break-word;
     line-height: 1.0;
@@ -3827,6 +3870,9 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     
     .fixtures-controls .group-selector {
         width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
     
     .fixtures-controls select {
@@ -4798,6 +4844,12 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
         align-items: stretch;
         gap: 15px;
     }
+
+    .forecast-controls .group-selector {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
     
     .statistics-controls .checkbox-control,
     .statistics-controls .group-selector,
@@ -4809,8 +4861,9 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     .topscorers-controls .team-selector,
     .topscorers-controls .group-selector-inline,
     .topscorers-controls .team-selector-inline {
-        justify-content: space-between;
-        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
     
     .statistics-controls select,
