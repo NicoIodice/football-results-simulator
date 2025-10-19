@@ -993,8 +993,8 @@ function checkQualificationStatus(groupId = null) {
         let allCompleted = true;
         let globalLastDate = null;
         
-        // Get all unique group IDs from fixtures
-        const allGroups = [...new Set(fixtures.map(f => f.groupId))];
+        // Get all unique group IDs from groups data (not just fixtures)
+        const allGroups = groups.map(g => g.id);
         
         for (const gId of allGroups) {
             const groupStatus = checkQualificationStatus(gId);
@@ -1009,16 +1009,30 @@ function checkQualificationStatus(groupId = null) {
         return {
             allCompleted: allCompleted,
             lastFixtureDate: globalLastDate,
-            qualificationsFinished: allCompleted && globalLastDate && currentDate > globalLastDate
+            qualificationsFinished: allCompleted && (!globalLastDate || currentDate > globalLastDate)
         };
     }
     
     // Group-specific check
+    // First, check if this group has only one team
+    const groupTeams = teams.filter(team => team.groupId === groupId);
+    
+    if (groupTeams.length <= 1) {
+        // Single team or no teams - automatically completed
+        return {
+            allCompleted: true,
+            lastFixtureDate: null,
+            qualificationsFinished: true,
+            hasFixtures: false,
+            isSingleTeamGroup: true
+        };
+    }
+    
     // Get all fixtures for this group
     const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === groupId);
     
     if (groupFixtures.length === 0) {
-        // No fixtures found for this group - consider it as having no scheduled matches
+        // No fixtures found but multiple teams - incomplete group
         return {
             allCompleted: false,
             lastFixtureDate: null,
@@ -1083,16 +1097,21 @@ function updateGroupStatusIndicator() {
     
     // Check qualification status for the current group only
     const status = checkQualificationStatus(currentGroupId);
-    
-    // If no fixtures exist for this group, hide indicator
-    if (!status.hasFixtures) {
-        statusElement.style.display = 'none';
-        return;
-    }
-    
     const groupName = currentGroupId.replace('group-', '').toUpperCase();
     
-    if (status.allCompleted) {
+    if (status.isSingleTeamGroup) {
+        // Single team group - automatically completed
+        statusElement.className = 'group-status-indicator completed';
+        statusElement.innerHTML = `
+            <span class="status-icon">✅</span>
+            <span class="status-text">Group ${groupName} completed! (Single team)</span>
+        `;
+        statusElement.style.display = 'flex';
+    } else if (!status.hasFixtures) {
+        // Multiple teams but no fixtures - hide indicator
+        statusElement.style.display = 'none';
+    } else if (status.allCompleted) {
+        // Normal completion with matches
         statusElement.className = 'group-status-indicator completed';
         statusElement.innerHTML = `
             <span class="status-icon">✅</span>
@@ -1100,6 +1119,7 @@ function updateGroupStatusIndicator() {
         `;
         statusElement.style.display = 'flex';
     } else {
+        // Group in progress
         statusElement.className = 'group-status-indicator in-progress';
         statusElement.innerHTML = `
             <span class="status-icon">⚠️</span>
@@ -1171,14 +1191,14 @@ function updateStandings() {
         const isActualFirst = index === 0; // True first place after tie-breakers
         
         // Add appropriate classes based on position and group completion status
-        if (isActualFirst && groupStatus.allCompleted) {
-            // True first place AND group completed - gets crown and green highlight
+        if (isActualFirst && (groupStatus.allCompleted || groupStatus.isSingleTeamGroup)) {
+            // True first place AND (group completed OR single team group) - gets crown and green highlight
             row.classList.add('champion-first-place');
-        } else if (isFirstPlace && !groupStatus.allCompleted) {
-            // Tied for first but group not completed - only gets yellow highlight
+        } else if (isFirstPlace && !groupStatus.allCompleted && !groupStatus.isSingleTeamGroup) {
+            // Tied for first but group not completed (and not single team) - only gets yellow highlight
             row.classList.add('tied-for-first-place');
         }
-        // Note: Crown only appears when group is completed
+        // Note: Crown appears when group is completed OR when it's a single team group
 
         // Rank and goal difference colors
         const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
