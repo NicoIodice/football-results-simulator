@@ -1068,74 +1068,60 @@ function checkQualificationStatus(groupId = null) {
     };
 }
 
-function updateQualificationDisclaimer() {
-    const disclaimerElement = document.getElementById('qualification-status-disclaimer');
-    if (!disclaimerElement) return;
+function updateGroupStatusIndicator() {
+    const statusElement = document.getElementById('group-status-indicator');
+    if (!statusElement) return;
     
     // Get current selected group
     const groupSelect = document.getElementById('selected-group');
     const currentGroupId = groupSelect ? groupSelect.value : null;
     
     if (!currentGroupId) {
-        disclaimerElement.style.display = 'none';
+        statusElement.style.display = 'none';
         return;
     }
     
     // Check qualification status for the current group only
     const status = checkQualificationStatus(currentGroupId);
     
-    // If no fixtures exist for this group, show no disclaimer
+    // If no fixtures exist for this group, hide indicator
     if (!status.hasFixtures) {
-        disclaimerElement.style.display = 'none';
-        logger.log('DEBUG: No disclaimer shown - No fixtures found for group', currentGroupId);
+        statusElement.style.display = 'none';
         return;
     }
     
-    if (status.qualificationsFinished) {
-        disclaimerElement.className = 'qualification-disclaimer completed';
-        disclaimerElement.innerHTML = `
-            <span class="status-icon">🏁</span>
-            <span class="status-text">Group ${currentGroupId.replace('group-', '').toUpperCase()} Completed!</span>
-            <span class="next-phase">All matches in this group have finished. Ready for knockout phase! 🏆</span>
-        `;
-        disclaimerElement.style.display = 'block';
-        
-        logger.log('DEBUG: Qualification disclaimer shown - Group completed', currentGroupId);
-    } else if (status.allCompleted && !status.qualificationsFinished) {
-        disclaimerElement.className = 'qualification-disclaimer completed';
-        disclaimerElement.innerHTML = `
+    const groupName = currentGroupId.replace('group-', '').toUpperCase();
+    
+    if (status.allCompleted) {
+        statusElement.className = 'group-status-indicator completed';
+        statusElement.innerHTML = `
             <span class="status-icon">✅</span>
-            <span class="status-text">Group ${currentGroupId.replace('group-', '').toUpperCase()} Matches Completed!</span>
-            <span class="next-phase">Waiting for final fixture time to pass...</span>
+            <span class="status-text">Group ${groupName} completed!</span>
         `;
-        disclaimerElement.style.display = 'block';
-        
-        logger.log('DEBUG: Qualification disclaimer shown - Group matches completed, waiting for time', currentGroupId);
+        statusElement.style.display = 'flex';
     } else {
-        // Check if current time is before the last fixture date
-        const currentDate = new Date();
-        if (status.lastFixtureDate && currentDate < status.lastFixtureDate) {
-            disclaimerElement.className = 'qualification-disclaimer in-progress';
-            disclaimerElement.innerHTML = `<strong>⚠️ Group ${currentGroupId.replace('group-', '').toUpperCase()} In Progress...</strong><br>Group winner is not yet finalized. Complete all group matches to determine knockout stage participants.`;
-            disclaimerElement.style.display = 'block';
-            
-            logger.log('DEBUG: Qualification disclaimer shown - Group in progress', currentGroupId);
-        } else {
-            // Current time is past last fixture but not all matches are completed
-            disclaimerElement.style.display = 'none';
-            logger.log('DEBUG: No disclaimer shown - Past fixture time but matches incomplete', currentGroupId);
-        }
+        statusElement.className = 'group-status-indicator in-progress';
+        statusElement.innerHTML = `
+            <span class="status-icon">⚠️</span>
+            <span class="status-text">Group matches in progress...</span>
+        `;
+        statusElement.style.display = 'flex';
     }
 }
 
 function updateStandings() {
     try {
-        // Update qualification status disclaimer
-        updateQualificationDisclaimer();
+        // Update group status indicator
+        updateGroupStatusIndicator();
         
         const standings = calculateStandings();
     const tbody = document.getElementById('standings-body');
     tbody.innerHTML = '';
+    
+    // Get current group's completion status for crown logic
+    const groupSelect = document.getElementById('selected-group');
+    const currentGroupId = groupSelect ? groupSelect.value : null;
+    const groupStatus = checkQualificationStatus(currentGroupId);
     
     // Determine first place teams (all teams with same points as leader)
     const firstPlacePoints = standings[0].points;
@@ -1184,20 +1170,15 @@ function updateStandings() {
         const isFirstPlace = firstPlaceTeams.includes(team);
         const isActualFirst = index === 0; // True first place after tie-breakers
         
-        // Check qualification status for current group to determine highlighting behavior
-        const groupSelect = document.getElementById('selected-group');
-        const currentGroupId = groupSelect ? groupSelect.value : null;
-        const qualificationStatus = checkQualificationStatus(currentGroupId);
-        
-        // Add appropriate classes based on position, tie status, and qualification completion
-        if (isActualFirst) {
-            // True first place - always gets crown and green highlight
+        // Add appropriate classes based on position and group completion status
+        if (isActualFirst && groupStatus.allCompleted) {
+            // True first place AND group completed - gets crown and green highlight
             row.classList.add('champion-first-place');
-        } else if (isFirstPlace && !qualificationStatus.qualificationsFinished) {
-            // Tied for first but lost tie-breaker - only gets yellow highlight during qualification period
+        } else if (isFirstPlace && !groupStatus.allCompleted) {
+            // Tied for first but group not completed - only gets yellow highlight
             row.classList.add('tied-for-first-place');
         }
-        // Note: After qualifications finish, only the actual winner (position 1) gets highlighting
+        // Note: Crown only appears when group is completed
 
         // Rank and goal difference colors
         const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
@@ -6175,6 +6156,7 @@ function showStandingsSubTab(tabId) {
     
     // Update content based on sub-tab
     if (tabId === 'knockout-stage') {
+        updateKnockoutDisclaimer();
         updateKnockoutStage();
     } else if (tabId === 'statistics') {
         updateStatistics();
@@ -6309,19 +6291,56 @@ function updateKnockoutDisclaimer() {
     }
 }
 
-function checkAllGroupMatchesComplete(groupId = null) {
-    // Check if all matches in the results data have been played
-    // If groupId is specified, check only that group's matches
-    const matchesToCheck = groupId 
-        ? results.filter(match => match.groupId === groupId)
-        : results;
+function updateKnockoutDisclaimer() {
+    const disclaimerElement = document.getElementById('knockout-disclaimer');
+    if (!disclaimerElement) return;
+    
+    // Check overall group stage status (all groups)
+    const globalStatus = checkQualificationStatus(); // null = check all groups
+    
+    const currentDate = new Date();
+    
+    if (globalStatus.allCompleted && globalStatus.lastFixtureDate && currentDate > globalStatus.lastFixtureDate) {
+        // All matches completed and time has passed
+        disclaimerElement.className = 'knockout-disclaimer success';
+        disclaimerElement.innerHTML = `
+            <strong>✅ Group Stage Complete!</strong><br>
+            All group matches have been completed and qualification period has ended. Ready for knockout phase!
+        `;
+        disclaimerElement.style.display = 'block';
         
-    for (const match of matchesToCheck) {
-        if (!match.played) {
-            return false;
-        }
+        logger.log('DEBUG: Knockout disclaimer - Group stage complete');
+    } else if (globalStatus.allCompleted && globalStatus.lastFixtureDate && currentDate <= globalStatus.lastFixtureDate) {
+        // All matches completed but waiting for time to pass
+        disclaimerElement.className = 'knockout-disclaimer warning';
+        disclaimerElement.innerHTML = `
+            <strong>⏳ Group Stage Matches Complete!</strong><br>
+            All group matches finished. Waiting for qualification period to end...
+        `;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Knockout disclaimer - Matches complete, waiting for time');
+    } else if (currentDate > globalStatus.lastFixtureDate) {
+        // Time has passed but matches are missing
+        disclaimerElement.className = 'knockout-disclaimer warning';
+        disclaimerElement.innerHTML = `
+            <strong>⚠️ Missing Match Results!</strong><br>
+            Some group stage matches are still incomplete despite the scheduled time passing.
+        `;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Knockout disclaimer - Missing results');
+    } else {
+        // Group stage still in progress
+        disclaimerElement.className = 'knockout-disclaimer warning';
+        disclaimerElement.innerHTML = `
+            <strong>⚠️ Group Stage In Progress...</strong><br>
+            Group stage matches are still ongoing. Knockout phase will begin once all groups are completed.
+        `;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Knockout disclaimer - Group stage in progress');
     }
-    return true;
 }
 
 function updateKnockoutMatch(matchId, homeTeam, awayTeam) {

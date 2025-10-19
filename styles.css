@@ -518,6 +518,40 @@ tr.first-place .goal-diff-negative {
     gap: 15px;
 }
 
+.group-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.group-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.group-status-indicator.completed {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.group-status-indicator.in-progress {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.group-status-indicator .status-icon {
+    font-size: 1.1rem;
+}
+
 .group-selector label {
     font-weight: 600;
     color: #2c3e50;
@@ -790,6 +824,18 @@ tr.first-place .goal-diff-negative {
         flex-direction: column;
         align-items: flex-start;
         gap: 10px;
+    }
+    
+    .group-selector-container {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        width: 100%;
+    }
+    
+    .group-status-indicator {
+        padding: 6px 10px;
+        font-size: 0.8rem;
     }
     
     .group-selector label {
