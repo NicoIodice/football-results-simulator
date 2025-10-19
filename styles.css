@@ -706,7 +706,7 @@ tr.first-place .goal-diff-negative {
 .team-selector {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 15px;
 }
 
 .team-selector label {
@@ -1662,6 +1662,8 @@ tr.first-place .goal-diff-negative {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    max-width: 800px;
+    margin: 0 auto 20px auto;
 }
 
 .match-teams {
@@ -2942,6 +2944,24 @@ tr.first-place .goal-diff-negative {
 }
 
 /* Tactics selector styling */
+/* Teams Tab Controls */
+.teams-controls {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #3498db;
+    display: flex;
+    gap: 30px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.teams-controls .team-selector,
+.teams-controls .tactics-selector {
+    margin-bottom: 0;
+}
+
 .tactics-selector {
     margin-bottom: 20px;
     display: flex;
@@ -3616,16 +3636,16 @@ tr.first-place .goal-diff-negative {
 
 /* Fixtures Controls */
 .fixtures-controls {
-    background: white;
+    background-color: #f8f9fa;
     padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #3498db;
 }
 
 .control-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     gap: 20px;
 }
@@ -4374,16 +4394,16 @@ tr.first-place .goal-diff-negative {
 
 /* Statistics Section Styles */
 .statistics-controls {
-    background: white;
+    background-color: #f8f9fa;
     padding: 20px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 30px;
+    border-left: 4px solid #3498db;
 }
 
 .statistics-controls .control-row {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     gap: 20px;
     flex-wrap: wrap;
@@ -5072,14 +5092,20 @@ body.dark-mode .gameweek-header {
 
 body.dark-mode .group-selector,
 body.dark-mode .simulator-controls,
-body.dark-mode .forecast-controls {
+body.dark-mode .forecast-controls,
+body.dark-mode .fixtures-controls,
+body.dark-mode .statistics-controls,
+body.dark-mode .teams-controls {
     background-color: #2a2a2a;
     border-left-color: #2c5282;
 }
 
 body.dark-mode .group-selector select,
 body.dark-mode .team-selector select,
-body.dark-mode .forecast-controls select {
+body.dark-mode .forecast-controls select,
+body.dark-mode .fixtures-controls select,
+body.dark-mode .statistics-controls select,
+body.dark-mode .teams-controls select {
     background-color: #3a3a3a;
     color: #e0e0e0;
     border-color: #555;
@@ -5087,7 +5113,10 @@ body.dark-mode .forecast-controls select {
 
 body.dark-mode .group-selector label,
 body.dark-mode .team-selector label,
-body.dark-mode .forecast-controls label {
+body.dark-mode .forecast-controls label,
+body.dark-mode .fixtures-controls label,
+body.dark-mode .statistics-controls label,
+body.dark-mode .teams-controls label {
     color: #e0e0e0;
 }
 

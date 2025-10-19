@@ -322,18 +322,20 @@
             <!-- Teams Tab -->
             <div id="teams" class="tab-content">
                 <h2>Team Lineup & Squad</h2>
-                <div class="team-selector">
-                    <label for="selected-team-lineup">Team:</label>
-                    <select id="selected-team-lineup" onchange="updateTeamLineup()">
-                        <!-- Teams will be populated by JavaScript -->
-                    </select>
-                </div>
-                
-                <div class="tactics-selector">
-                    <label for="selected-tactics">Formation:</label>
-                    <select id="selected-tactics" onchange="updateFormation()">
-                        <!-- Tactics will be populated by JavaScript -->
-                    </select>
+                <div class="teams-controls">
+                    <div class="team-selector">
+                        <label for="selected-team-lineup">Team:</label>
+                        <select id="selected-team-lineup" onchange="updateTeamLineup()">
+                            <!-- Teams will be populated by JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <div class="tactics-selector">
+                        <label for="selected-tactics">Formation:</label>
+                        <select id="selected-tactics" onchange="updateFormation()">
+                            <!-- Tactics will be populated by JavaScript -->
+                        </select>
+                    </div>
                 </div>
                 
                 <div id="team-lineup-content">
@@ -517,7 +519,7 @@
                 
                 <!-- Forecast Controls -->
                 <div class="forecast-controls">
-                    <div class="control-row">
+                    <div class="group-selector">
                         <label for="forecast-group-select">Group:</label>
                         <select id="forecast-group-select" onchange="updateForecastForGroup()">
                             <!-- Groups will be populated by JavaScript -->
