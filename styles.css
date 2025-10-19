@@ -2588,6 +2588,20 @@ tr.first-place .goal-diff-negative {
         min-width: 320px !important;
         white-space: nowrap !important;
     }
+    /* Mobile forecast: keep horizontal row and reorder: Home | Result | Away */
+    #forecast-content .match-teams {
+        display: grid !important;
+        grid-template-columns: 1fr auto 1fr !important; /* Home | Result | Away */
+        align-items: center !important;
+        gap: 12px !important;
+        white-space: normal !important; /* allow wrapping inside child blocks */
+    }
+    #forecast-content .team-prediction.home-team { order: 1 !important; }
+    #forecast-content .match-center { order: 2 !important; }
+    #forecast-content .team-prediction.away-team { order: 3 !important; }
+    /* Ensure headings wrap properly if long */
+    #forecast-content .team-prediction h4 { white-space: normal !important; }
+    #forecast-content .match-center .vs-divider { font-size: 1rem !important; }
     
     .forecast-content .prediction-details {
         flex-direction: column !important;
