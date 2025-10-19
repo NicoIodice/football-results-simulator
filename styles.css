@@ -2640,6 +2640,28 @@ tr.first-place .goal-diff-negative {
         overflow-wrap: break-word !important;
         line-height: 1.5 !important;
     }
+    /* Gap between analysis and goal scorers (when present) */
+    #forecast-content .prediction-reasoning + .goal-scorer-predictions {
+        margin-top: 21px !important;
+    }
+    /* Increase space in team and result blocks */
+    #forecast-content .team-prediction.home-team,
+    #forecast-content .team-prediction.away-team {
+        padding: 8px 10px !important;
+        background: rgba(255,255,255,0.6) !important;
+        border-radius: 6px !important;
+    }
+    #forecast-content .match-center {
+        padding: 8px 10px !important;
+        background: rgba(236,240,241,0.6) !important;
+        border-radius: 6px !important;
+    }
+
+    #forecast-content .goal-scorer-predictions {
+        width: 600px !important;
+        margin: 15px -20px -20px -20px !important;
+        padding: 12px 20px !important;
+    }
     
     /* Championship forecast mobile layout */
     .championship-forecast {
