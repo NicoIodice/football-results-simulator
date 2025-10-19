@@ -3761,7 +3761,7 @@ function generateTeamAnalysisHTML(teamAnalysis) {
                     
                     <div class="team-metrics">
                         <!-- League single row -->
-                        <div class="metric league-metric" style="display:flex; align-items:center; gap:8px; grid-column:1 / -1;">
+                        <div class="metric league-metric" style="align-items:center; grid-column:1 / -1;">
                             <span class="metric-label">League:</span>
                             <span class="metric-value">${renderTeamBadge(team.id)}</span>
                         </div>
