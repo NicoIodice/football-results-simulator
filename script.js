@@ -3,6 +3,7 @@ let groups = [];
 let teams = [];
 let fixtures = [];
 let results = [];
+let knockoutResults = {};
 let goals = [];
 let defaults = {}; // Add defaults configuration
 let selectedGroupId = null;
@@ -10,16 +11,35 @@ let selectedGroupId = null;
 // Forecast-specific variables
 let selectedForecastGroupId = null;
 
-// Admin configuration
-const ADMIN_CONFIG = {
-    role: 'admin',
-    validateTime: false // Enable/disable time validation for adding results
-};
+// Configuration loaded from config.json
+let config = null;
 
-// Configuration for simulation type
-const SIMULATION_CONFIG = {
-    useOpenAI: false, // Switch to enable/disable OpenAI analysis (default off)
-    pointsGapLimit: 3 // Only analyze teams within this points gap - will be updated from defaults.json
+// Centralized logging system that respects debug mode setting
+const logger = {
+    log: (...args) => {
+        if (config?.ui?.enableDebugMode) {
+            console.log(...args);
+        }
+    },
+    warn: (...args) => {
+        if (config?.ui?.enableDebugMode) {
+            console.warn(...args);
+        }
+    },
+    error: (...args) => {
+        // Always show errors regardless of debug mode
+        console.error(...args);
+    },
+    info: (...args) => {
+        if (config?.ui?.enableDebugMode) {
+            console.info(...args);
+        }
+    },
+    debug: (...args) => {
+        if (config?.ui?.enableDebugMode) {
+            console.debug(...args);
+        }
+    }
 };
 
 // OpenRouter API configuration (formerly OpenAI)
@@ -50,14 +70,14 @@ async function loadOpenAIKeyFromConfig() {
         if (apiKey && apiKey !== 'your-api-key-here' && apiKey.trim()) {
             OPENAI_CONFIG.apiKey = apiKey.trim();
             initializeOpenAI(OPENAI_CONFIG.apiKey);
-            console.log('✅ OpenRouter API key loaded from config.json');
+            logger.log('✅ OpenRouter API key loaded from config.json');
             return;
         } else {
-            console.warn('⚠️ No valid OpenRouter API key found in config.json');
+            logger.warn('⚠️ No valid OpenRouter API key found in config.json');
         }
     } catch (error) {
-        console.warn('⚠️ Could not load config.json:', error.message);
-        console.info('💡 Create a config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
+        logger.warn('⚠️ Could not load config.json:', error.message);
+        logger.info('💡 Create a config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
     }
 }
 
@@ -78,30 +98,30 @@ async function loadOpenAIKeyFromEnv() {
                 if (apiKey && apiKey !== 'your-api-key-here') {
                     OPENAI_CONFIG.apiKey = apiKey;
                     initializeOpenAI(apiKey);
-                    console.log('✅ OpenRouter API key loaded from .env file');
+                    logger.log('✅ OpenRouter API key loaded from .env file');
                     return;
                 }
             }
         }
-        console.warn('⚠️ No valid OpenRouter API key found in .env file');
+        logger.warn('⚠️ No valid OpenRouter API key found in .env file');
     } catch (error) {
         // Don't log .env errors since it's expected to fail often
-        console.debug('.env file not accessible via HTTP (this is normal)');
+        logger.debug('.env file not accessible via HTTP (this is normal)');
     }
 }
 
 // Initialize OpenAI client
 function initializeOpenAI(apiKey) {
     if (!apiKey) {
-        console.warn('⚠️ No API key provided for OpenRouter initialization');
+        logger.warn('⚠️ No API key provided for OpenRouter initialization');
         return;
     }
     
     try {
         OPENAI_CONFIG.apiKey = apiKey;
-        console.log('✅ OpenRouter client initialized successfully');
+        logger.log('✅ OpenRouter client initialized successfully');
     } catch (error) {
-        console.error('❌ Failed to initialize OpenRouter client:', error);
+        logger.error('❌ Failed to initialize OpenRouter client:', error);
     }
 }
 
@@ -195,7 +215,7 @@ function hideLoadingMask() {
 // Initialize OpenRouter system on page load
 async function initializeOpenRouterSystem() {
     try {
-        console.log('🔄 Initializing OpenRouter system...');
+        logger.log('🔄 Initializing OpenRouter system...');
         
         // Try to load API key in order of preference
         await loadOpenAIKeyFromConfig(); // Try config.json first
@@ -209,22 +229,22 @@ async function initializeOpenRouterSystem() {
         // Show success or error toast
         if (OPENAI_CONFIG.apiKey) {
             showToast('🤖 OpenRouter Engine Ready - Advanced analysis available!', 'success', 5000);
-            console.log('✅ OpenRouter system fully initialized');
+            logger.log('✅ OpenRouter system fully initialized');
         } else {
             showToast('⚠️ OpenRouter Engine unavailable - Using standard analysis', 'warning', 5000);
-            console.log('⚠️ OpenRouter system initialization incomplete - no API key');
+            logger.log('⚠️ OpenRouter system initialization incomplete - no API key');
         }
         
     } catch (error) {
         showToast('❌ OpenRouter Engine failed to initialize - Using standard analysis', 'error', 5000);
-        console.error('❌ OpenRouter system initialization failed:', error);
+        logger.error('❌ OpenRouter system initialization failed:', error);
     }
 }
 
 // Load data when page loads
 document.addEventListener('DOMContentLoaded', async function() {
-    console.log('Using default OpenAI configuration:', {
-        useOpenAI: SIMULATION_CONFIG.useOpenAI,
+    logger.log('Using default OpenAI configuration:', {
+        useOpenAI: false, // Will be loaded from config.json
         maxTokens: OPENAI_CONFIG.maxTokens,
         retryAttempts: OPENAI_CONFIG.retryAttempts,
         model: OPENAI_CONFIG.model
@@ -239,41 +259,39 @@ document.addEventListener('DOMContentLoaded', async function() {
     showTab('standings');
     
     // Initialize OpenRouter only if enabled
-    if (SIMULATION_CONFIG.useOpenAI) {
+    if (config?.simulation?.useOpenAI) {
         initializeOpenRouterSystem();
     } else {
-        console.log('ℹ️ OpenRouter feature disabled, skipping initialization');
+        logger.log('ℹ️ OpenRouter feature disabled, skipping initialization');
     }
 });
 
 // Load JSON data
 async function loadData() {
     try {
-        const [defaultsResponse, groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse] = await Promise.all([
-            fetch('data/defaults.json'),
+        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse, knockoutResponse] = await Promise.all([
+            fetch('data/config.json'),
             fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
             fetch('data/results.json'),
-            fetch('data/goals.json')
+            fetch('data/goals.json'),
+            fetch('data/knockout-results.json')
         ]);
         
-        defaults = await defaultsResponse.json();
+        defaults = await configResponse.json();
+        config = defaults; // Store config for feature toggles
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await resultsResponse.json();
         goals = await goalsResponse.json();
+        knockoutResults = await knockoutResponse.json();
         
-        // Set default group based on defaults.json
+        // Set default group based on config.json
         selectedGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
         
-        // Update simulation config from defaults
-        if (defaults.simulation) {
-            SIMULATION_CONFIG.pointsGapLimit = defaults.simulation.pointsGapLimit || 3;
-        }
-        
-        console.log('Data loaded successfully');
+        logger.log('Data loaded successfully');
         
         // Apply tab visibility settings
         applyTabVisibilitySettings();
@@ -288,7 +306,7 @@ async function loadData() {
         // Load team player data for Teams tab
         await loadPlayersData();
     } catch (error) {
-        console.error('Error loading data:', error);
+        logger.error('Error loading data:', error);
     }
 }
 
@@ -335,7 +353,7 @@ function updateTeamSelectorForGroup() {
         
         if (groupTeams.length > 0) {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = group.name;
+            optgroup.label = `${group.name} - ${group.description}`;
             
             groupTeams.forEach(team => {
                 const option = document.createElement('option');
@@ -1278,11 +1296,11 @@ function createMatchElement(match, showGroupIndicator) {
         `<span class="fixture-group-indicator">${group.name}</span>` : '';
     
     // Admin add result button (only for today's matches without results)
-    const addResultButton = (!result && ADMIN_CONFIG.role === 'admin') ? 
+    const addResultButton = (!result && config?.admin?.role === 'admin') ? 
         `<button class="add-result-btn" onclick="showAddResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}')">+</button>` : '';
     
     // Edit result button (only for today's matches with results, until midnight)
-    const editResultButton = (result && isToday && ADMIN_CONFIG.role === 'admin') ? 
+    const editResultButton = (result && isToday && config?.admin?.role === 'admin') ? 
         `<button class="edit-result-btn" onclick="showEditResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}', ${result.homeScore}, ${result.awayScore})">Edit</button>` : '';
     
     matchDiv.innerHTML = `
@@ -1314,21 +1332,21 @@ async function updateSimulation() {
     
     try {
         // Debug logging for OpenAI configuration
-        console.log('🔍 OpenAI Debug Info:', {
-            useOpenAI: SIMULATION_CONFIG.useOpenAI,
+        logger.log('🔍 OpenAI Debug Info:', {
+            useOpenAI: config?.simulation?.useOpenAI || false,
             openaiClientExists: !!OPENAI_CONFIG.apiKey,
             apiKeyExists: !!OPENAI_CONFIG.apiKey,
             apiKeyPrefix: OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none'
         });
         
         // Check if OpenRouter is enabled and configured
-        if (SIMULATION_CONFIG.useOpenAI && OPENAI_CONFIG.apiKey) {
-            console.log('✅ Using OpenRouter for simulation analysis');
+        if (config?.simulation?.useOpenAI && OPENAI_CONFIG.apiKey) {
+            logger.log('✅ Using OpenRouter for simulation analysis');
             try {
                 const aiAnalysis = await generateAISimulation(selectedTeamId, selectedTeam);
                 simulationResults.innerHTML = aiAnalysis;
             } catch (aiError) {
-                console.warn('AI analysis failed, falling back to custom analysis:', aiError.message);
+                logger.warn('AI analysis failed, falling back to custom analysis:', aiError.message);
                 
                 // Show error message and fallback to custom analysis
                 const errorMessage = `
@@ -1344,12 +1362,12 @@ async function updateSimulation() {
             }
         } else {
             // Use custom championship analysis
-            const reason = !SIMULATION_CONFIG.useOpenAI ? 'OpenAI disabled' : 
+            const reason = !config?.simulation?.useOpenAI ? 'OpenAI disabled' : 
                           !OPENAI_CONFIG.apiKey ? 'OpenRouter client not initialized' : 
                           !OPENAI_CONFIG.apiKey ? 'No API key available' : 'Unknown';
                           
-            console.log('⚠️ Using fallback analysis because:', {
-                useOpenAI: SIMULATION_CONFIG.useOpenAI,
+            logger.log('⚠️ Using fallback analysis because:', {
+                useOpenAI: config?.simulation?.useOpenAI,
                 openaiClient: !!OPENAI_CONFIG.apiKey,
                 hasApiKey: !!OPENAI_CONFIG.apiKey,
                 reason: reason
@@ -1359,7 +1377,7 @@ async function updateSimulation() {
             simulationResults.innerHTML = customAnalysis;
         }
     } catch (error) {
-        console.error('Simulation error:', error);
+        logger.error('Simulation error:', error);
         // Final fallback to basic simulation on any error
         const errorMessage = `
             <div class="ai-powered-badge" style="background: linear-gradient(135deg, #dc3545, #c82333); color: white; margin-bottom: 15px;">
@@ -1402,7 +1420,7 @@ async function generateAISimulation(teamId, team) {
     } catch (error) {
         // Restore original group selection on error
         selectedGroupId = originalGroupId;
-        console.error('OpenAI API error:', error);
+        logger.error('OpenAI API error:', error);
         throw error;
     }
 }
@@ -1502,7 +1520,7 @@ async function queryOpenAI(contextData) {
     let lastError;
     for (let attempt = 1; attempt <= OPENAI_CONFIG.retryAttempts; attempt++) {
         try {
-            console.log(`OpenRouter API attempt ${attempt}/${OPENAI_CONFIG.retryAttempts}`);
+            logger.log(`OpenRouter API attempt ${attempt}/${OPENAI_CONFIG.retryAttempts}`);
             
             // Create abort controller for timeout
             const controller = new AbortController();
@@ -1546,7 +1564,7 @@ async function queryOpenAI(contextData) {
             
             // Log and track token usage for cost monitoring
             if (data.usage) {
-                console.log('Token usage:', {
+                logger.log('Token usage:', {
                     prompt_tokens: data.usage.prompt_tokens,
                     completion_tokens: data.usage.completion_tokens,
                     total_tokens: data.usage.total_tokens,
@@ -1559,7 +1577,7 @@ async function queryOpenAI(contextData) {
             
         } catch (error) {
             lastError = error;
-            console.warn(`OpenRouter API attempt ${attempt} failed:`, error.message);
+            logger.warn(`OpenRouter API attempt ${attempt} failed:`, error.message);
             
             // Extract status code from error message for HTTP errors
             const httpStatusMatch = error.message.match(/HTTP (\d+)/);
@@ -1577,7 +1595,7 @@ async function queryOpenAI(contextData) {
                 const delay = baseDelay * Math.pow(2, attempt - 1); // Exponential backoff
                 
                 if (attempt < OPENAI_CONFIG.retryAttempts) {
-                    console.log(`Rate limited. Waiting ${delay}ms before retry...`);
+                    logger.log(`Rate limited. Waiting ${delay}ms before retry...`);
                     await new Promise(resolve => setTimeout(resolve, delay));
                     continue;
                 }
@@ -1586,7 +1604,7 @@ async function queryOpenAI(contextData) {
             // For other errors, use exponential backoff
             if (attempt < OPENAI_CONFIG.retryAttempts) {
                 const delay = OPENAI_CONFIG.retryDelay * Math.pow(2, attempt - 1);
-                console.log(`Retrying in ${delay}ms...`);
+                logger.log(`Retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
@@ -1598,7 +1616,7 @@ async function queryOpenAI(contextData) {
 
 // Enhanced error handling with user-friendly messages
 function handleOpenAIError(error) {
-    console.error('OpenAI API error after retries:', error);
+    logger.error('OpenAI API error after retries:', error);
     
     if (error.status === 401) {
         return new Error('❌ Invalid API key. Please check your OpenAI API key in the .env file.');
@@ -1897,8 +1915,8 @@ function generateCustomSimulation(teamId, team) {
     const currentPosition = currentStandings.findIndex(t => t.id === teamId) + 1;
     const remainingMatches = getRemainingMatches(teamId);
     
-    // Get teams within 3-point gap
-    const relevantTeams = getTeamsWithinGap(currentStandings, teamId, SIMULATION_CONFIG.pointsGapLimit);
+    // Get teams within points gap
+    const relevantTeams = getTeamsWithinGap(currentStandings, teamId, config?.simulation?.pointsGapLimit || 3);
     
     // Calculate all possible scenarios
     const scenarios = calculateAdvancedScenarios(teamId, currentStandings, relevantTeams);
@@ -1935,7 +1953,7 @@ function generateCustomSimulation(teamId, team) {
                 </div>
                 
                 <div class="relevant-teams">
-                    <h4>Teams Within ${SIMULATION_CONFIG.pointsGapLimit}-Point Gap (Next Gameweek Focus)</h4>
+                    <h4>Teams Within ${config?.simulation?.pointsGapLimit || 3}-Point Gap (Next Gameweek Focus)</h4>
                     <div class="teams-list">
                         ${relevantTeams.map(team => {
                             const nextGameweek = findNextGameweek();
@@ -1985,7 +2003,7 @@ function generateCustomSimulation(teamId, team) {
             <div class="simulation-content">
                 <div class="strategic-summary">
                     <p><strong>Next Gameweek Focus:</strong> Immediate impact scenarios only</p>
-                    <p><strong>Teams in Analysis:</strong> ${relevantTeams.length - 1} competitors within ${SIMULATION_CONFIG.pointsGapLimit}-point gap</p>
+                    <p><strong>Teams in Analysis:</strong> ${relevantTeams.length - 1} competitors within ${config?.simulation?.pointsGapLimit || 3}-point gap</p>
                     <p><strong>Scenarios for Next Round:</strong> ${scenarios.length} possible outcomes</p>
                     <p><strong>Analysis Type:</strong> Win/Draw/Loss impact on position</p>
                 </div>
@@ -2954,7 +2972,7 @@ function updateForecast() {
         const forecast = generateForecast();
         forecastContent.innerHTML = forecast;
     } catch (error) {
-        console.error('Forecast error:', error);
+        logger.error('Forecast error:', error);
         forecastContent.innerHTML = '<div class="error">Error generating forecast. Please try again.</div>';
     }
 }
@@ -2974,7 +2992,7 @@ function populateForecastGroupSelector() {
     groups.forEach(group => {
         const option = document.createElement('option');
         option.value = group.id;
-        option.textContent = group.name;
+        option.textContent = `${group.name} - ${group.description}`;
         selector.appendChild(option);
     });
     
@@ -3036,13 +3054,13 @@ function generateForecast() {
         
         if (allMatchesCompleted && !isNextMondayOrLater) {
             headerText = `🔍 Prediction Review for ${groupName} - Gameweek ${currentGameweek.gameweek}`;
-            statusMessage = `<div class="status-message review-mode">📈 All matches completed! Reviewing prediction accuracy until Monday (today is ${currentDayName}).</div>`;
+            statusMessage = `<div class="status-message review-mode">📈 All matches completed! Reviewing prediction accuracy until Monday.</div>`;
         } else if (allMatchesCompleted && isNextMondayOrLater) {
             headerText = `⚽ Match Predictions for ${groupName} - Gameweek ${currentGameweek.gameweek}`;
-            statusMessage = `<div class="status-message archive-mode">📚 Previous gameweek results (today is ${currentDayName} - review period ended).</div>`;
+            statusMessage = `<div class="status-message archive-mode">📚 Previous gameweek results (review period ended).</div>`;
         } else {
             headerText = `⚽ Match Predictions for ${groupName} - Gameweek ${currentGameweek.gameweek}`;
-            statusMessage = `<div class="status-message prediction-mode">🔮 Live predictions for upcoming matches (today is ${currentDayName}).</div>`;
+            statusMessage = `<div class="status-message prediction-mode">🔮 Live predictions for upcoming matches.</div>`;
         }
     }
     
@@ -3210,14 +3228,14 @@ function calculateMomentum(team) {
 function findCurrentGameweekForGroup(groupId) {
     if (!groupId) return null;
     
-    console.log('DEBUG: Finding current gameweek for group:', groupId);
+    logger.log('DEBUG: Finding current gameweek for group:', groupId);
     
     // Get all gameweek objects for this group
     const groupGameweeks = fixtures.filter(gw => gw.groupId === groupId);
     const groupResults = results.filter(r => r.groupId === groupId);
     
-    console.log('DEBUG: Available gameweeks:', groupGameweeks.map(gw => gw.gameweek));
-    console.log('DEBUG: Results count:', groupResults.length);
+    logger.log('DEBUG: Available gameweeks:', groupGameweeks.map(gw => gw.gameweek));
+    logger.log('DEBUG: Results count:', groupResults.length);
     
     if (groupGameweeks.length === 0) return null;
     
@@ -3232,7 +3250,7 @@ function findCurrentGameweekForGroup(groupId) {
     // The idea is: complete gameweek on any day = stay for review until next Monday
     const isNextMondayOrLater = currentDayOfWeek === 1; // Only Monday, not the whole week
     
-    console.log('DEBUG: Current day of week:', currentDayOfWeek, 'isNextMondayOrLater:', isNextMondayOrLater);
+    logger.log('DEBUG: Current day of week:', currentDayOfWeek, 'isNextMondayOrLater:', isNextMondayOrLater);
     
     // Find the most advanced gameweek that has had any matches played
     let actualCurrentGameweek = null;
@@ -3249,12 +3267,12 @@ function findCurrentGameweekForGroup(groupId) {
             );
         });
         
-        console.log('DEBUG: Checking gameweek', gameweekObj.gameweek, 'hasAnyMatchPlayed:', hasAnyMatchPlayed);
+        logger.log('DEBUG: Checking gameweek', gameweekObj.gameweek, 'hasAnyMatchPlayed:', hasAnyMatchPlayed);
         
         if (hasAnyMatchPlayed) {
             // This is the most advanced gameweek with matches played
             actualCurrentGameweek = gameweekObj;
-            console.log('DEBUG: Found actual current gameweek:', actualCurrentGameweek.gameweek);
+            logger.log('DEBUG: Found actual current gameweek:', actualCurrentGameweek.gameweek);
             break;
         }
     }
@@ -3262,7 +3280,7 @@ function findCurrentGameweekForGroup(groupId) {
     // If no gameweek has matches played yet, use the first gameweek
     if (!actualCurrentGameweek) {
         actualCurrentGameweek = groupGameweeks[0];
-        console.log('DEBUG: No played gameweeks found, using first:', actualCurrentGameweek.gameweek);
+        logger.log('DEBUG: No played gameweeks found, using first:', actualCurrentGameweek.gameweek);
     }
     
     // Find the next gameweek after the actual current one
@@ -3282,25 +3300,25 @@ function findCurrentGameweekForGroup(groupId) {
         );
     });
     
-    console.log('DEBUG: actualCurrentGameweek:', actualCurrentGameweek.gameweek, 'allComplete:', currentGameweekAllComplete);
-    console.log('DEBUG: nextAvailableGameweek:', nextAvailableGameweek?.gameweek || 'none');
+    logger.log('DEBUG: actualCurrentGameweek:', actualCurrentGameweek.gameweek, 'allComplete:', currentGameweekAllComplete);
+    logger.log('DEBUG: nextAvailableGameweek:', nextAvailableGameweek?.gameweek || 'none');
     
     if (!currentGameweekAllComplete) {
         // Current gameweek has unplayed matches - always show it
         currentGameweek = actualCurrentGameweek;
-        console.log('DEBUG: Showing current gameweek (has unplayed matches):', currentGameweek.gameweek);
+        logger.log('DEBUG: Showing current gameweek (has unplayed matches):', currentGameweek.gameweek);
     } else if (currentGameweekAllComplete && !isNextMondayOrLater) {
         // Current gameweek is complete but it's not Monday yet - stay for review
         currentGameweek = actualCurrentGameweek;
-        console.log('DEBUG: Showing current gameweek for review (not Monday yet):', currentGameweek.gameweek);
+        logger.log('DEBUG: Showing current gameweek for review (not Monday yet):', currentGameweek.gameweek);
     } else if (currentGameweekAllComplete && isNextMondayOrLater && nextAvailableGameweek) {
         // Current gameweek is complete, it's Monday, and there's a next gameweek - advance
         currentGameweek = nextAvailableGameweek;
-        console.log('DEBUG: Advancing to next gameweek (Monday):', currentGameweek.gameweek);
+        logger.log('DEBUG: Advancing to next gameweek (Monday):', currentGameweek.gameweek);
     } else {
         // Fallback: stay on current gameweek
         currentGameweek = actualCurrentGameweek;
-        console.log('DEBUG: Fallback to current gameweek:', currentGameweek.gameweek);
+        logger.log('DEBUG: Fallback to current gameweek:', currentGameweek.gameweek);
     }
     
     // Return the gameweek object with all matches
@@ -3500,10 +3518,15 @@ function calculateChampionshipProbability(team, allTeams, remainingMatches) {
 function generateTeamAnalysisHTML(teamAnalysis) {
     return `
         <div class="team-analysis-grid">
-            ${teamAnalysis.map(team => `
-                <div class="team-analysis-card ${team.position <= 2 ? 'top-team' : ''}">
+            ${teamAnalysis.map(team => {
+                // Use performance position for All Groups view, otherwise use league position
+                const displayPosition = team.performancePosition || team.position;
+                const positionLabel = team.performancePosition ? 'Performance Rank' : 'League Position';
+                
+                return `
+                <div class="team-analysis-card ${displayPosition <= 2 ? 'top-team' : ''}">
                     <div class="team-header">
-                        <div class="team-position">${team.position}</div>
+                        <div class="team-position" title="${positionLabel}">${displayPosition}</div>
                         <div class="team-info">
                             <h3>${team.name}</h3>
                             <div class="team-record">${team.wins}W-${team.draws}D-${team.losses}L (${team.points} pts)</div>
@@ -3542,7 +3565,8 @@ function generateTeamAnalysisHTML(teamAnalysis) {
                         </div>
                     </div>
                 </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
     `;
 }
@@ -3625,12 +3649,12 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         <strong>Analysis:</strong> ${pred.prediction.reasoning}
                     </div>
                     
-                    ${!pred.actualResult ? generateGoalScorerPredictionsHTML(
+                    ${generateGoalScorerPredictionsHTML(
                         pred.homeTeam.id, 
                         pred.awayTeam.id, 
                         parseInt(pred.prediction.predictedScore.split(' - ')[0]), 
                         parseInt(pred.prediction.predictedScore.split(' - ')[1])
-                    ) : ''}
+                    )}
                 </div>
             `).join('')}
         </div>
@@ -3679,15 +3703,20 @@ function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predicte
         away: []
     };
     
+    // Debug logging
+    logger.log(`🔍 Predicting scorers for ${homeTeamId} (${predictedHomeScore}) vs ${awayTeamId} (${predictedAwayScore})`);
+    
     // Home team predictions
     if (hasGoalScorerData(homeTeamId) && predictedHomeScore > 0) {
         const homeScorers = getTeamGoalScorers(homeTeamId);
         const totalHomeGoals = homeScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
         
+        logger.log(`📊 ${homeTeamId} scorers:`, homeScorers.length, 'total goals:', totalHomeGoals);
+        
         if (homeScorers.length > 0 && totalHomeGoals > 0) {
             homeScorers.forEach(scorer => {
                 const probability = (scorer.goals / totalHomeGoals * 100);
-                if (probability >= 15) { // Only show players with decent probability
+                if (probability >= 10) { // Lowered threshold for better predictions
                     predictions.home.push({
                         name: scorer.name,
                         probability: Math.round(probability),
@@ -3696,7 +3725,21 @@ function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predicte
                     });
                 }
             });
+            
+            // If no players meet threshold, show top scorer anyway
+            if (predictions.home.length === 0 && homeScorers.length > 0) {
+                const topScorer = homeScorers[0];
+                const probability = (topScorer.goals / totalHomeGoals * 100);
+                predictions.home.push({
+                    name: topScorer.name,
+                    probability: Math.round(probability),
+                    goals: topScorer.goals,
+                    penalties: topScorer.penalties
+                });
+            }
         }
+    } else {
+        logger.log(`⚠️ ${homeTeamId}: hasData=${hasGoalScorerData(homeTeamId)}, predictedScore=${predictedHomeScore}`);
     }
     
     // Away team predictions
@@ -3704,10 +3747,12 @@ function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predicte
         const awayScorers = getTeamGoalScorers(awayTeamId);
         const totalAwayGoals = awayScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
         
+        logger.log(`📊 ${awayTeamId} scorers:`, awayScorers.length, 'total goals:', totalAwayGoals);
+        
         if (awayScorers.length > 0 && totalAwayGoals > 0) {
             awayScorers.forEach(scorer => {
                 const probability = (scorer.goals / totalAwayGoals * 100);
-                if (probability >= 15) { // Only show players with decent probability
+                if (probability >= 10) { // Lowered threshold for better predictions
                     predictions.away.push({
                         name: scorer.name,
                         probability: Math.round(probability),
@@ -3716,9 +3761,24 @@ function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predicte
                     });
                 }
             });
+            
+            // If no players meet threshold, show top scorer anyway
+            if (predictions.away.length === 0 && awayScorers.length > 0) {
+                const topScorer = awayScorers[0];
+                const probability = (topScorer.goals / totalAwayGoals * 100);
+                predictions.away.push({
+                    name: topScorer.name,
+                    probability: Math.round(probability),
+                    goals: topScorer.goals,
+                    penalties: topScorer.penalties
+                });
+            }
         }
+    } else {
+        logger.log(`⚠️ ${awayTeamId}: hasData=${hasGoalScorerData(awayTeamId)}, predictedScore=${predictedAwayScore}`);
     }
     
+    logger.log(`✅ Final predictions - Home: ${predictions.home.length}, Away: ${predictions.away.length}`);
     return predictions;
 }
 
@@ -3726,9 +3786,18 @@ function predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predicte
 function generateGoalScorerPredictionsHTML(homeTeamId, awayTeamId, predictedHomeScore, predictedAwayScore) {
     const scorerPredictions = predictGoalScorers(homeTeamId, awayTeamId, predictedHomeScore, predictedAwayScore);
     
-    if (scorerPredictions.home.length === 0 && scorerPredictions.away.length === 0) {
+    // Check if both teams have goal scorer data available
+    const homeHasData = hasGoalScorerData(homeTeamId);
+    const awayHasData = hasGoalScorerData(awayTeamId);
+    
+    // Only show if at least one team has goal scorer data
+    if (!homeHasData && !awayHasData) {
         return '';
     }
+    
+    // Get team names
+    const homeTeam = teams.find(t => t.id === homeTeamId);
+    const awayTeam = teams.find(t => t.id === awayTeamId);
     
     // Generate unique ID for this match's scorer predictions
     const uniqueId = `scorer-${homeTeamId}-${awayTeamId}-${Date.now()}`;
@@ -3741,31 +3810,39 @@ function generateGoalScorerPredictionsHTML(homeTeamId, awayTeamId, predictedHome
                     <span class="scorer-toggle" id="toggle-${uniqueId}">▼</span>
                 </div>
                 <div class="scorer-predictions-grid collapsed" id="${uniqueId}">
-                    ${scorerPredictions.home.length > 0 ? `
+                    <div class="teams-scorer-columns">
                         <div class="team-scorers home-scorers">
-                            <h6>Home Team</h6>
-                            ${scorerPredictions.home.map(scorer => `
-                                <div class="scorer-prediction">
-                                    <span class="scorer-name">${scorer.name}</span>
-                                    <span class="scorer-probability">${scorer.probability}%</span>
-                                    <small class="scorer-stats">${scorer.goals}g${scorer.penalties > 0 ? `, ${scorer.penalties}p` : ''}</small>
-                                </div>
-                            `).join('')}
+                            <h6>${homeTeam ? homeTeam.name : 'Home Team'}</h6>
+                            ${homeHasData ? (
+                                predictedHomeScore > 0 ? (
+                                    scorerPredictions.home.length > 0 ? 
+                                        scorerPredictions.home.map(scorer => `
+                                            <div class="scorer-prediction">
+                                                <span class="scorer-name">${scorer.name}</span>
+                                                <span class="scorer-probability">${scorer.probability}%</span>
+                                            </div>
+                                        `).join('') : 
+                                        '<div class="no-data">No qualifying scorers</div>'
+                                ) : '<div class="no-data">No goals predicted</div>'
+                            ) : '<div class="no-data">No scorer data available</div>'}
                         </div>
-                    ` : ''}
-                    
-                    ${scorerPredictions.away.length > 0 ? `
+                        
                         <div class="team-scorers away-scorers">
-                            <h6>Away Team</h6>
-                            ${scorerPredictions.away.map(scorer => `
-                                <div class="scorer-prediction">
-                                    <span class="scorer-name">${scorer.name}</span>
-                                    <span class="scorer-probability">${scorer.probability}%</span>
-                                    <small class="scorer-stats">${scorer.goals}g${scorer.penalties > 0 ? `, ${scorer.penalties}p` : ''}</small>
-                                </div>
-                            `).join('')}
+                            <h6>${awayTeam ? awayTeam.name : 'Away Team'}</h6>
+                            ${awayHasData ? (
+                                predictedAwayScore > 0 ? (
+                                    scorerPredictions.away.length > 0 ? 
+                                        scorerPredictions.away.map(scorer => `
+                                            <div class="scorer-prediction">
+                                                <span class="scorer-name">${scorer.name}</span>
+                                                <span class="scorer-probability">${scorer.probability}%</span>
+                                            </div>
+                                        `).join('') : 
+                                        '<div class="no-data">No qualifying scorers</div>'
+                                ) : '<div class="no-data">No goals predicted</div>'
+                            ) : '<div class="no-data">No scorer data available</div>'}
                         </div>
-                    ` : ''}
+                    </div>
                 </div>
             </div>
         </div>
@@ -3835,18 +3912,6 @@ function generateChampionshipForecastHTML(forecast) {
                     `;
                 }).join('')}
             </div>
-            
-            <div class="forecast-summary">
-                <h4>Championship Predictions:</h4>
-                <div class="top-candidates">
-                    ${forecast.projections.slice(0, 3).map(team => `
-                        <div class="candidate">
-                            <strong>${team.name}</strong>: ${team.championshipProbability}% chance
-                            ${team.position === 1 ? ' (Current Leader)' : ''}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
         </div>
     `;
 }
@@ -3888,7 +3953,11 @@ function generateStatisticalInsightsHTML(standings, teamAnalysis) {
             <div class="league-stats">
                 <h4>League Statistics:</h4>
                 <div class="stats-grid">
-                    <div>Average goals per game: ${(teamAnalysis.reduce((sum, t) => sum + t.goalsFor, 0) / teamAnalysis.reduce((sum, t) => sum + t.played, 0)).toFixed(1)}</div>
+                    <div>Average goals per game: ${(() => {
+                        const totalGoals = teamAnalysis.reduce((sum, t) => sum + t.goalsFor, 0);
+                        const totalGames = teamAnalysis.reduce((sum, t) => sum + t.played, 0);
+                        return totalGames > 0 ? (totalGoals / totalGames).toFixed(1) : '0.0';
+                    })()}</div>
                     <div>Most competitive matchup: Teams closest in performance rating</div>
                     <div>Surprise factor: ${teamAnalysis.filter(t => Math.abs(t.position - (7 - t.performanceRating)) > 1).length} teams performing above/below expectations</div>
                 </div>
@@ -4077,7 +4146,7 @@ function findMatchById(matchId) {
 }
 
 function validateMatchTime(matchDate, matchTime) {
-    if (!ADMIN_CONFIG.validateTime) {
+    if (!config?.admin?.validateTime) {
         return true; // Skip validation if disabled
     }
     
@@ -4086,7 +4155,7 @@ function validateMatchTime(matchDate, matchTime) {
     const currentDateTime = new Date();
     
     // Debug logging (can be removed later)
-    console.log('Match time validation:', {
+    logger.log('Match time validation:', {
         matchDate,
         matchTime,
         matchDateTime: matchDateTime.toLocaleString(),
@@ -4191,22 +4260,22 @@ window.onclick = function(event) {
 
 // Function to enable admin mode (for testing)
 function enableAdminMode() {
-    ADMIN_CONFIG.role = 'admin';
+    config.admin.role = 'admin';
     updateAllTabs(); // Refresh to show admin buttons
     showToast('Admin mode enabled', 'success');
 }
 
 // Function to disable admin mode
 function disableAdminMode() {
-    ADMIN_CONFIG.role = 'user';
+    config.admin.role = 'user';
     updateAllTabs(); // Refresh to hide admin buttons
     showToast('Admin mode disabled', 'info');
 }
 
 // Function to toggle time validation
 function toggleTimeValidation() {
-    ADMIN_CONFIG.validateTime = !ADMIN_CONFIG.validateTime;
-    const status = ADMIN_CONFIG.validateTime ? 'enabled' : 'disabled';
+    config.admin.validateTime = !config.admin.validateTime;
+    const status = config.admin.validateTime ? 'enabled' : 'disabled';
     showToast(`Time validation ${status}`, 'info');
 }
 
@@ -4227,10 +4296,10 @@ function loadPendingResults() {
                     results.push(sessionResult);
                 }
             });
-            console.log('Loaded pending results from session');
+            logger.log('Loaded pending results from session');
             showToast('Previous session data restored', 'info');
         } catch (error) {
-            console.error('Error loading pending results:', error);
+            logger.error('Error loading pending results:', error);
         }
     }
 }
@@ -4247,7 +4316,7 @@ function downloadUpdatedResults() {
     if (isMobileDevice()) {
         // On mobile, just store in session and show different message
         sessionStorage.setItem('pendingResults', JSON.stringify(results));
-        console.log('Results stored in session (mobile device)');
+        logger.log('Results stored in session (mobile device)');
         return;
     }
     
@@ -4265,8 +4334,8 @@ function downloadUpdatedResults() {
 
 // Function to export all current results for manual copying
 function exportAllResults() {
-    console.log('All Current Results (copy this to results.json):');
-    console.log(JSON.stringify(results, null, 2));
+    logger.log('All Current Results (copy this to results.json):');
+    logger.log(JSON.stringify(results, null, 2));
     
     if (!isMobileDevice()) {
         downloadUpdatedResults();
@@ -4310,25 +4379,25 @@ window.footballAdmin = {
     enableAdmin: enableAdminMode,
     disableAdmin: disableAdminMode,
     toggleValidation: toggleTimeValidation,
-    getConfig: () => ADMIN_CONFIG,
+    getConfig: () => config,
     showConfig: () => {
-        console.log('Current Admin Configuration:', ADMIN_CONFIG);
-        console.log('OpenAI Configuration:', {
+        logger.log('Current Configuration:', config);
+        logger.log('OpenAI Configuration:', {
             clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
-            useOpenAI: SIMULATION_CONFIG.useOpenAI,
+            useOpenAI: config?.simulation?.useOpenAI || false,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts,
             retryDelay: OPENAI_CONFIG.retryDelay
         });
-        console.log('Token Usage Stats:', tokenUsageStats);
+        logger.log('Token Usage Stats:', tokenUsageStats);
         return { 
-            ADMIN_CONFIG, 
+            config, 
             OPENAI_CONFIG: {
                 client: !!OPENAI_CONFIG.apiKey, 
                 apiKey: !!OPENAI_CONFIG.apiKey, 
-                enabled: SIMULATION_CONFIG.useOpenAI,
+                enabled: config?.simulation?.useOpenAI || false,
                 model: OPENAI_CONFIG.model,
                 maxTokens: OPENAI_CONFIG.maxTokens
             },
@@ -4345,8 +4414,10 @@ window.footballAdmin = {
     },
     // OpenAI controls
     enableOpenAI: () => {
-        const wasEnabled = SIMULATION_CONFIG.useOpenAI;
-        SIMULATION_CONFIG.useOpenAI = true;
+        const wasEnabled = config?.simulation?.useOpenAI;
+        if (config?.simulation) {
+            config.simulation.useOpenAI = true;
+        }
         
         if (!wasEnabled) {
             // Initialize OpenAI if it wasn't enabled before
@@ -4354,33 +4425,35 @@ window.footballAdmin = {
         } else {
             showToast('OpenAI analysis already enabled', 'info', 3000);
         }
-        console.log('OpenAI enabled for this session');
+        logger.log('OpenAI enabled for this session');
     },
     disableOpenAI: () => {
-        SIMULATION_CONFIG.useOpenAI = false;
+        if (config?.simulation) {
+            config.simulation.useOpenAI = false;
+        }
         showToast('OpenAI analysis disabled - Using standard analysis', 'info', 3000);
-        console.log('OpenAI disabled for this session');
+        logger.log('OpenAI disabled for this session');
     },
     checkOpenAI: () => {
         const status = {
-            enabled: SIMULATION_CONFIG.useOpenAI,
+            enabled: config?.simulation?.useOpenAI || false,
             clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts,
-            readyForUse: SIMULATION_CONFIG.useOpenAI && !!OPENAI_CONFIG.apiKey
+            readyForUse: (config?.simulation?.useOpenAI || false) && !!OPENAI_CONFIG.apiKey
         };
-        console.log('🤖 OpenAI Status:', status);
+        logger.log('🤖 OpenAI Status:', status);
         
         if (status.readyForUse) {
-            console.log('✅ OpenAI is ready for use!');
+            logger.log('✅ OpenAI is ready for use!');
         } else if (!status.enabled) {
-            console.log('⚠️ OpenAI is disabled. Enable with: footballAdmin.enableOpenAI()');
+            logger.log('⚠️ OpenAI is disabled. Enable with: footballAdmin.enableOpenAI()');
         } else if (!status.clientInitialized) {
-            console.log('⚠️ OpenAI client not initialized. Check API key.');
+            logger.log('⚠️ OpenAI client not initialized. Check API key.');
         } else if (!status.apiKeyLoaded) {
-            console.log('⚠️ No API key loaded. Check .env file or use manual entry.');
+            logger.log('⚠️ No API key loaded. Check .env file or use manual entry.');
         }
         
         return status.readyForUse;
@@ -4390,13 +4463,13 @@ window.footballAdmin = {
         if (tokens >= 50 && tokens <= 2000) {
             OPENAI_CONFIG.maxTokens = tokens;
             showToast(`Max tokens set to ${tokens}`, 'info');
-            console.log(`Token limit updated to ${tokens} for this session`);
+            logger.log(`Token limit updated to ${tokens} for this session`);
         } else {
-            console.error('Invalid token limit. Must be between 50 and 2000.');
+            logger.error('Invalid token limit. Must be between 50 and 2000.');
         }
     },
     getTokenStats: () => {
-        console.log('Token Usage Statistics:', {
+        logger.log('Token Usage Statistics:', {
             ...tokenUsageStats,
             averageTokensPerRequest: tokenUsageStats.totalRequests > 0 ? 
                 Math.round(tokenUsageStats.totalTokens / tokenUsageStats.totalRequests) : 0,
@@ -4419,24 +4492,26 @@ window.footballAdmin = {
             OPENAI_CONFIG.retryAttempts = attempts;
             showToast(`Retry attempts set to ${attempts}`, 'info');
         } else {
-            console.error('Invalid retry attempts. Must be between 1 and 5.');
+            logger.error('Invalid retry attempts. Must be between 1 and 5.');
         }
     },
     // Configuration management (clears any old localStorage data)
     clearConfig: () => {
         localStorage.removeItem('openai_config');
         sessionStorage.removeItem('openai_session_key');
-        // Reset to code defaults
-        SIMULATION_CONFIG.useOpenAI = true; // Back to default
+        // Reset to config defaults
+        if (config?.simulation) {
+            config.simulation.useOpenAI = false; // Back to default from config.json
+        }
         OPENAI_CONFIG.maxTokens = 500;
         OPENAI_CONFIG.retryAttempts = 3;
         OPENAI_CONFIG.model = 'gpt-3.5-turbo';
         showToast('Cleared old config, using code defaults', 'info');
-        console.log('🗑️ Cleared localStorage/sessionStorage and reset to code defaults');
+        logger.log('🗑️ Cleared localStorage/sessionStorage and reset to code defaults');
     },
     // Debug helpers
     reloadApiKey: async () => {
-        console.log('🔄 Reloading API key...');
+        logger.log('🔄 Reloading API key...');
         OPENAI_CONFIG.apiKey = null;
         openai = null;
         
@@ -4449,47 +4524,47 @@ window.footballAdmin = {
         }
         
         if (OPENAI_CONFIG.apiKey) {
-            console.log('✅ API key reloaded successfully');
+            logger.log('✅ API key reloaded successfully');
             showToast('API key reloaded', 'success');
         } else {
-            console.log('❌ No API key found');
+            logger.log('❌ No API key found');
             showToast('No API key found', 'error');
         }
         
         return !!OPENAI_CONFIG.apiKey;
     },
     debugOpenAI: () => {
-        console.log('🔍 Complete OpenAI Debug Report:');
-        console.log('window.fetch available:', !!window.fetch);
-        console.log('SIMULATION_CONFIG.useOpenAI:', SIMULATION_CONFIG.useOpenAI, '(from code defaults)');
-        console.log('openai client exists:', !!openai);
-        console.log('OPENAI_CONFIG.apiKey exists:', !!OPENAI_CONFIG.apiKey);
-        console.log('API Key prefix:', OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none');
+        logger.log('🔍 Complete OpenAI Debug Report:');
+        logger.log('window.fetch available:', !!window.fetch);
+        logger.log('config.simulation.useOpenAI:', config?.simulation?.useOpenAI, '(from config.json)');
+        logger.log('openai client exists:', !!openai);
+        logger.log('OPENAI_CONFIG.apiKey exists:', !!OPENAI_CONFIG.apiKey);
+        logger.log('API Key prefix:', OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none');
         
         const oldLocalStorage = localStorage.getItem('openai_config');
         if (oldLocalStorage) {
-            console.warn('⚠️ Old localStorage config found (no longer used):', oldLocalStorage);
-            console.log('💡 Run footballAdmin.clearConfig() to remove old data');
+            logger.warn('⚠️ Old localStorage config found (no longer used):', oldLocalStorage);
+            logger.log('💡 Run footballAdmin.clearConfig() to remove old data');
         } else {
-            console.log('✅ No localStorage config (good - using code defaults)');
+            logger.log('✅ No localStorage config (good - using code defaults)');
         }
         
-        console.log('Current Configuration (from code defaults):', {
-            useOpenAI: SIMULATION_CONFIG.useOpenAI,
+        logger.log('Current Configuration (from config.json):', {
+            useOpenAI: config?.simulation?.useOpenAI || false,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts
         });
         
-        const isReady = SIMULATION_CONFIG.useOpenAI && !!openai && !!OPENAI_CONFIG.apiKey;
-        console.log('🎯 OpenAI Ready:', isReady);
+        const isReady = (config?.simulation?.useOpenAI || false) && !!openai && !!OPENAI_CONFIG.apiKey;
+        logger.log('🎯 OpenAI Ready:', isReady);
         
         if (!isReady) {
-            console.log('❌ Issues preventing OpenAI from working:');
-            if (!window.fetch) console.log('  - Fetch API not available');
-            if (!SIMULATION_CONFIG.useOpenAI) console.log('  - OpenAI disabled in config');
-            if (!openai) console.log('  - OpenAI client not initialized');
-            if (!OPENAI_CONFIG.apiKey) console.log('  - No API key available');
+            logger.log('❌ Issues preventing OpenAI from working:');
+            if (!window.fetch) logger.log('  - Fetch API not available');
+            if (!(config?.simulation?.useOpenAI)) logger.log('  - OpenAI disabled in config');
+            if (!openai) logger.log('  - OpenAI client not initialized');
+            if (!OPENAI_CONFIG.apiKey) logger.log('  - No API key available');
         }
         
         return {
@@ -4497,35 +4572,35 @@ window.footballAdmin = {
             sdkLoaded: !!window.fetch,
             clientInitialized: !!openai,
             hasApiKey: !!OPENAI_CONFIG.apiKey,
-            enabled: SIMULATION_CONFIG.useOpenAI
+            enabled: config?.simulation?.useOpenAI || false
         };
     },
     clearConfig: () => {
         localStorage.removeItem('openai_config');
         sessionStorage.removeItem('openai_session_key');
-        console.log('🗑️ Cleared all OpenAI configuration from storage');
-        console.log('💡 Reload the page to use default settings');
+        logger.log('🗑️ Cleared all OpenAI configuration from storage');
+        logger.log('💡 Reload the page to use default settings');
     },
     testConfig: () => {
-        console.log('🧪 Testing configuration files...');
+        logger.log('🧪 Testing configuration files...');
         
         // Test config.json
         fetch('config.json')
             .then(response => {
-                console.log('config.json status:', response.status, response.ok ? '✅' : '❌');
+                logger.log('config.json status:', response.status, response.ok ? '✅' : '❌');
                 return response.json();
             })
-            .then(data => console.log('config.json content:', data))
-            .catch(err => console.log('config.json error:', err.message));
+            .then(data => logger.log('config.json content:', data))
+            .catch(err => logger.log('config.json error:', err.message));
             
         // Test .env
         fetch('.env')
             .then(response => {
-                console.log('.env status:', response.status, response.ok ? '✅' : '❌');
+                logger.log('.env status:', response.status, response.ok ? '✅' : '❌');
                 return response.text();
             })
-            .then(data => console.log('.env content available:', !!data))
-            .catch(err => console.log('.env error:', err.message));
+            .then(data => logger.log('.env content available:', !!data))
+            .catch(err => logger.log('.env error:', err.message));
     }
 };
 
@@ -4540,10 +4615,10 @@ async function loadPlayersData() {
     try {
         const response = await fetch('./data/teams.json');
         teamsData = await response.json();
-        console.log('Teams data loaded:', teamsData);
+        logger.log('Teams data loaded:', teamsData);
         populateTeamLineupSelector();
     } catch (error) {
-        console.error('Error loading teams data:', error);
+        logger.error('Error loading teams data:', error);
     }
 }
 
@@ -4561,7 +4636,7 @@ function populateTeamLineupSelector() {
         
         if (groupTeams.length > 0) {
             const optgroup = document.createElement('optgroup');
-            optgroup.label = group.name;
+            optgroup.label = `${group.name} - ${group.description}`;
             
             groupTeams.forEach(team => {
                 const option = document.createElement('option');
@@ -4596,7 +4671,7 @@ function updateTeamLineup() {
     const team = teamsData.find(t => t.id === selectedTeamId);
     if (!team) return;
     
-    console.log('Updating lineup for team:', team.name);
+    logger.log('Updating lineup for team:', team.name);
     
     // Populate tactics selector for this team
     populateTacticsSelector(selectedTeamId);
@@ -4780,7 +4855,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     
     // Create and store event handlers
     playerIcon._dragStartHandler = function(e) {
-        console.log('Drag start for player:', player.name);
+        logger.log('Drag start for player:', player.name);
         e.dataTransfer.setData('text/plain', JSON.stringify({
             playerId: player.id,
             playerPosition: player.position,
@@ -4792,7 +4867,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     };
     
     playerIcon._dragEndHandler = function(e) {
-        console.log('Drag end for player:', player.name);
+        logger.log('Drag end for player:', player.name);
         playerIcon.classList.remove('dragging');
         hideDropZones();
     };
@@ -4806,7 +4881,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     
     playerIcon._touchStartHandler = function(e) {
         e.preventDefault();
-        console.log('Touch start for player:', player.name);
+        logger.log('Touch start for player:', player.name);
         touchStartData = {
             playerId: player.id,
             playerPosition: player.position,
@@ -4819,7 +4894,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     
     playerIcon._touchEndHandler = function(e) {
         e.preventDefault();
-        console.log('Touch end for player:', player.name);
+        logger.log('Touch end for player:', player.name);
         
         if (touchStartData) {
             const touch = e.changedTouches[0];
@@ -4840,7 +4915,7 @@ function setupPlayerDragAndDrop(playerIcon, positionId, player) {
     playerIcon.addEventListener('touchstart', playerIcon._touchStartHandler);
     playerIcon.addEventListener('touchend', playerIcon._touchEndHandler);
     
-    console.log('Drag and drop setup completed for:', player.name, 'at position:', positionId);
+    logger.log('Drag and drop setup completed for:', player.name, 'at position:', positionId);
 }
 
 // Bench Player Drag and Drop Functionality
@@ -4862,7 +4937,7 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     
     // Create and store event handlers
     playerDiv._dragStartHandler = function(e) {
-        console.log('Bench drag start for player:', player.name);
+        logger.log('Bench drag start for player:', player.name);
         e.dataTransfer.setData('text/plain', JSON.stringify({
             playerId: player.id,
             playerPosition: player.position,
@@ -4876,7 +4951,7 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     };
     
     playerDiv._dragEndHandler = function(e) {
-        console.log('Bench drag end for player:', player.name);
+        logger.log('Bench drag end for player:', player.name);
         playerDiv.classList.remove('dragging');
         playerDiv.style.cursor = 'grab';
         hideBenchDropZones();
@@ -4895,7 +4970,7 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     
     playerDiv._touchStartHandler = function(e) {
         e.preventDefault();
-        console.log('Bench touch start for player:', player.name);
+        logger.log('Bench touch start for player:', player.name);
         touchStartData = {
             playerId: player.id,
             playerPosition: player.position,
@@ -4910,7 +4985,7 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     
     playerDiv._touchEndHandler = function(e) {
         e.preventDefault();
-        console.log('Bench touch end for player:', player.name);
+        logger.log('Bench touch end for player:', player.name);
         
         if (touchStartData) {
             const touch = e.changedTouches[0];
@@ -4919,13 +4994,13 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
             // Check if dropped on field position
             const targetFieldPosition = elementBelow?.closest('.player-position');
             if (targetFieldPosition && isValidDropPosition(touchStartData.playerPosition, targetFieldPosition.id)) {
-                console.log('Bench player dropped on field position:', targetFieldPosition.id);
+                logger.log('Bench player dropped on field position:', targetFieldPosition.id);
                 moveBenchPlayerToField(touchStartData, targetFieldPosition.id);
                 showToast(`${player.name} moved to ${getPositionDisplayName(targetFieldPosition.id)}`, 'success');
             }
             // Check if dropped on bench area
             else if (elementBelow?.closest('#bench-players')) {
-                console.log('Bench player dropped on bench area');
+                logger.log('Bench player dropped on bench area');
                 // Handle bench reordering if needed
                 showToast(`${player.name} reordered in bench`, 'info');
             }
@@ -4941,12 +5016,12 @@ function setupBenchPlayerDragAndDrop(playerDiv, playerIcon, player) {
     playerDiv.addEventListener('touchstart', playerDiv._touchStartHandler);
     playerDiv.addEventListener('touchend', playerDiv._touchEndHandler);
     
-    console.log('Bench drag and drop setup completed for:', player.name);
+    logger.log('Bench drag and drop setup completed for:', player.name);
 }
 
 // Show drop zones for bench players (field positions + bench area)
 function showBenchDropZones(playerPosition) {
-    console.log('Showing bench drop zones for position:', playerPosition);
+    logger.log('Showing bench drop zones for position:', playerPosition);
     
     // Show field drop zones (same as field players)
     showDropZones(playerPosition);
@@ -4972,7 +5047,7 @@ function hideBenchDropZones() {
 
 // Setup bench area as drop zone
 function setupBenchDropZone(benchArea) {
-    console.log('Setting up bench drop zone');
+    logger.log('Setting up bench drop zone');
     
     function handleBenchDragOver(e) {
         e.preventDefault();
@@ -4981,22 +5056,22 @@ function setupBenchDropZone(benchArea) {
     
     function handleBenchDrop(e) {
         e.preventDefault();
-        console.log('Drop on bench area');
+        logger.log('Drop on bench area');
         
         try {
             const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
-            console.log('Bench drop data:', dragData);
+            logger.log('Bench drop data:', dragData);
             
             if (dragData.isBenchPlayer) {
                 // Reordering within bench - handled by the bench container
-                console.log('Bench player reordering');
+                logger.log('Bench player reordering');
             } else {
                 // Field player moving to bench
-                console.log('Field player moving to bench');
+                logger.log('Field player moving to bench');
                 moveFieldPlayerToBench(dragData);
             }
         } catch (error) {
-            console.error('Bench drop error:', error);
+            logger.error('Bench drop error:', error);
         }
         
         hideBenchDropZones();
@@ -5033,15 +5108,15 @@ function removeBenchDropZone(benchArea) {
 
 // Show valid drop zones for a player position
 function showDropZones(playerPosition) {
-    console.log('Showing drop zones for position:', playerPosition);
+    logger.log('Showing drop zones for position:', playerPosition);
     const allPositions = document.querySelectorAll('.player-position');
-    console.log('Found positions:', allPositions.length);
+    logger.log('Found positions:', allPositions.length);
     
     allPositions.forEach(position => {
         const positionId = position.id;
         const isValidDrop = isValidDropPosition(playerPosition, positionId);
         
-        console.log(`Position ${positionId}: valid=${isValidDrop}`);
+        logger.log(`Position ${positionId}: valid=${isValidDrop}`);
         
         position.classList.add('drop-zone');
         
@@ -5138,27 +5213,27 @@ function moveBenchPlayerToField(dragData, targetPositionId) {
 
 // Setup drop zone event handlers
 function setupDropZone(positionElement) {
-    console.log('Setting up drop zone for:', positionElement.id);
+    logger.log('Setting up drop zone for:', positionElement.id);
     
     function handleDragOver(e) {
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
-        console.log('Drag over:', positionElement.id);
+        logger.log('Drag over:', positionElement.id);
     }
     
     function handleDrop(e) {
         e.preventDefault();
-        console.log('Drop on:', positionElement.id);
+        logger.log('Drop on:', positionElement.id);
         
         try {
             const dragData = JSON.parse(e.dataTransfer.getData('text/plain'));
             const targetPositionId = positionElement.id;
             
-            console.log('Drop data:', dragData);
-            console.log('Target position:', targetPositionId);
+            logger.log('Drop data:', dragData);
+            logger.log('Target position:', targetPositionId);
             
             if (isValidDropPosition(dragData.playerPosition, targetPositionId)) {
-                console.log('Valid drop');
+                logger.log('Valid drop');
                 
                 if (dragData.isBenchPlayer) {
                     // Bench player moving to field
@@ -5170,10 +5245,10 @@ function setupDropZone(positionElement) {
                 
                 showToast(`Player moved to ${getPositionDisplayName(targetPositionId)}`, 'success');
             } else {
-                console.log('Invalid drop position');
+                logger.log('Invalid drop position');
             }
         } catch (error) {
-            console.error('Drop error:', error);
+            logger.error('Drop error:', error);
         }
         
         hideDropZones();
@@ -5271,25 +5346,25 @@ function getPositionDisplayName(positionId) {
 
 // Debug function to test drag and drop setup
 function testDragAndDrop() {
-    console.log('=== TESTING DRAG AND DROP SETUP ===');
+    logger.log('=== TESTING DRAG AND DROP SETUP ===');
     
     const allPlayerIcons = document.querySelectorAll('.player-icon');
-    console.log('Found player icons:', allPlayerIcons.length);
+    logger.log('Found player icons:', allPlayerIcons.length);
     
     allPlayerIcons.forEach((icon, index) => {
-        console.log(`Player ${index + 1}:`);
-        console.log('  - Draggable:', icon.draggable);
-        console.log('  - Has dataset:', !!icon.dataset.playerId);
-        console.log('  - Position:', icon.dataset.playerPosition);
-        console.log('  - Current pos:', icon.dataset.currentPositionId);
-        console.log('  - Classes:', icon.className);
+        logger.log(`Player ${index + 1}:`);
+        logger.log('  - Draggable:', icon.draggable);
+        logger.log('  - Has dataset:', !!icon.dataset.playerId);
+        logger.log('  - Position:', icon.dataset.playerPosition);
+        logger.log('  - Current pos:', icon.dataset.currentPositionId);
+        logger.log('  - Classes:', icon.className);
     });
     
     const allPositions = document.querySelectorAll('.player-position');
-    console.log('Found position elements:', allPositions.length);
+    logger.log('Found position elements:', allPositions.length);
     
     allPositions.forEach((pos, index) => {
-        console.log(`Position ${index + 1}: ${pos.id} - Display: ${pos.style.display}`);
+        logger.log(`Position ${index + 1}: ${pos.id} - Display: ${pos.style.display}`);
     });
 }
 
@@ -5422,7 +5497,7 @@ function updateFormation() {
     const team = teamsData.find(t => t.id === selectedTeamId);
     if (!team) return;
     
-    console.log(`Updating formation to ${selectedTactic} for team ${team.name}`);
+    logger.log(`Updating formation to ${selectedTactic} for team ${team.name}`);
     
     // Update team formation temporarily (not saving to data)
     team.formation = selectedTactic;
@@ -5471,7 +5546,7 @@ function populateStatisticsGroupSelector() {
     groups.forEach(group => {
         const option = document.createElement('option');
         option.value = group.id;
-        option.textContent = group.name;
+        option.textContent = `${group.name} - ${group.description}`;
         groupSelect.appendChild(option);
     });
     
@@ -5492,7 +5567,7 @@ function populateTopScorersGroupSelector() {
     groups.forEach(group => {
         const option = document.createElement('option');
         option.value = group.id;
-        option.textContent = group.name;
+        option.textContent = `${group.name} - ${group.description}`;
         groupSelect.appendChild(option);
     });
     
@@ -5509,11 +5584,28 @@ function populateTopScorersTeamSelector() {
     
     teamSelect.innerHTML = '';
     
-    teams.forEach(team => {
-        const option = document.createElement('option');
-        option.value = team.id;
-        option.textContent = team.name;
-        teamSelect.appendChild(option);
+    // Group teams by their groups and add with headers
+    groups.forEach(group => {
+        // Add group header (optgroup)
+        const optGroup = document.createElement('optgroup');
+        optGroup.label = `${group.name} - ${group.description}`;
+        
+        // Add teams from this group
+        const groupTeams = teams.filter(team => 
+            group.teams.includes(team.id)
+        ).sort((a, b) => a.name.localeCompare(b.name));
+        
+        groupTeams.forEach(team => {
+            const option = document.createElement('option');
+            option.value = team.id;
+            option.textContent = team.name;
+            optGroup.appendChild(option);
+        });
+        
+        // Only add the optgroup if it has teams
+        if (groupTeams.length > 0) {
+            teamSelect.appendChild(optGroup);
+        }
     });
 }
 
@@ -5617,9 +5709,22 @@ function updateTeamPerformanceAnalysis() {
         });
         selectedGroupId = originalGroupId;
         standings = allStandings;
+        
+        // Filter out teams that haven't played any games when All Groups is selected
+        standings = standings.filter(team => team.played > 0);
     }
     
     const teamAnalysis = analyzeAllTeams(standings);
+    
+    // Sort by performance rating when All Groups is selected
+    if (!selectedStatisticsGroupId) {
+        teamAnalysis.sort((a, b) => b.performanceRating - a.performanceRating);
+        // Update positions based on performance ranking
+        teamAnalysis.forEach((team, index) => {
+            team.performancePosition = index + 1;
+        });
+    }
+    
     content.innerHTML = generateTeamAnalysisHTML(teamAnalysis);
 }
 
@@ -5645,6 +5750,9 @@ function updateStatisticalInsights() {
         });
         selectedGroupId = originalGroupId;
         standings = allStandings;
+        
+        // Filter out teams that haven't played any games when All Groups is selected
+        standings = standings.filter(team => team.played > 0);
     }
     
     const teamAnalysis = analyzeAllTeams(standings);
@@ -5739,7 +5847,10 @@ function getTopScorersForGroup(groupId) {
 }
 
 function getTopScorersForTeam(teamId) {
-    if (!teamId) return [];
+    if (!teamId) {
+        // If no team selected, return empty array
+        return [];
+    }
     
     const teamGoals = goals.filter(goal => goal.teamId === teamId);
     const playersMap = new Map();
@@ -5896,7 +6007,7 @@ function initializeKnockoutDates() {
 
 // Function to update the knockout stage with current group winners
 function updateKnockoutStage() {
-    console.log('DEBUG: Updating knockout stage');
+    logger.log('DEBUG: Updating knockout stage');
     
     // Load knockout date and title from defaults configuration (ensure it's always updated)
     const knockoutDateElement = document.getElementById('knockout-date');
@@ -5915,7 +6026,7 @@ function updateKnockoutStage() {
     const groupCWinner = getGroupWinner('group-c');
     const groupDWinner = getGroupWinner('group-d');
     
-    console.log('DEBUG: Group winners:', {
+    logger.log('DEBUG: Group winners:', {
         'Group A': groupAWinner?.name,
         'Group B': groupBWinner?.name,
         'Group C': groupCWinner?.name,
@@ -5949,4 +6060,209 @@ function updateKnockoutStage() {
         groupCBox.querySelector('.team-name').textContent = groupCWinner.name;
         groupCBox.title = `${groupCWinner.fullName || groupCWinner.name} - ${groupCWinner.points} points`;
     }
+    
+    // Update knockout match displays and controls
+    updateKnockoutMatch('semi1', groupAWinner, groupDWinner);
+    updateKnockoutMatch('semi2', groupBWinner, groupCWinner);
+    
+    // Update dependent matches based on results
+    if (knockoutResults.semi1.played && knockoutResults.semi2.played) {
+        const semi1Winner = teams.find(t => t.id === knockoutResults.semi1.winner);
+        const semi1Loser = teams.find(t => t.id === knockoutResults.semi1.loser);
+        const semi2Winner = teams.find(t => t.id === knockoutResults.semi2.winner);
+        const semi2Loser = teams.find(t => t.id === knockoutResults.semi2.loser);
+        
+        updateKnockoutMatch('final', semi1Winner, semi2Winner);
+        updateKnockoutMatch('third', semi1Loser, semi2Loser);
+        
+        // Update display elements for finals
+        updateSemiFinalResultDisplays();
+    }
+}
+
+function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
+    const matchResult = knockoutResults[matchId];
+    const isAdmin = config?.admin?.role === 'admin';
+    
+    // Show edit button if teams are available and admin
+    const editBtn = document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`);
+    if (editBtn && homeTeam && awayTeam && isAdmin) {
+        editBtn.style.display = 'inline-block';
+    }
+    
+    // Update match teams if they're not set in the result
+    if (homeTeam && awayTeam && (!matchResult.homeTeam || !matchResult.awayTeam)) {
+        matchResult.homeTeam = homeTeam.id;
+        matchResult.awayTeam = awayTeam.id;
+    }
+    
+    // Show score if match has been played
+    const scoreDisplay = document.getElementById(`${matchId}-score`);
+    const vsText = scoreDisplay?.parentElement.querySelector('.vs-text');
+    
+    if (matchResult.played && scoreDisplay && vsText) {
+        scoreDisplay.textContent = `${matchResult.homeScore} - ${matchResult.awayScore}`;
+        scoreDisplay.style.display = 'block';
+        vsText.style.display = 'none';
+    } else if (scoreDisplay && vsText) {
+        scoreDisplay.style.display = 'none';
+        vsText.style.display = 'flex';
+    }
+}
+
+function updateSemiFinalResultDisplays() {
+    // Update third place match teams
+    const semi1LoserBox = document.getElementById('semifinal-1-loser');
+    const semi2LoserBox = document.getElementById('semifinal-2-loser');
+    const semi1WinnerBox = document.getElementById('semifinal-1-winner');
+    const semi2WinnerBox = document.getElementById('semifinal-2-winner');
+    
+    if (knockoutResults.semi1.played) {
+        const winner = teams.find(t => t.id === knockoutResults.semi1.winner);
+        const loser = teams.find(t => t.id === knockoutResults.semi1.loser);
+        
+        if (semi1WinnerBox && winner) {
+            semi1WinnerBox.querySelector('.team-name').textContent = winner.name;
+            semi1WinnerBox.title = winner.fullName || winner.name;
+        }
+        
+        if (semi1LoserBox && loser) {
+            semi1LoserBox.querySelector('.team-name').textContent = loser.name;
+            semi1LoserBox.title = loser.fullName || loser.name;
+        }
+    }
+    
+    if (knockoutResults.semi2.played) {
+        const winner = teams.find(t => t.id === knockoutResults.semi2.winner);
+        const loser = teams.find(t => t.id === knockoutResults.semi2.loser);
+        
+        if (semi2WinnerBox && winner) {
+            semi2WinnerBox.querySelector('.team-name').textContent = winner.name;
+            semi2WinnerBox.title = winner.fullName || winner.name;
+        }
+        
+        if (semi2LoserBox && loser) {
+            semi2LoserBox.querySelector('.team-name').textContent = loser.name;
+            semi2LoserBox.title = loser.fullName || loser.name;
+        }
+    }
+}
+
+// Knockout match editing functions
+function editKnockoutMatch(matchId) {
+    const matchResult = knockoutResults[matchId];
+    if (!matchResult.homeTeam || !matchResult.awayTeam) return;
+    
+    // Show score inputs
+    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
+    const scoreDisplay = document.getElementById(`${matchId}-score`);
+    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
+    
+    scoreInputs.style.display = 'flex';
+    scoreDisplay.style.display = 'none';
+    vsText.style.display = 'none';
+    
+    // Pre-populate with existing scores if available
+    document.getElementById(`${matchId}-home-score`).value = matchResult.homeScore || '';
+    document.getElementById(`${matchId}-away-score`).value = matchResult.awayScore || '';
+    
+    // Show/hide buttons
+    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'none';
+    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
+    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'inline-block';
+}
+
+function saveKnockoutMatch(matchId) {
+    const homeScore = parseInt(document.getElementById(`${matchId}-home-score`).value);
+    const awayScore = parseInt(document.getElementById(`${matchId}-away-score`).value);
+    
+    if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0) {
+        showToast('Please enter valid scores (0 or higher)', 'error');
+        return;
+    }
+    
+    const matchResult = knockoutResults[matchId];
+    matchResult.homeScore = homeScore;
+    matchResult.awayScore = awayScore;
+    matchResult.played = true;
+    
+    // Determine winner and loser
+    if (homeScore > awayScore) {
+        matchResult.winner = matchResult.homeTeam;
+        matchResult.loser = matchResult.awayTeam;
+    } else if (awayScore > homeScore) {
+        matchResult.winner = matchResult.awayTeam;
+        matchResult.loser = matchResult.homeTeam;
+    } else {
+        // For ties, we'll need penalty shootout logic - for now, home team wins
+        matchResult.winner = matchResult.homeTeam;
+        matchResult.loser = matchResult.awayTeam;
+        showToast('Tie game - home team advances on penalties', 'info');
+    }
+    
+    // Hide inputs, show score
+    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
+    const scoreDisplay = document.getElementById(`${matchId}-score`);
+    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
+    
+    scoreInputs.style.display = 'none';
+    scoreDisplay.style.display = 'block';
+    scoreDisplay.textContent = `${homeScore} - ${awayScore}`;
+    
+    // Show/hide buttons
+    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
+    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'none';
+    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'none';
+    
+    // Download updated knockout results
+    downloadKnockoutResults();
+    
+    // Update dependent matches
+    updateKnockoutStage();
+    
+    // Show success message
+    const homeTeam = teams.find(t => t.id === matchResult.homeTeam);
+    const awayTeam = teams.find(t => t.id === matchResult.awayTeam);
+    const teamNames = `${homeTeam?.name || 'Team'} vs ${awayTeam?.name || 'Team'}`;
+    
+    if (isMobileDevice()) {
+        showToast(`${matchResult.name} result saved! (${teamNames}: ${homeScore}-${awayScore})`, 'success');
+    } else {
+        showToast(`${matchResult.name} result saved! Check Downloads → Replace data/knockout-results.json → Refresh page`, 'success');
+    }
+}
+
+function cancelKnockoutEdit(matchId) {
+    // Hide inputs
+    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
+    const scoreDisplay = document.getElementById(`${matchId}-score`);
+    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
+    
+    scoreInputs.style.display = 'none';
+    
+    // Show appropriate display
+    const matchResult = knockoutResults[matchId];
+    if (matchResult.played) {
+        scoreDisplay.style.display = 'block';
+        vsText.style.display = 'none';
+    } else {
+        scoreDisplay.style.display = 'none';
+        vsText.style.display = 'flex';
+    }
+    
+    // Show/hide buttons
+    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
+    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'none';
+    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'none';
+}
+
+function downloadKnockoutResults() {
+    const dataStr = JSON.stringify(knockoutResults, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'knockout-results.json';
+    link.click();
+    URL.revokeObjectURL(url);
 }

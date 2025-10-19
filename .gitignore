@@ -10,7 +10,7 @@
 .env.production.local
 
 # Configuration files that might contain secrets
-config.json
+app-config.json
 secrets.json
 credentials.json
 

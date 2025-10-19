@@ -902,6 +902,47 @@ tr.first-place .goal-diff-negative {
     }
 }
 
+/* Tablet improvements for teams tab */
+@media (max-width: 768px) and (min-width: 481px) {
+    .tactics-selector {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .tactics-selector label {
+        min-width: auto;
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+    
+    .tactics-selector select {
+        flex: 1;
+        max-width: none;
+    }
+    
+    .team-selector {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .team-selector label {
+        min-width: auto;
+        white-space: nowrap;
+        margin-bottom: 0;
+    }
+    
+    .team-selector select {
+        flex: 1;
+        max-width: none;
+    }
+}
+
 @media (max-width: 480px) {
     .match-card {
         width: 20px;
@@ -915,6 +956,70 @@ tr.first-place .goal-diff-negative {
     
     .tab-content h2 {
         font-size: 1.5rem;
+    }
+    
+    .tactics-selector {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+    
+    .tactics-selector label {
+        min-width: auto;
+        white-space: nowrap;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+    
+    .tactics-selector select {
+        flex: 1;
+        max-width: none;
+        font-size: 0.9rem;
+        padding: 10px 12px;
+    }
+    
+    .team-selector {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+    
+    .team-selector label {
+        min-width: auto;
+        white-space: nowrap;
+        margin-bottom: 0;
+        font-size: 0.9rem;
+    }
+    
+    .team-selector select {
+        flex: 1;
+        max-width: none;
+        font-size: 0.9rem;
+    }
+    
+    /* Football field mobile adjustments */
+    .football-field {
+        padding: 10px;
+        margin: 10px 0;
+    }
+    
+    .player-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 0.7rem;
+    }
+    
+    .player-name {
+        font-size: 0.7rem;
+        max-width: 80px;
+    }
+    
+    .formation-line {
+        margin-bottom: 15px;
     }
 }
 
@@ -1391,12 +1496,15 @@ tr.first-place .goal-diff-negative {
 }
 
 .scorer-predictions-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 15px;
     margin-top: 12px;
     transition: all 0.3s ease;
     overflow: hidden;
+}
+
+.teams-scorer-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
 }
 
 .scorer-predictions-grid.collapsed {
@@ -1455,14 +1563,20 @@ tr.first-place .goal-diff-negative {
     margin-left: 4px;
 }
 
-/* Single column layout for teams with only one set of scorers */
-.scorer-predictions-grid:has(.team-scorers:only-child) {
-    grid-template-columns: 1fr;
+.no-data {
+    padding: 8px;
+    color: #6c757d;
+    font-style: italic;
+    font-size: 0.8em;
+    text-align: center;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px dashed #dee2e6;
 }
 
 /* Mobile responsive for goal scorer predictions */
 @media (max-width: 768px) {
-    .scorer-predictions-grid {
+    .teams-scorer-columns {
         grid-template-columns: 1fr;
         gap: 10px;
     }
@@ -2336,28 +2450,30 @@ tr.first-place .goal-diff-negative {
     }
     
     .projected-position {
-        grid-template-columns: 35px 1fr auto !important;
-        gap: 10px !important;
+        grid-template-columns: 30px 1fr 50px 60px !important;
+        gap: 8px !important;
         padding: 8px !important;
         font-size: 0.9rem !important;
     }
     
     .proj-probability {
-        display: none !important; /* Hide probability on mobile to save space */
+        font-size: 0.8rem !important;
+        white-space: nowrap !important;
     }
     
     .proj-rank {
-        font-size: 1rem !important;
+        font-size: 0.9rem !important;
         font-weight: bold !important;
     }
     
     .proj-team {
-        font-size: 0.9rem !important;
+        font-size: 0.85rem !important;
         word-wrap: break-word !important;
+        overflow: hidden !important;
     }
     
     .proj-points {
-        font-size: 0.85rem !important;
+        font-size: 0.8rem !important;
         white-space: nowrap !important;
     }
     
@@ -2492,7 +2608,7 @@ tr.first-place .goal-diff-negative {
     min-width: 100px;
 }
 
-.tactics-selector select {
+.team-selector select, .tactics-selector select {
     padding: 8px 12px;
     border: 2px solid #ddd;
     border-radius: 6px;
@@ -3435,6 +3551,88 @@ tr.first-place .goal-diff-negative {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.vs-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.score-inputs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+
+.score-inputs input {
+    width: 50px;
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.score-inputs span {
+    font-weight: bold;
+    color: #2c3e50;
+}
+
+.score-display {
+    background: #f8f9fa;
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 2px solid #3498db;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-top: 5px;
+}
+
+.match-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.edit-knockout-btn, .save-knockout-btn, .cancel-knockout-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.edit-knockout-btn {
+    background: #3498db;
+    color: white;
+}
+
+.edit-knockout-btn:hover {
+    background: #2980b9;
+}
+
+.save-knockout-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.save-knockout-btn:hover {
+    background: #229954;
+}
+
+.cancel-knockout-btn {
+    background: #e74c3c;
+    color: white;
+}
+
+.cancel-knockout-btn:hover {
+    background: #c0392b;
 }
 
 .match-label {

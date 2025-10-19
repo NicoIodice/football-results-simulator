@@ -85,7 +85,15 @@
                                             </div>
                                             <div class="team-label">Winner of Group A</div>
                                         </div>
-                                        <div class="vs-text">VS</div>
+                                        <div class="vs-section">
+                                            <div class="vs-text">VS</div>
+                                            <div class="score-inputs" style="display: none;">
+                                                <input type="number" id="semi1-home-score" min="0" max="99" placeholder="0">
+                                                <span>-</span>
+                                                <input type="number" id="semi1-away-score" min="0" max="99" placeholder="0">
+                                            </div>
+                                            <div class="score-display" id="semi1-score" style="display: none;"></div>
+                                        </div>
                                         <div class="participant">
                                             <div id="group-d-winner" class="team-box">
                                                 <span class="team-name">TBD</span>
@@ -93,7 +101,12 @@
                                             <div class="team-label">Winner of Group D</div>
                                         </div>
                                     </div>
-                                    <div class="match-label">Semi-Final 1</div>
+                                    <div class="match-controls">
+                                        <div class="match-label">Semi-Final 1</div>
+                                        <button class="edit-knockout-btn" onclick="editKnockoutMatch('semi1')" style="display: none;">Edit</button>
+                                        <button class="save-knockout-btn" onclick="saveKnockoutMatch('semi1')" style="display: none;">Save</button>
+                                        <button class="cancel-knockout-btn" onclick="cancelKnockoutEdit('semi1')" style="display: none;">Cancel</button>
+                                    </div>
                                 </div>
                                 
                                 <div class="knockout-match">
@@ -104,7 +117,15 @@
                                             </div>
                                             <div class="team-label">Winner of Group B</div>
                                         </div>
-                                        <div class="vs-text">VS</div>
+                                        <div class="vs-section">
+                                            <div class="vs-text">VS</div>
+                                            <div class="score-inputs" style="display: none;">
+                                                <input type="number" id="semi2-home-score" min="0" max="99" placeholder="0">
+                                                <span>-</span>
+                                                <input type="number" id="semi2-away-score" min="0" max="99" placeholder="0">
+                                            </div>
+                                            <div class="score-display" id="semi2-score" style="display: none;"></div>
+                                        </div>
                                         <div class="participant">
                                             <div id="group-c-winner" class="team-box">
                                                 <span class="team-name">TBD</span>
@@ -112,7 +133,12 @@
                                             <div class="team-label">Winner of Group C</div>
                                         </div>
                                     </div>
-                                    <div class="match-label">Semi-Final 2</div>
+                                    <div class="match-controls">
+                                        <div class="match-label">Semi-Final 2</div>
+                                        <button class="edit-knockout-btn" onclick="editKnockoutMatch('semi2')" style="display: none;">Edit</button>
+                                        <button class="save-knockout-btn" onclick="saveKnockoutMatch('semi2')" style="display: none;">Save</button>
+                                        <button class="cancel-knockout-btn" onclick="cancelKnockoutEdit('semi2')" style="display: none;">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +155,15 @@
                                             </div>
                                             <div class="team-label">Loser of Semi-Final 1</div>
                                         </div>
-                                        <div class="vs-text">VS</div>
+                                        <div class="vs-section">
+                                            <div class="vs-text">VS</div>
+                                            <div class="score-inputs" style="display: none;">
+                                                <input type="number" id="third-home-score" min="0" max="99" placeholder="0">
+                                                <span>-</span>
+                                                <input type="number" id="third-away-score" min="0" max="99" placeholder="0">
+                                            </div>
+                                            <div class="score-display" id="third-score" style="display: none;"></div>
+                                        </div>
                                         <div class="participant">
                                             <div id="semifinal-2-loser" class="team-box">
                                                 <span class="team-name">TBD</span>
@@ -137,7 +171,12 @@
                                             <div class="team-label">Loser of Semi-Final 2</div>
                                         </div>
                                     </div>
-                                    <div class="match-label">3rd Place Match</div>
+                                    <div class="match-controls">
+                                        <div class="match-label">3rd Place Match</div>
+                                        <button class="edit-knockout-btn" onclick="editKnockoutMatch('third')" style="display: none;">Edit</button>
+                                        <button class="save-knockout-btn" onclick="saveKnockoutMatch('third')" style="display: none;">Save</button>
+                                        <button class="cancel-knockout-btn" onclick="cancelKnockoutEdit('third')" style="display: none;">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +193,15 @@
                                             </div>
                                             <div class="team-label">Winner of Semi-Final 1</div>
                                         </div>
-                                        <div class="vs-text">VS</div>
+                                        <div class="vs-section">
+                                            <div class="vs-text">VS</div>
+                                            <div class="score-inputs" style="display: none;">
+                                                <input type="number" id="final-home-score" min="0" max="99" placeholder="0">
+                                                <span>-</span>
+                                                <input type="number" id="final-away-score" min="0" max="99" placeholder="0">
+                                            </div>
+                                            <div class="score-display" id="final-score" style="display: none;"></div>
+                                        </div>
                                         <div class="participant">
                                             <div id="semifinal-2-winner" class="team-box">
                                                 <span class="team-name">TBD</span>
@@ -162,7 +209,12 @@
                                             <div class="team-label">Winner of Semi-Final 2</div>
                                         </div>
                                     </div>
-                                    <div class="match-label">Championship Final</div>
+                                    <div class="match-controls">
+                                        <div class="match-label">Championship Final</div>
+                                        <button class="edit-knockout-btn" onclick="editKnockoutMatch('final')" style="display: none;">Edit</button>
+                                        <button class="save-knockout-btn" onclick="saveKnockoutMatch('final')" style="display: none;">Save</button>
+                                        <button class="cancel-knockout-btn" onclick="cancelKnockoutEdit('final')" style="display: none;">Cancel</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
