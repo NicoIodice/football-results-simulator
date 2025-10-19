@@ -633,7 +633,7 @@ tr.first-place .goal-diff-negative {
     border-left: 4px solid #3498db;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 .group-selector-container {
@@ -641,6 +641,7 @@ tr.first-place .goal-diff-negative {
     align-items: center;
     gap: 15px;
     flex: 1;
+    justify-content: space-between;
 }
 
 .group-status-indicator {
@@ -706,7 +707,7 @@ tr.first-place .goal-diff-negative {
 .team-selector {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 .team-selector label {
@@ -2975,7 +2976,7 @@ tr.first-place .goal-diff-negative {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
 }
 
 .tactics-selector label {
@@ -3831,6 +3832,9 @@ tr.first-place .goal-diff-negative {
     margin-bottom: 20px;
     text-align: center;
     font-size: 1rem;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .knockout-disclaimer.warning {
@@ -3871,9 +3875,11 @@ tr.first-place .goal-diff-negative {
 
 .matches-container {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     flex-wrap: wrap;
     gap: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .knockout-match {
