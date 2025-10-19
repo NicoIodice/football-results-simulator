@@ -339,19 +339,332 @@ document.addEventListener('DOMContentLoaded', async function() {
     
     // Load data first (non-blocking)
     await loadData();
-    
+
     // Load any pending results from session storage (mobile)
     loadPendingResults();
-    
+
     showTab('standings');
-    
+
     // Initialize OpenRouter only if enabled
     if (config?.simulation?.useOpenAI) {
         initializeOpenRouterSystem();
     } else {
         logger.log('ℹ️ OpenRouter feature disabled, skipping initialization');
     }
+
+    // Settings modal logic
+    const settingsToggle = document.getElementById('settings-toggle');
+    if (settingsToggle) {
+        settingsToggle.addEventListener('click', showConfigModal);
+    }
 });
+
+// Show config modal and blur main page
+function showConfigModal() {
+    const modal = document.getElementById('configModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.classList.add('config-modal-open');
+        renderConfigCategories();
+        renderConfigFieldsPanel(selectedConfigCategory || 'General');
+    }
+}
+
+// Hide config modal and unblur main page
+function hideConfigModal() {
+    const modal = document.getElementById('configModal');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.classList.remove('config-modal-open');
+    }
+}
+
+// Render config fields in modal (to be implemented)
+// Google-style config modal logic
+let selectedConfigCategory = 'General';
+
+const configCategoryLabels = {
+    General: 'General',
+    tabVisibility: 'Tabs Visibility',
+    subTabs: 'Sub Tabs',
+    groupPhase: 'Group Phase',
+    knockout: 'Knockout',
+    admin: 'Admin',
+    simulation: 'Simulation',
+    ui: 'UI',
+    venues: 'Venues'
+};
+
+function renderConfigCategories() {
+    const panel = document.getElementById('config-categories-panel');
+    if (!panel || !config) return;
+    panel.innerHTML = '';
+    const categories = [
+        'General',
+        'tabVisibility',
+        'subTabs',
+        'groupPhase',
+        'knockout',
+        'admin',
+        'simulation',
+        'ui',
+        'venues'
+    ];
+    categories.forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'config-category-item' + (selectedConfigCategory === cat ? ' active' : '');
+        btn.textContent = configCategoryLabels[cat] || cat;
+        btn.onclick = () => {
+            selectedConfigCategory = cat;
+            renderConfigCategories();
+            renderConfigFieldsPanel(cat);
+        };
+        panel.appendChild(btn);
+    });
+}
+
+function renderConfigFieldsPanel(category) {
+    const panel = document.getElementById('config-fields-panel');
+    if (!panel || !config) return;
+    panel.innerHTML = '';
+    let fields = {};
+    let title = configCategoryLabels[category] || category;
+    if (category === 'General') {
+        // Only show top-level primitives
+        for (const key in config) {
+            if (typeof config[key] !== 'object' || config[key] === null || Array.isArray(config[key])) {
+                fields[key] = config[key];
+            }
+        }
+    } else if (category === 'venues') {
+        // Venues editor (group and knockout)
+        renderVenuesEditor(panel);
+        return;
+    } else {
+        fields = config[category] || {};
+    }
+    const heading = document.createElement('h1');
+    heading.textContent = title;
+    panel.appendChild(heading);
+    const list = document.createElement('div');
+    list.className = 'config-fields-list';
+    for (const key in fields) {
+        const fieldRow = document.createElement('div');
+        fieldRow.className = 'config-field-row';
+        const label = document.createElement('label');
+        label.textContent = getUserFriendlyLabel(key, category);
+        label.htmlFor = `config-${category}-${key}`;
+        fieldRow.appendChild(label);
+        fieldRow.appendChild(createConfigInput(category, key, fields[key]));
+        list.appendChild(fieldRow);
+    }
+    panel.appendChild(list);
+}
+
+function getUserFriendlyLabel(key, category) {
+    // Map technical keys to user-friendly labels
+    const labels = {
+        tabVisibility: 'Tabs Visibility',
+        subTabs: 'Sub Tabs',
+        defaultGroup: 'Default Group',
+        defaultTeam: 'Default Team',
+        startDate: 'Start Date',
+        endDate: 'End Date',
+        dateTimeFormatted: 'Date Range',
+        venues: 'Venues',
+        role: 'Role',
+        validateTime: 'Validate Time',
+        useOpenAI: 'Use OpenAI',
+        pointsGapLimit: 'Points Gap Limit',
+        maxScenarios: 'Max Scenarios',
+        showLoadingMask: 'Show Loading Mask',
+        enableDebugMode: 'Enable Debug Mode',
+        enableDarkMode: 'Enable Dark Mode',
+        title: 'Title',
+        date: 'Date',
+        startTime: 'Start Time',
+        description: 'Description',
+        name: 'Name',
+        googleMapsUrl: 'Google Maps URL',
+        leagueStandings: 'League Standings',
+        knockoutStage: 'Knockout Stage',
+        statistics: 'Statistics',
+        enabled: 'Enabled'
+    };
+    if (category === 'subTabs' && key === 'standings') return 'Overview Tabs';
+    return labels[key] || key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+}
+
+function createConfigInput(category, key, value) {
+    // Special controls for certain fields
+    if (key === 'defaultGroup') {
+        return createGroupDropdown(value);
+    }
+    if (key === 'defaultTeam') {
+        return createTeamDropdown(value);
+    }
+    if (key.toLowerCase().includes('date')) {
+        return createDatePicker(value);
+    }
+    if (typeof value === 'boolean') {
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = value;
+        input.className = 'config-input';
+        input.onchange = onConfigInputChange;
+        input.dataset.path = `${category}.${key}`;
+        return input;
+    }
+    if (typeof value === 'number') {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = value;
+        input.className = 'config-input';
+        input.oninput = onConfigInputChange;
+        input.dataset.path = `${category}.${key}`;
+        return input;
+    }
+    if (typeof value === 'string') {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = value;
+        input.className = 'config-input';
+        input.oninput = onConfigInputChange;
+        input.dataset.path = `${category}.${key}`;
+        return input;
+    }
+    // For objects, show as disabled JSON
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.value = JSON.stringify(value);
+    input.className = 'config-input';
+    input.disabled = true;
+    return input;
+}
+
+function createGroupDropdown(selected) {
+    const select = document.createElement('select');
+    select.className = 'config-input';
+    select.dataset.path = 'General.defaultGroup';
+    // Use global groups if available
+    if (window.groups && Array.isArray(window.groups)) {
+        window.groups.forEach(g => {
+            const option = document.createElement('option');
+            option.value = g.id;
+            option.textContent = g.name || g.id;
+            if (g.id === selected) option.selected = true;
+            select.appendChild(option);
+        });
+    }
+    select.onchange = onConfigInputChange;
+    return select;
+}
+
+function createTeamDropdown(selected) {
+    const select = document.createElement('select');
+    select.className = 'config-input';
+    select.dataset.path = 'General.defaultTeam';
+    // Group teams by group
+    if (window.groups && window.teams && Array.isArray(window.groups) && Array.isArray(window.teams)) {
+        window.groups.forEach(g => {
+            const optgroup = document.createElement('optgroup');
+            optgroup.label = g.name || g.id;
+            window.teams.filter(t => t.groupId === g.id).forEach(team => {
+                const option = document.createElement('option');
+                option.value = team.id;
+                option.textContent = team.name;
+                if (team.id === selected) option.selected = true;
+                optgroup.appendChild(option);
+            });
+            select.appendChild(optgroup);
+        });
+    }
+    select.onchange = onConfigInputChange;
+    return select;
+}
+
+function createDatePicker(value) {
+    const input = document.createElement('input');
+    input.type = 'date';
+    input.value = value && value.length >= 10 ? value.substring(0, 10) : '';
+    input.className = 'config-input';
+    input.oninput = onConfigInputChange;
+    input.dataset.path = 'General.' + value;
+    return input;
+}
+
+function renderVenuesEditor(panel) {
+    // Render venues for group and knockout games, allow add/edit (placeholder for now)
+    const heading = document.createElement('h1');
+    heading.textContent = 'Venues';
+    panel.appendChild(heading);
+
+    // Group phase venues
+    const groupVenues = (config.groupPhase && config.groupPhase.venues) || {};
+    const groupVenueList = document.createElement('div');
+    groupVenueList.className = 'venues-list';
+    groupVenueList.innerHTML = '<h3>Group Phase Venues</h3>';
+    Object.entries(groupVenues).forEach(([groupId, venue]) => {
+        const group = groups.find(g => g.id === groupId);
+        const groupName = group ? group.name : groupId;
+        const venueDiv = document.createElement('div');
+        venueDiv.className = 'venue-row';
+        venueDiv.innerHTML = `<strong>${groupName}:</strong> <span>${venue.name || ''}</span> <a href="${venue.googleMapsUrl || '#'}" target="_blank">Map</a>`;
+        groupVenueList.appendChild(venueDiv);
+    });
+    panel.appendChild(groupVenueList);
+
+    // Knockout venue
+    const knockoutVenue = (config.knockout && config.knockout.venue) || null;
+    if (knockoutVenue) {
+        const knockoutDiv = document.createElement('div');
+        knockoutDiv.className = 'venue-row';
+        knockoutDiv.innerHTML = `<h3>Knockout Venue</h3><strong>${knockoutVenue.name || ''}</strong> <a href="${knockoutVenue.googleMapsUrl || '#'}" target="_blank">Map</a>`;
+        panel.appendChild(knockoutDiv);
+    }
+}
+
+// Track config changes
+let configEdits = {};
+function onConfigInputChange(e) {
+    const input = e.target;
+    const path = input.dataset.path;
+    let value;
+    if (input.type === 'checkbox') {
+        value = input.checked;
+    } else if (input.type === 'number') {
+        value = input.value === '' ? null : Number(input.value);
+    } else {
+        value = input.value;
+    }
+    configEdits[path] = value;
+    updateConfigSaveButton();
+}
+
+function updateConfigSaveButton() {
+    const btn = document.getElementById('config-save-btn');
+    if (!btn) return;
+    // Enable if any edits differ from config
+    let changed = false;
+    for (const path in configEdits) {
+        const keys = path.split('.');
+        let ref = config;
+        for (let i = 0; i < keys.length - 1; i++) {
+            ref = ref[keys[i]];
+        }
+        const orig = ref[keys[keys.length - 1]];
+        if (configEdits[path] !== orig) {
+            changed = true;
+            break;
+        }
+    }
+    btn.disabled = !changed;
+}
+
+// Save config changes (to be implemented)
+function saveConfig() {
+    // TODO: Validate and save config changes to data/config.json
+}
 
 // Load JSON data
 async function loadData() {

@@ -16,7 +16,31 @@
             <button id="dark-mode-toggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
                 <span class="dark-mode-icon">🌙</span>
             </button>
+            <button id="settings-toggle" class="settings-toggle" onclick="showConfigModal()" title="Settings">
+                <span class="settings-icon">⚙️</span>
+            </button>
         </header>
+
+        <!-- Config Modal -->
+        <div id="configModal" class="modal config-modal" style="display:none;">
+            <div class="modal-content config-modal-content">
+                <div class="modal-header config-modal-header">
+                    <h3>Configuration Settings</h3>
+                    <span class="close-modal" onclick="hideConfigModal()">&times;</span>
+                </div>
+                <div class="config-modal-main">
+                    <aside class="config-categories-panel" id="config-categories-panel">
+                        <!-- Categories will be rendered here by JS -->
+                    </aside>
+                    <section class="config-fields-panel" id="config-fields-panel">
+                        <!-- Fields for selected category will be rendered here by JS -->
+                    </section>
+                </div>
+                <div class="modal-actions config-modal-actions">
+                    <button type="button" class="btn-primary" id="config-save-btn" disabled onclick="saveConfig()">Save</button>
+                </div>
+            </div>
+        </div>
 
         <nav class="tabs">
             <button class="tab-button active" onclick="showTab('standings')">Overview</button>
