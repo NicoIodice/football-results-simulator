@@ -14,6 +14,49 @@ let selectedForecastGroupId = null;
 // Configuration loaded from config.json
 let config = null;
 
+// Local storage keys
+const STORAGE_KEYS = {
+    teamFormations: 'frs_team_formations',
+    teamStarters: 'frs_team_starters'
+};
+
+function loadPersistedTeamState() {
+    try {
+        const formationsRaw = localStorage.getItem(STORAGE_KEYS.teamFormations);
+        const startersRaw = localStorage.getItem(STORAGE_KEYS.teamStarters);
+        const formations = formationsRaw ? JSON.parse(formationsRaw) : {};
+        const starters = startersRaw ? JSON.parse(startersRaw) : {};
+        // Apply to teamsData if already loaded
+        if (Array.isArray(teamsData)) {
+            teamsData.forEach(team => {
+                if (formations[team.id]) {
+                    team.formation = formations[team.id];
+                }
+                if (starters[team.id]) {
+                    const starterSet = new Set(starters[team.id]);
+                    team.players.forEach(p => {
+                        p.isStarter = starterSet.has(p.id);
+                    });
+                }
+            });
+        }
+    } catch (e) { logger.warn('Failed to load persisted team state', e); }
+}
+
+function persistTeamState() {
+    try {
+        if (!Array.isArray(teamsData)) return;
+        const formations = {};
+        const starters = {};
+        teamsData.forEach(team => {
+            formations[team.id] = team.formation;
+            starters[team.id] = team.players.filter(p => p.isStarter).map(p => p.id);
+        });
+        localStorage.setItem(STORAGE_KEYS.teamFormations, JSON.stringify(formations));
+        localStorage.setItem(STORAGE_KEYS.teamStarters, JSON.stringify(starters));
+    } catch (e) { logger.warn('Failed to persist team state', e); }
+}
+
 // Centralized logging system that respects debug mode setting
 const logger = {
     log: (...args) => {
@@ -4838,6 +4881,8 @@ async function loadPlayersData() {
         const response = await fetch('./data/teams.json');
         teamsData = await response.json();
         logger.log('Teams data loaded:', teamsData);
+        // Apply persisted formations/starters if available
+        loadPersistedTeamState();
         populateTeamLineupSelector();
     } catch (error) {
         logger.error('Error loading teams data:', error);
@@ -4903,42 +4948,58 @@ function updateTeamLineup() {
     
     // Update bench players
     updateBenchPlayers(team);
+
+    // Persist after any lineup refresh (captures starters order/flags)
+    persistTeamState();
 }
 
 // Update players on the field
 function updateFieldPlayers(team) {
     // Validate and fix formation if needed
     const validatedFormation = validateFutsalFormation(team.formation);
-    
-    const starters = team.players.filter(player => player.isStarter);
-    
-    // Update goalkeeper
+
+    // Only use non-injured, on-field starters for reassignment
+    let starters = team.players.filter(player => player.isStarter && player.status !== 'injured');
+
+    // Update goalkeeper (unchanged)
     const goalkeeper = starters.find(p => p.position === 'goalkeeper');
     if (goalkeeper) {
         updatePlayerIcon('goalkeeper', goalkeeper);
         updatePlayerName('goalkeeper-name', goalkeeper);
     }
-    
-    // Get formation structure
-    const formationParts = validatedFormation.split('-').map(Number);
-    const [defenders, midfielders, forwards] = formationParts;
-    
-    // Clear all field positions first
-    clearFieldPositions();
-    
-    // Get players by position
-    const defenderPlayers = starters.filter(p => p.position === 'defender').slice(0, defenders);
-    const midfielderPlayers = starters.filter(p => p.position === 'midfielder').slice(0, midfielders);
-    const forwardPlayers = starters.filter(p => p.position === 'forward').slice(0, forwards);
-    
-    // Position defenders
-    positionPlayers('defender', defenderPlayers, defenders);
-    
-    // Position midfielders  
-    positionPlayers('midfielder', midfielderPlayers, midfielders);
-    
-    // Position forwards
-    positionPlayers('forward', forwardPlayers, forwards);
+
+    // Parse formation
+    const [defenders, midfielders, forwards] = validatedFormation.split('-').map(Number);
+
+    // Reassign only among current on-field, non-injured players
+    // Collect all field players (not bench, not injured, not GK)
+    let fieldPlayers = starters.filter(p => p.position !== 'goalkeeper');
+    // Partition by role
+    let defendersList = fieldPlayers.filter(p => p.position === 'defender');
+    let midfieldersList = fieldPlayers.filter(p => p.position === 'midfielder');
+    let forwardsList = fieldPlayers.filter(p => p.position === 'forward');
+
+    // If any line needs more than available, move excess from other lines (preserve as much as possible)
+    // Build a flat list, then assign by formation order: defenders, midfielders, forwards
+    let allField = [...defendersList, ...midfieldersList, ...forwardsList];
+    let newDef = allField.splice(0, defenders);
+    let newMid = allField.splice(0, midfielders);
+    let newFwd = allField.splice(0, forwards);
+
+    // If any player changed line, show warning toast
+    const oldMap = {def: defendersList.map(p=>p.id), mid: midfieldersList.map(p=>p.id), fwd: forwardsList.map(p=>p.id)};
+    const newMap = {def: newDef.map(p=>p.id), mid: newMid.map(p=>p.id), fwd: newFwd.map(p=>p.id)};
+    if (JSON.stringify(oldMap) !== JSON.stringify(newMap)) {
+        showToast('You changed tactics but should review player positions', 'warning', 4000);
+    }
+
+    // Reset all field slots
+    resetLineSlots();
+    allocateLine('defense', 'defender', defenders, newDef);
+    allocateLine('midfield', 'midfielder', midfielders, newMid);
+    allocateLine('attack', 'forward', forwards, newFwd);
+
+    persistTeamState();
 }
 
 // Validate futsal formation
@@ -4973,50 +5034,78 @@ function clearFieldPositions() {
 
 // Position players based on formation and available players
 function positionPlayers(positionType, players, maxPlayers) {
-    // Early return if no players needed for this position
-    if (maxPlayers === 0 || players.length === 0) return;
-    
-    // Get available positions based on formation
-    const availablePositions = getAvailablePositions(positionType, maxPlayers);
-    
-    // Position players in available spots
-    players.slice(0, maxPlayers).forEach((player, index) => {
-        if (availablePositions[index]) {
-            const positionElement = document.getElementById(availablePositions[index]);
-            if (positionElement) {
-                positionElement.style.display = 'block';
-                updatePlayerIcon(availablePositions[index], player);
-            }
-        }
-    });
+    // Legacy function retained for compatibility. New slot system uses allocateLine().
 }
 
 // Get available positions based on formation needs
 function getAvailablePositions(positionType, count) {
-    const allPositions = {
-        'defender': ['position-2', 'position-3', 'position-8', 'position-9'],     // 4 defensive positions
-        'midfielder': ['position-4', 'position-6', 'position-10', 'position-11'], // 4 midfield positions  
-        'forward': ['position-5', 'position-7', 'position-12', 'position-13']     // 4 attacking positions
-    };
-    
-    const positions = allPositions[positionType] || [];
-    
-    // Return the number of positions needed
-    return positions.slice(0, count);
+    // Deprecated with slot system; kept to avoid runtime errors elsewhere.
+    return [];
 }
 
 // Get position IDs for each position type (keeping for compatibility)
 function getPositionsForType(positionType) {
     switch (positionType) {
         case 'defender':
-            return ['position-2', 'position-3'];
+            return [];
         case 'midfielder':
-            return ['position-4'];
+            return [];
         case 'forward':
-            return ['position-5'];
+            return [];
         default:
             return [];
     }
+}
+
+// --- Slot System Helpers ---
+function resetLineSlots() {
+    document.querySelectorAll('.formation-line[data-line] .line-slot').forEach(slot => {
+        slot.classList.remove('occupied', 'valid-target');
+        slot.innerHTML = '';
+    });
+}
+
+function allocateLine(lineKey, positionType, countNeeded, players) {
+    const line = document.querySelector(`.formation-line[data-line="${lineKey}"]`);
+    if (!line) return;
+    const slots = Array.from(line.querySelectorAll('.line-slot'));
+
+    const slotPattern = getSlotPattern(countNeeded);
+    const chosenSlots = slots.filter(slot => slotPattern.includes(parseInt(slot.dataset.slot)));
+
+    players.slice(0, countNeeded).forEach((player, idx) => {
+        const targetSlot = chosenSlots[idx];
+        if (targetSlot) {
+            const positionId = `${lineKey}-slot-${targetSlot.dataset.slot}`;
+            const playerWrapper = createPlayerPositionElement(positionId, player, positionType);
+            targetSlot.appendChild(playerWrapper);
+            targetSlot.classList.add('occupied');
+        }
+    });
+}
+
+function getSlotPattern(count) {
+    const patterns = {
+        0: [],
+        1: [3],
+        2: [2,4],
+        3: [1,3,5],
+        4: [1,2,4,5]
+    };
+    return patterns[count] || [];
+}
+
+function createPlayerPositionElement(positionId, player, positionType) {
+    const container = document.createElement('div');
+    container.className = 'player-position';
+    container.id = positionId;
+
+    container.innerHTML = `\n        <div class="player-icon ${player.position}">\n            <span class="player-number">${player.number}</span>\n        </div>\n        <div class="player-name">${player.name}</div>\n    `;
+
+    // Attach drag/drop
+    const icon = container.querySelector('.player-icon');
+    updatePlayerIcon(positionId, player); // Reuse existing to set flags + drag
+    return container;
 }
 
 // Update player icon and information
@@ -5331,46 +5420,67 @@ function removeBenchDropZone(benchArea) {
 // Show valid drop zones for a player position
 function showDropZones(playerPosition) {
     logger.log('Showing drop zones for position:', playerPosition);
-    const allPositions = document.querySelectorAll('.player-position');
-    logger.log('Found positions:', allPositions.length);
-    
-    allPositions.forEach(position => {
-        const positionId = position.id;
-        const isValidDrop = isValidDropPosition(playerPosition, positionId);
-        
-        logger.log(`Position ${positionId}: valid=${isValidDrop}`);
-        
-        position.classList.add('drop-zone');
-        
-        if (isValidDrop) {
-            position.classList.add('valid-drop');
-            setupDropZone(position);
+    // Determine line for this position
+    const positionLineMap = { defender: 'defense', midfielder: 'midfield', forward: 'attack' };
+    const line = positionLineMap[playerPosition];
+    if (!line) return;
+    const lineEl = document.querySelector(`.formation-line[data-line="${line}"]`);
+    if (!lineEl) return;
+    const slots = Array.from(lineEl.querySelectorAll('.line-slot'));
+    slots.forEach(slot => {
+        const slotIndex = parseInt(slot.dataset.slot);
+        const existingPlayerPos = slot.querySelector('.player-position');
+        // Mark all slots in the line as valid drop targets for this position type
+        if (existingPlayerPos) {
+            existingPlayerPos.classList.add('drop-zone','valid-drop');
+            setupDropZone(existingPlayerPos);
         } else {
-            position.classList.add('invalid-drop');
+            slot.classList.add('valid-target');
+            // Create a temporary target div to attach listeners
+            const tempTargetId = `${line}-slot-${slotIndex}`;
+            let temp = slot.querySelector('.player-position');
+            if (!temp) {
+                temp = document.createElement('div');
+                temp.className = 'player-position empty-slot';
+                temp.id = tempTargetId;
+                slot.appendChild(temp);
+            }
+            temp.classList.add('drop-zone','valid-drop');
+            setupDropZone(temp);
         }
     });
 }
 
 // Hide all drop zones
 function hideDropZones() {
-    const allPositions = document.querySelectorAll('.player-position');
-    
-    allPositions.forEach(position => {
-        position.classList.remove('drop-zone', 'valid-drop', 'invalid-drop');
-        removeDropZone(position);
+    document.querySelectorAll('.player-position').forEach(pos => {
+        pos.classList.remove('drop-zone','valid-drop','invalid-drop');
+        removeDropZone(pos);
+        if (pos.classList.contains('empty-slot')) {
+            // remove temporary placeholder
+            const parent = pos.parentElement;
+            pos.remove();
+            if (parent) parent.classList.remove('valid-target');
+        }
     });
 }
 
 // Check if a position is valid for a player type
 function isValidDropPosition(playerPosition, targetPositionId) {
-    const positionRules = {
-        'defender': ['position-2', 'position-3'],
-        'midfielder': ['position-4', 'position-6'],
-        'forward': ['position-5', 'position-7'],
-        'goalkeeper': ['goalkeeper'] // Goalkeepers can only go to goalkeeper position
+    if (targetPositionId === 'goalkeeper') {
+        return playerPosition === 'goalkeeper';
+    }
+    // Allow drop to any slot in the correct line for this position type
+    const slotMatch = targetPositionId.match(/(defense|midfield|attack)-slot-(\d+)/);
+    if (!slotMatch) return false;
+    const line = slotMatch[1];
+    const positionLineMap = {
+        'defender': 'defense',
+        'midfielder': 'midfield',
+        'forward': 'attack'
     };
-    
-    return positionRules[playerPosition]?.includes(targetPositionId) || false;
+    // If player is in the wrong line, allow moving to their correct line
+    return positionLineMap[playerPosition] === line;
 }
 
 // Move field player to bench
@@ -5509,46 +5619,49 @@ function removeDropZone(positionElement) {
 function swapPlayers(sourcePositionId, targetPositionId) {
     const selectedTeamId = document.getElementById('selected-team-lineup').value;
     if (!selectedTeamId) return;
-    
+
     const team = teamsData.find(t => t.id === selectedTeamId);
     if (!team) return;
-    
+
     const sourceElement = document.getElementById(sourcePositionId);
     const targetElement = document.getElementById(targetPositionId);
-    
     if (!sourceElement || !targetElement) return;
-    
-    // Get current players
+
     const sourcePlayerIcon = sourceElement.querySelector('.player-icon');
     const targetPlayerIcon = targetElement.querySelector('.player-icon');
-    
     if (!sourcePlayerIcon) return;
-    
+
     const sourcePlayerId = sourcePlayerIcon.dataset.playerId;
-    
-    // Find the players in the team data
     const sourcePlayer = team.players.find(p => p.id === sourcePlayerId);
-    
-    if (sourcePlayer) {
-        // If target position is empty, just move the player
-        if (!targetPlayerIcon || targetElement.style.display === 'none') {
-            // Clear source position
-            sourceElement.style.display = 'none';
-            
-            // Show and update target position
-            targetElement.style.display = 'block';
-            updatePlayerIcon(targetPositionId, sourcePlayer);
-        } else {
-            // If target has a player, swap them
-            const targetPlayerId = targetPlayerIcon.dataset.playerId;
-            const targetPlayer = team.players.find(p => p.id === targetPlayerId);
-            
-            if (targetPlayer) {
-                updatePlayerIcon(sourcePositionId, targetPlayer);
-                updatePlayerIcon(targetPositionId, sourcePlayer);
+    if (!sourcePlayer) return;
+
+    // If target is empty, move player
+    if (!targetPlayerIcon) {
+        targetElement.innerHTML = sourceElement.innerHTML;
+        sourceElement.innerHTML = '';
+    } else {
+        // Swap innerHTML
+        const temp = sourceElement.innerHTML;
+        sourceElement.innerHTML = targetElement.innerHTML;
+        targetElement.innerHTML = temp;
+    }
+
+    // Update isStarter flags: both source and target remain starters
+    // (No change needed unless you want to demote to bench on drag out)
+
+    // Reattach drag handlers for involved players
+    [sourceElement, targetElement].forEach(el => {
+        const icon = el.querySelector('.player-icon');
+        if (icon) {
+            const pid = icon.dataset.playerId;
+            const playerObj = team.players.find(p => p.id === pid);
+            if (playerObj) {
+                setupPlayerDragAndDrop(icon, el.id, playerObj);
             }
         }
-    }
+    });
+
+    persistTeamState();
 }
 
 // Get display name for position
@@ -5721,11 +5834,41 @@ function updateFormation() {
     
     logger.log(`Updating formation to ${selectedTactic} for team ${team.name}`);
     
-    // Update team formation temporarily (not saving to data)
-    team.formation = selectedTactic;
-    
-    // Re-render the field with new formation
+    const oldFormation = team.formation;
+    team.formation = selectedTactic; // temporary update
+
+    // Track pre-change player allocation summary
+    const beforeMap = getCurrentLinePlayerMap(team);
+
+    // Re-render field
     updateFieldPlayers(team);
+
+    // Compare after allocation
+    const afterMap = getCurrentLinePlayerMap(team);
+    if (formationPlayerMovementOccurred(beforeMap, afterMap)) {
+        showToast('You changed tactics but should review player positions', 'warning', 4000);
+    }
+
+    // Persist new formation
+    persistTeamState();
+}
+
+function getCurrentLinePlayerMap(team) {
+    const map = { defense: [], midfield: [], attack: [] };
+    ['defense','midfield','attack'].forEach(line => {
+        const lineEl = document.querySelector(`.formation-line[data-line="${line}"]`);
+        if (!lineEl) return;
+        lineEl.querySelectorAll('.player-position .player-icon').forEach(icon => {
+            const pid = icon.dataset.playerId;
+            if (pid) map[line].push(pid);
+        });
+    });
+    return map;
+}
+
+function formationPlayerMovementOccurred(beforeMap, afterMap) {
+    // Simple string comparison for each line
+    return ['defense','midfield','attack'].some(line => (beforeMap[line]||[]).join(',') !== (afterMap[line]||[]).join(','));
 }
 
 // Override the validateFutsalFormation to accept all tactics

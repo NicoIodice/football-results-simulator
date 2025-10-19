@@ -633,7 +633,7 @@ tr.first-place .goal-diff-negative {
     border-left: 4px solid #3498db;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px; /* tighter label-dropdown spacing */
 }
 
 .group-selector-container {
@@ -698,16 +698,22 @@ tr.first-place .goal-diff-negative {
 /* Simulator styling */
 .simulator-controls {
     background-color: #f8f9fa;
-    padding: 20px;
+    padding: 18px 20px; /* slightly reduced vertical padding for better centering */
     border-radius: 8px;
     margin-bottom: 30px;
     border-left: 4px solid #3498db;
+    display: flex;
+    align-items: center;
+}
+
+.simulator-controls .team-selector {
+    margin: 0; /* remove any external margin ensuring vertical balance */
 }
 
 .team-selector {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px; /* tighter spacing */
 }
 
 .team-selector label {
@@ -2976,7 +2982,7 @@ tr.first-place .goal-diff-negative {
     margin-bottom: 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px; /* tighter spacing */
 }
 
 .tactics-selector label {
@@ -3199,6 +3205,75 @@ tr.first-place .goal-diff-negative {
 
 .goalkeeper-position {
     text-align: center;
+/* Slot-based formation system */
+/* --- Field slot layout: absolute positioning for perfect alignment --- */
+.football-field { position: relative; }
+.formation-line[data-line] {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    min-height: 70px;
+    pointer-events: none;
+    z-index: 2;
+}
+.formation-line[data-line="defense"] {
+    top: 32%;
+}
+.formation-line[data-line="midfield"] {
+    top: 50%;
+}
+.formation-line[data-line="attack"] {
+    top: 72%;
+}
+.formation-line[data-line] .line-slot {
+    flex: 1 1 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 0;
+    min-height: 68px;
+    position: relative;
+    pointer-events: auto;
+}
+/* Visual hint when slot is active target during drag */
+.formation-line[data-line] .line-slot.valid-target::after {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 54px;
+    height: 54px;
+    border: 2px dashed #bbb;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    pointer-events: none;
+}
+.formation-line[data-line] .line-slot.occupied::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    pointer-events: none;
+}
+/* Dark mode adjustments */
+body.dark-mode .formation-line[data-line] .line-slot.valid-target::after {
+    border-color: #666;
+    background: rgba(255,255,255,0.07);
+}
+body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
+    background: rgba(255,255,255,0.12);
+}
 }
 
 /* Field Players Container */
