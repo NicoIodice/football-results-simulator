@@ -2606,6 +2606,23 @@ tr.first-place .goal-diff-negative {
         line-height: 1.5 !important;
     }
     
+    /* Make match-header and prediction-reasoning bars extend full card width on mobile */
+    #forecast-content .match-header {
+        width: 600px !important;
+        margin: -20px -20px 15px -20px !important;
+        padding: 10px 20px !important;
+        background: #3498db !important;
+        color: white !important;
+        border-radius: 10px 10px 0 0 !important;
+    }
+    
+    #forecast-content .prediction-reasoning {
+        width: 600px !important;
+        margin: 15px -20px -20px -20px !important;
+        padding: 12px 20px !important;
+        border-radius: 0 0 10px 10px !important;
+    }
+    
     /* Championship forecast mobile layout */
     .championship-forecast {
         padding: 12px !important;
@@ -4123,9 +4140,14 @@ tr.first-place .goal-diff-negative {
         flex-direction: column;
         gap: 15px;
     }
+
+    .vs-section {
+        gap: 8px;
+        margin-top: 1px; /* Move VS text up to center with team cards */
+    }
     
     .vs-text {
-        margin: 10px 0;
+        margin: 10px 150px;
     }
     
     .match-controls {
