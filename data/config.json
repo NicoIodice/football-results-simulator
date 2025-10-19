@@ -10,7 +10,8 @@
     "standings": {
       "enabled": true,
       "leagueStandings": true,
-      "knockoutStage": true
+      "knockoutStage": true,
+      "statistics": true
     }
   },
   "defaultGroup": "group-c",
@@ -23,12 +24,17 @@
     "venue": "Stadium Complex",
     "description": "Championship knockout stage featuring semi-finals, 3rd place playoff, and final"
   },
+  "admin": {
+    "role": "admin",
+    "validateTime": false
+  },
+  "simulation": {
+    "useOpenAI": false,
+    "pointsGapLimit": 3,
+    "maxScenarios": 10
+  },
   "ui": {
     "showLoadingMask": true,
     "enableDebugMode": false
-  },
-  "simulation": {
-    "pointsGapLimit": 3,
-    "maxScenarios": 10
   }
 }

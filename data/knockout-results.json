@@ -1,0 +1,46 @@
+{
+  "semi1": {
+    "id": "semi1",
+    "name": "Semi-Final 1",
+    "homeTeam": null,
+    "awayTeam": null,
+    "homeScore": null,
+    "awayScore": null,
+    "winner": null,
+    "loser": null,
+    "played": false
+  },
+  "semi2": {
+    "id": "semi2",
+    "name": "Semi-Final 2",
+    "homeTeam": null,
+    "awayTeam": null,
+    "homeScore": null,
+    "awayScore": null,
+    "winner": null,
+    "loser": null,
+    "played": false
+  },
+  "third": {
+    "id": "third",
+    "name": "3rd Place Match",
+    "homeTeam": null,
+    "awayTeam": null,
+    "homeScore": null,
+    "awayScore": null,
+    "winner": null,
+    "loser": null,
+    "played": false
+  },
+  "final": {
+    "id": "final",
+    "name": "Championship Final",
+    "homeTeam": null,
+    "awayTeam": null,
+    "homeScore": null,
+    "awayScore": null,
+    "winner": null,
+    "loser": null,
+    "played": false
+  }
+}

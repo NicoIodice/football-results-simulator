@@ -14,7 +14,7 @@
   {
     "id": "group-b",
     "name": "Group B",
-    "description": "Coimbra",
+    "description": "Coimbra/Viseu",
     "teams": [
       "critigals",
       "underdogs-fc",
@@ -39,7 +39,7 @@
   {
     "id": "group-d",
     "name": "Group D",
-    "description": "Southampton",
+    "description": "Southampton/Munich",
     "teams": [
       "southampton-fc"
     ]
