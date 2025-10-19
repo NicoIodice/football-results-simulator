@@ -3442,6 +3442,32 @@ tr.first-place .goal-diff-negative {
     margin: 0;
 }
 
+.knockout-disclaimer {
+    background: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.knockout-disclaimer.warning {
+    background: #fff3cd;
+    border-color: #ffeaa7;
+    color: #856404;
+}
+
+.knockout-disclaimer.success {
+    background: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+.knockout-disclaimer strong {
+    font-weight: 600;
+}
+
 .knockout-bracket {
     max-width: 1000px;
     margin: 0 auto;
@@ -3485,6 +3511,33 @@ tr.first-place .goal-diff-negative {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
     border-color: #3498db;
+}
+
+.match-header {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    margin: -20px -20px 15px -20px;
+    padding: 12px 20px;
+    border-radius: 12px 12px 0 0;
+    text-align: center;
+}
+
+.match-header .match-label {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 0;
+    margin: 0;
+}
+
+.final-match .match-header {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+}
+
+.final-match .match-header .match-label {
+    font-size: 1.2rem;
 }
 
 .final-match {
@@ -3582,21 +3635,35 @@ tr.first-place .goal-diff-negative {
     color: #2c3e50;
 }
 
-.score-display {
-    background: #f8f9fa;
-    padding: 8px 16px;
-    border-radius: 6px;
-    border: 2px solid #3498db;
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #2c3e50;
-    margin-top: 5px;
-}
-
 .match-controls {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
+    align-items: center;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-top: 15px;
+}
+
+.match-controls .score-display {
+    background: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: 2px solid #3498db;
+    font-weight: bold;
+    font-size: 1.3rem;
+    color: #2c3e50;
+    min-width: 80px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.2);
+    order: 1;
+}
+
+.match-controls .add-result-btn,
+.match-controls .edit-result-btn {
+    order: 2;
 }
 
 .edit-knockout-btn, .save-knockout-btn, .cancel-knockout-btn {
@@ -3606,6 +3673,51 @@ tr.first-place .goal-diff-negative {
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
+}
+
+.add-result-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    font-weight: bold;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.add-result-btn:hover {
+    background: #229954;
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.4);
+}
+
+.add-result-btn .plus-icon {
+    font-size: 1.4rem;
+    line-height: 1;
+}
+
+.edit-result-btn {
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.edit-result-btn:hover {
+    background: #2980b9;
+    transform: translateY(-1px);
 }
 
 .edit-knockout-btn {
@@ -3635,17 +3747,6 @@ tr.first-place .goal-diff-negative {
     background: #c0392b;
 }
 
-.match-label {
-    text-align: center;
-    font-weight: bold;
-    color: #2c3e50;
-    font-size: 1rem;
-    padding: 8px;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #dee2e6;
-}
-
 /* Special styling for finals */
 .final .team-box {
     background: linear-gradient(135deg, #e67e22, #d35400);
@@ -3657,11 +3758,176 @@ tr.first-place .goal-diff-negative {
     border-color: #c0392b;
 }
 
-.final .match-label {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
+/* Knockout Score Modal */
+.score-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+}
+
+.score-modal {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.score-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #eee;
+    background: linear-gradient(135deg, #3498db, #2980b9);
     color: white;
+    border-radius: 12px 12px 0 0;
+}
+
+.score-modal-header h3 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.modal-close {
+    background: none;
     border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.score-modal-body {
+    padding: 20px;
+}
+
+.teams-display {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.team-section {
+    flex: 1;
+    text-align: center;
+}
+
+.team-section .team-name {
+    font-weight: bold;
     font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.score-input {
+    width: 80px;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: border-color 0.3s ease;
+}
+
+.score-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+}
+
+.teams-display .vs-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.teams-display .vs-text {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #e74c3c;
+    background: #f8f9fa;
+    padding: 10px 15px;
+    border-radius: 50%;
+    border: 2px solid #e74c3c;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-actions .cancel-btn,
+.modal-actions .save-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.modal-actions .cancel-btn {
+    background: #95a5a6;
+    color: white;
+}
+
+.modal-actions .cancel-btn:hover {
+    background: #7f8c8d;
+}
+
+.modal-actions .save-btn {
+    background: #27ae60;
+    color: white;
+}
+
+.modal-actions .save-btn:hover {
+    background: #229954;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .teams-display {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .teams-display .vs-section {
+        order: 2;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .modal-actions .cancel-btn,
+    .modal-actions .save-btn {
+        width: 100%;
+    }
 }
 
 /* Responsive design for knockout stage */
@@ -3676,6 +3942,19 @@ tr.first-place .goal-diff-negative {
         max-width: 100%;
     }
     
+    .match-header {
+        margin: -20px -20px 10px -20px;
+        padding: 10px 15px;
+    }
+    
+    .match-header .match-label {
+        font-size: 1rem;
+    }
+    
+    .final-match .match-header .match-label {
+        font-size: 1.1rem;
+    }
+    
     .match-participants {
         flex-direction: column;
         gap: 15px;
@@ -3683,6 +3962,16 @@ tr.first-place .goal-diff-negative {
     
     .vs-text {
         margin: 10px 0;
+    }
+    
+    .match-controls {
+        margin-top: 10px;
+        padding: 12px;
+    }
+    
+    .match-controls .score-display {
+        font-size: 1.2rem;
+        padding: 10px 16px;
     }
     
     .sub-tabs {

@@ -6020,6 +6020,9 @@ function updateKnockoutStage() {
         knockoutHeader.textContent = defaults.knockout.title;
     }
     
+    // Update disclaimer
+    updateKnockoutDisclaimer();
+    
     // Get winners for each group
     const groupAWinner = getGroupWinner('group-a');
     const groupBWinner = getGroupWinner('group-b');
@@ -6080,15 +6083,39 @@ function updateKnockoutStage() {
     }
 }
 
+function updateKnockoutDisclaimer() {
+    const disclaimerElement = document.getElementById('knockout-disclaimer');
+    if (!disclaimerElement) return;
+    
+    // Check if all group stage matches are complete
+    const allGroupMatchesComplete = checkAllGroupMatchesComplete();
+    
+    if (allGroupMatchesComplete) {
+        disclaimerElement.className = 'knockout-disclaimer success';
+        disclaimerElement.innerHTML = '<strong>✅ Group Stage Complete!</strong><br>All group winners have been determined and knockout stage teams are finalized. Let the ball roll and the best team win!';
+    } else {
+        disclaimerElement.className = 'knockout-disclaimer warning';
+        disclaimerElement.innerHTML = '<strong>⚠️ Group Stage In Progress...</strong><br>Group winners are not yet finalized. Complete all group matches to determine knockout stage participants.';
+    }
+}
+
+function checkAllGroupMatchesComplete() {
+    // Check if all matches in the results data have been played
+    for (const round of Object.values(results)) {
+        for (const group of Object.values(round)) {
+            for (const match of group) {
+                if (!match.played) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
+}
+
 function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
     const matchResult = knockoutResults[matchId];
     const isAdmin = config?.admin?.role === 'admin';
-    
-    // Show edit button if teams are available and admin
-    const editBtn = document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`);
-    if (editBtn && homeTeam && awayTeam && isAdmin) {
-        editBtn.style.display = 'inline-block';
-    }
     
     // Update match teams if they're not set in the result
     if (homeTeam && awayTeam && (!matchResult.homeTeam || !matchResult.awayTeam)) {
@@ -6096,17 +6123,38 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
         matchResult.awayTeam = awayTeam.id;
     }
     
-    // Show score if match has been played
+    // Update button visibility and score display
+    const addBtn = document.getElementById(`${matchId}-add-btn`);
+    const editBtn = document.getElementById(`${matchId}-edit-btn`);
     const scoreDisplay = document.getElementById(`${matchId}-score`);
-    const vsText = scoreDisplay?.parentElement.querySelector('.vs-text');
     
-    if (matchResult.played && scoreDisplay && vsText) {
-        scoreDisplay.textContent = `${matchResult.homeScore} - ${matchResult.awayScore}`;
-        scoreDisplay.style.display = 'block';
-        vsText.style.display = 'none';
-    } else if (scoreDisplay && vsText) {
-        scoreDisplay.style.display = 'none';
-        vsText.style.display = 'flex';
+    if (matchResult.played) {
+        // Match has been played - show score and conditional edit button
+        if (scoreDisplay) {
+            scoreDisplay.textContent = `${matchResult.homeScore} - ${matchResult.awayScore}`;
+        }
+        
+        if (addBtn) addBtn.style.display = 'none';
+        
+        // Show edit button only if admin and within edit window
+        if (editBtn && isAdmin && isWithinEditWindow(matchResult.playedDate)) {
+            editBtn.style.display = 'inline-block';
+        } else if (editBtn) {
+            editBtn.style.display = 'none';
+        }
+    } else {
+        // Match not played - show add button if teams available and admin
+        if (scoreDisplay) {
+            scoreDisplay.textContent = ' - ';
+        }
+        
+        if (editBtn) editBtn.style.display = 'none';
+        
+        if (addBtn && homeTeam && awayTeam && isAdmin) {
+            addBtn.style.display = 'inline-block';
+        } else if (addBtn) {
+            addBtn.style.display = 'none';
+        }
     }
 }
 
@@ -6148,33 +6196,97 @@ function updateSemiFinalResultDisplays() {
     }
 }
 
-// Knockout match editing functions
-function editKnockoutMatch(matchId) {
+// New knockout match result functions
+function addKnockoutResult(matchId) {
     const matchResult = knockoutResults[matchId];
-    if (!matchResult.homeTeam || !matchResult.awayTeam) return;
+    if (!matchResult.homeTeam || !matchResult.awayTeam) {
+        showToast('Teams not available for this match yet', 'error');
+        return;
+    }
     
-    // Show score inputs
-    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
-    const scoreDisplay = document.getElementById(`${matchId}-score`);
-    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
+    const homeTeam = teams.find(t => t.id === matchResult.homeTeam);
+    const awayTeam = teams.find(t => t.id === matchResult.awayTeam);
     
-    scoreInputs.style.display = 'flex';
-    scoreDisplay.style.display = 'none';
-    vsText.style.display = 'none';
-    
-    // Pre-populate with existing scores if available
-    document.getElementById(`${matchId}-home-score`).value = matchResult.homeScore || '';
-    document.getElementById(`${matchId}-away-score`).value = matchResult.awayScore || '';
-    
-    // Show/hide buttons
-    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'none';
-    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
-    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'inline-block';
+    // Create modal for score input
+    showKnockoutScoreModal(matchId, homeTeam, awayTeam, false);
 }
 
-function saveKnockoutMatch(matchId) {
-    const homeScore = parseInt(document.getElementById(`${matchId}-home-score`).value);
-    const awayScore = parseInt(document.getElementById(`${matchId}-away-score`).value);
+function editKnockoutResult(matchId) {
+    const matchResult = knockoutResults[matchId];
+    if (!matchResult.played) return;
+    
+    const homeTeam = teams.find(t => t.id === matchResult.homeTeam);
+    const awayTeam = teams.find(t => t.id === matchResult.awayTeam);
+    
+    // Create modal for score editing
+    showKnockoutScoreModal(matchId, homeTeam, awayTeam, true);
+}
+
+function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
+    const matchResult = knockoutResults[matchId];
+    const action = isEdit ? 'Edit' : 'Add';
+    
+    const modalHTML = `
+        <div class="score-modal-overlay" id="knockout-score-modal">
+            <div class="score-modal">
+                <div class="score-modal-header">
+                    <h3>${action} ${matchResult.name} Result</h3>
+                    <button class="modal-close" onclick="closeKnockoutScoreModal()">×</button>
+                </div>
+                <div class="score-modal-body">
+                    <div class="teams-display">
+                        <div class="team-section">
+                            <div class="team-name">${homeTeam.name}</div>
+                            <input type="number" id="knockout-home-score" min="0" max="99" 
+                                   placeholder="0" value="${isEdit ? matchResult.homeScore : ''}" 
+                                   class="score-input">
+                        </div>
+                        <div class="vs-section">
+                            <span class="vs-text">VS</span>
+                        </div>
+                        <div class="team-section">
+                            <div class="team-name">${awayTeam.name}</div>
+                            <input type="number" id="knockout-away-score" min="0" max="99" 
+                                   placeholder="0" value="${isEdit ? matchResult.awayScore : ''}" 
+                                   class="score-input">
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="cancel-btn" onclick="closeKnockoutScoreModal()">Cancel</button>
+                        <button class="save-btn" onclick="saveKnockoutScoreModal('${matchId}', ${isEdit})">
+                            ${action} Result
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if present
+    const existingModal = document.getElementById('knockout-score-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to DOM
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // Focus on first input
+    setTimeout(() => {
+        document.getElementById('knockout-home-score').focus();
+    }, 100);
+}
+
+function closeKnockoutScoreModal() {
+    const modal = document.getElementById('knockout-score-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function saveKnockoutScoreModal(matchId, isEdit) {
+    const homeScore = parseInt(document.getElementById('knockout-home-score').value);
+    const awayScore = parseInt(document.getElementById('knockout-away-score').value);
     
     if (isNaN(homeScore) || isNaN(awayScore) || homeScore < 0 || awayScore < 0) {
         showToast('Please enter valid scores (0 or higher)', 'error');
@@ -6185,6 +6297,7 @@ function saveKnockoutMatch(matchId) {
     matchResult.homeScore = homeScore;
     matchResult.awayScore = awayScore;
     matchResult.played = true;
+    matchResult.playedDate = new Date().toISOString();
     
     // Determine winner and loser
     if (homeScore > awayScore) {
@@ -6200,24 +6313,13 @@ function saveKnockoutMatch(matchId) {
         showToast('Tie game - home team advances on penalties', 'info');
     }
     
-    // Hide inputs, show score
-    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
-    const scoreDisplay = document.getElementById(`${matchId}-score`);
-    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
-    
-    scoreInputs.style.display = 'none';
-    scoreDisplay.style.display = 'block';
-    scoreDisplay.textContent = `${homeScore} - ${awayScore}`;
-    
-    // Show/hide buttons
-    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
-    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'none';
-    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'none';
+    // Close modal
+    closeKnockoutScoreModal();
     
     // Download updated knockout results
     downloadKnockoutResults();
     
-    // Update dependent matches
+    // Update knockout stage display
     updateKnockoutStage();
     
     // Show success message
@@ -6232,28 +6334,17 @@ function saveKnockoutMatch(matchId) {
     }
 }
 
-function cancelKnockoutEdit(matchId) {
-    // Hide inputs
-    const scoreInputs = document.querySelector(`#${matchId}-home-score`).closest('.score-inputs');
-    const scoreDisplay = document.getElementById(`${matchId}-score`);
-    const vsText = scoreInputs.parentElement.querySelector('.vs-text');
+function isWithinEditWindow(playedDate) {
+    if (!playedDate) return true; // If no date recorded, allow editing
     
-    scoreInputs.style.display = 'none';
+    const played = new Date(playedDate);
+    const now = new Date();
     
-    // Show appropriate display
-    const matchResult = knockoutResults[matchId];
-    if (matchResult.played) {
-        scoreDisplay.style.display = 'block';
-        vsText.style.display = 'none';
-    } else {
-        scoreDisplay.style.display = 'none';
-        vsText.style.display = 'flex';
-    }
+    // Allow editing until midnight of the same day
+    const playedMidnight = new Date(played);
+    playedMidnight.setHours(23, 59, 59, 999);
     
-    // Show/hide buttons
-    document.querySelector(`button[onclick="editKnockoutMatch('${matchId}')"]`).style.display = 'inline-block';
-    document.querySelector(`button[onclick="saveKnockoutMatch('${matchId}')"]`).style.display = 'none';
-    document.querySelector(`button[onclick="cancelKnockoutEdit('${matchId}')"]`).style.display = 'none';
+    return now <= playedMidnight;
 }
 
 function downloadKnockoutResults() {
