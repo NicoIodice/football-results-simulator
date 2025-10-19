@@ -3811,7 +3811,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         </div>
                     </div>
                     
-                    <div class="match-teams">
+                    <div class="match-teams match-teams-predictions">
                         <div class="team-prediction home-team">
                             <h4>${pred.homeTeam.name} ${renderTeamBadge(pred.homeTeam.id)}</h4>
                             <div class="team-form">Form: ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text}</div>

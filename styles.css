@@ -1475,6 +1475,11 @@ tr.first-place .goal-diff-negative {
     display: flex;
     align-items: center;
     gap: 10px;
+    background-color: transparent;
+    padding: 0;
+    border-left: none;
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .forecast-controls label {
@@ -1662,8 +1667,7 @@ tr.first-place .goal-diff-negative {
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    max-width: 800px;
-    margin: 0 auto 20px auto;
+    margin: 0 0 20px 0;
 }
 
 .match-teams {
@@ -1672,9 +1676,14 @@ tr.first-place .goal-diff-negative {
     flex-wrap: nowrap;
     align-items: center;
     justify-content: left;
-    gap: 7px; /* slightly tighter than 20px */
+    gap: 7px;
     margin-bottom: 1px;
     white-space: nowrap;
+}
+
+.match-teams-predictions {
+    justify-content: center;
+    gap: 150px;
 }
 
 .team-prediction {
@@ -3673,6 +3682,11 @@ tr.first-place .goal-diff-negative {
     display: flex;
     align-items: center;
     gap: 10px;
+    background-color: transparent;
+    padding: 0;
+    border-left: none;
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .fixtures-controls .group-selector label {
@@ -4434,6 +4448,11 @@ tr.first-place .goal-diff-negative {
     display: flex;
     align-items: center;
     gap: 10px;
+    background-color: transparent;
+    padding: 0;
+    border-left: none;
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .statistics-controls .group-selector label,
