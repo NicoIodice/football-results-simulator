@@ -13,6 +13,9 @@
         <header>
             <h1>Critical Cup 2025</h1>
             <p>Solidarity Football Tournament</p>
+            <button id="dark-mode-toggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
+                <span class="dark-mode-icon">🌙</span>
+            </button>
         </header>
 
         <nav class="tabs">
@@ -90,6 +93,7 @@
                                 <div class="knockout-match">
                                     <div class="match-header">
                                         <div class="match-label">Semi-Final 1</div>
+                                        <div class="match-venue" id="semi1-venue"></div>
                                     </div>
                                     <div class="match-participants">
                                         <div class="participant">
@@ -122,6 +126,7 @@
                                 <div class="knockout-match">
                                     <div class="match-header">
                                         <div class="match-label">Semi-Final 2</div>
+                                        <div class="match-venue" id="semi2-venue"></div>
                                     </div>
                                     <div class="match-participants">
                                         <div class="participant">
@@ -160,6 +165,7 @@
                                 <div class="knockout-match final-match">
                                     <div class="match-header">
                                         <div class="match-label">Championship Final</div>
+                                        <div class="match-venue" id="final-venue"></div>
                                     </div>
                                     <div class="match-participants">
                                         <div class="participant">
@@ -198,6 +204,7 @@
                                 <div class="knockout-match">
                                     <div class="match-header">
                                         <div class="match-label">3rd Place Match</div>
+                                        <div class="match-venue" id="third-venue"></div>
                                     </div>
                                     <div class="match-participants">
                                         <div class="participant">

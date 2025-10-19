@@ -313,12 +313,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 // Load JSON data
 async function loadData() {
     try {
-        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, resultsResponse, goalsResponse, knockoutResponse] = await Promise.all([
+        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, goalsResponse, knockoutResponse] = await Promise.all([
             fetch('data/config.json'),
             fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
-            fetch('data/results.json'),
+            fetch('data/group-phase-results.json'),
             fetch('data/goals.json'),
             fetch('data/knockout-results.json')
         ]);
@@ -328,7 +328,7 @@ async function loadData() {
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
-        results = await resultsResponse.json();
+        results = await groupPhaseResultsResponse.json();
         goals = await goalsResponse.json();
         knockoutResults = await knockoutResponse.json();
         
@@ -349,6 +349,9 @@ async function loadData() {
         
         // Load team player data for Teams tab
         await loadPlayersData();
+        
+        // Initialize dark mode after config is loaded
+        initializeDarkMode();
     } catch (error) {
         logger.error('Error loading data:', error);
     }
@@ -1514,6 +1517,13 @@ function createMatchElement(match, showGroupIndicator) {
     const editResultButton = (result && isToday && config?.admin?.role === 'admin') ? 
         `<button class="edit-result-btn" onclick="showEditResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}', ${result.homeScore}, ${result.awayScore})">Edit</button>` : '';
     
+    // Get venue information from config
+    const venueInfo = config?.groupPhase?.venues?.[match.groupId];
+    const venueLink = venueInfo ? 
+        `<a href="${venueInfo.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-link" title="${venueInfo.name}">
+            <span class="venue-icon">📍</span>
+        </a>` : '';
+    
     matchDiv.innerHTML = `
         <div class="match-teams">
             ${homeTeam.name}${renderTeamBadge(homeTeam.id)} <span class="match-vs">vs</span> ${awayTeam.name}${renderTeamBadge(awayTeam.id)}
@@ -1523,7 +1533,7 @@ function createMatchElement(match, showGroupIndicator) {
         <div class="match-datetime-container">
             ${addResultButton}
             ${editResultButton}
-            <div class="match-datetime">${formattedDate} - ${match.time}</div>
+            <div class="match-datetime">${venueLink}${formattedDate} - ${match.time}</div>
         </div>
         <div class="match-score ${scoreClass}">${scoreDisplay}</div>
     `;
@@ -4401,7 +4411,7 @@ function submitResult(event) {
             results[existingResultIndex].awayScore = awayScore;
         }
         
-        // Trigger download of updated results.json
+        // Trigger download of updated group-phase-results.json
         downloadUpdatedResults();
         
         // Hide modal and reset title
@@ -4413,7 +4423,7 @@ function submitResult(event) {
         if (isMobileDevice()) {
             showToast('Result updated! Data stored in session (will be lost on refresh)', 'success');
         } else {
-            showToast('Result updated! Check Downloads → Replace data/results.json → Refresh page', 'success');
+            showToast('Result updated! Check Downloads → Replace data/group-phase-results.json → Refresh page', 'success');
         }
     } else {
         // Create new result
@@ -4431,7 +4441,7 @@ function submitResult(event) {
         // Add to results array (only in memory for current session)
         results.push(newResult);
         
-        // Trigger download of updated results.json
+        // Trigger download of updated group-phase-results.json
         downloadUpdatedResults();
         
         // Hide modal
@@ -4441,7 +4451,7 @@ function submitResult(event) {
         if (isMobileDevice()) {
             showToast('Result added! Data stored in session (will be lost on refresh)', 'success');
         } else {
-            showToast('Result added! Check Downloads → Replace data/results.json → Refresh page', 'success');
+            showToast('Result added! Check Downloads → Replace data/group-phase-results.json → Refresh page', 'success');
         }
     }
     
@@ -4522,7 +4532,7 @@ function isMobileDevice() {
            window.innerWidth <= 768;
 }
 
-// Function to download updated results.json
+// Function to download updated group-phase-results.json
 function downloadUpdatedResults() {
     // Check if it's a mobile device
     if (isMobileDevice()) {
@@ -4538,7 +4548,7 @@ function downloadUpdatedResults() {
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
-    link.download = 'results.json';
+    link.download = 'group-phase-results.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -4546,7 +4556,7 @@ function downloadUpdatedResults() {
 
 // Function to export all current results for manual copying
 function exportAllResults() {
-    logger.log('All Current Results (copy this to results.json):');
+    logger.log('All Current Results (copy this to group-phase-results.json):');
     logger.log(JSON.stringify(results, null, 2));
     
     if (!isMobileDevice()) {
@@ -6233,6 +6243,9 @@ function updateKnockoutStage() {
         knockoutHeader.textContent = defaults.knockout.title;
     }
     
+    // Update knockout venue information
+    updateKnockoutVenues();
+    
     // Update disclaimer
     updateKnockoutDisclaimer();
     
@@ -6830,6 +6843,63 @@ function parsePredictedScore(scoreStr) {
     const home = parseInt(match[1], 10);
     const away = parseInt(match[2], 10);
     return { home, away };
+}
+
+// Dark Mode Toggle
+function toggleDarkMode() {
+    const body = document.body;
+    const icon = document.querySelector('.dark-mode-icon');
+    
+    body.classList.toggle('dark-mode');
+    
+    // Update icon
+    if (body.classList.contains('dark-mode')) {
+        icon.textContent = '☀️';
+        localStorage.setItem('darkMode', 'enabled');
+    } else {
+        icon.textContent = '🌙';
+        localStorage.setItem('darkMode', 'disabled');
+    }
+}
+
+// Initialize dark mode from localStorage and config
+function initializeDarkMode() {
+    const darkModeToggle = document.getElementById('dark-mode-toggle');
+    
+    // Check if dark mode is enabled in config
+    if (!config?.ui?.enableDarkMode) {
+        if (darkModeToggle) {
+            darkModeToggle.style.display = 'none';
+        }
+        return;
+    }
+    
+    // Check localStorage for user preference
+    const darkModePreference = localStorage.getItem('darkMode');
+    const icon = document.querySelector('.dark-mode-icon');
+    
+    if (darkModePreference === 'enabled') {
+        document.body.classList.add('dark-mode');
+        if (icon) icon.textContent = '☀️';
+    }
+}
+
+// Update knockout stage venue information
+function updateKnockoutVenues() {
+    if (!config?.knockout?.venue) return;
+    
+    const venueInfo = config.knockout.venue;
+    const venueHTML = `<a href="${venueInfo.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-link" title="${venueInfo.name}"><span class="venue-icon">📍</span>${venueInfo.name}</a>`;
+    
+    // Update all knockout match venues (they all share the same venue)
+    const venueElements = ['semi1-venue', 'semi2-venue', 'final-venue', 'third-venue'];
+    
+    venueElements.forEach(elementId => {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.innerHTML = venueHTML;
+        }
+    });
 }
 
 // Determine team company (CSW / CTW) from teams list using league field

@@ -6,6 +6,12 @@
     "awayTeam": null,
     "homeScore": null,
     "awayScore": null,
+    "compensationTime": null,
+    "penaltyTies": {
+        "occurred": false,
+        "homeScore": null,
+        "awayScore": null
+    },
     "winner": null,
     "loser": null,
     "played": false
@@ -17,6 +23,12 @@
     "awayTeam": null,
     "homeScore": null,
     "awayScore": null,
+    "compensationTime": null,
+    "penaltyTies": {
+        "occurred": false,
+        "homeScore": null,
+        "awayScore": null
+    },
     "winner": null,
     "loser": null,
     "played": false
@@ -28,6 +40,12 @@
     "awayTeam": null,
     "homeScore": null,
     "awayScore": null,
+    "compensationTime": null,
+    "penaltyTies": {
+        "occurred": false,
+        "homeScore": null,
+        "awayScore": null
+    },
     "winner": null,
     "loser": null,
     "played": false
@@ -39,6 +57,12 @@
     "awayTeam": null,
     "homeScore": null,
     "awayScore": null,
+    "compensationTime": null,
+    "penaltyTies": {
+        "occurred": false,
+        "homeScore": null,
+        "awayScore": null
+    },
     "winner": null,
     "loser": null,
     "played": false
