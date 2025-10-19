@@ -987,34 +987,84 @@ function calculateStandingsExcludingGameweek(excludeGameweek) {
 // Check if group stage qualifications are finished
 function checkQualificationStatus(groupId = null) {
     const currentDate = new Date();
-    let allGroupMatchesCompleted = true;
-    let lastFixtureDate = null;
     
-    // If groupId is specified, check only that group's matches
-    // If groupId is null, check all matches (global check)
-    const matchesToCheck = groupId 
-        ? results.filter(match => match.groupId === groupId)
-        : results;
-    
-    // Check matches for completion
-    for (const match of matchesToCheck) {
-        if (!match.played) {
-            allGroupMatchesCompleted = false;
+    if (!groupId) {
+        // Global check - check all groups
+        let allCompleted = true;
+        let globalLastDate = null;
+        
+        // Get all unique group IDs from fixtures
+        const allGroups = [...new Set(fixtures.map(f => f.groupId))];
+        
+        for (const gId of allGroups) {
+            const groupStatus = checkQualificationStatus(gId);
+            if (!groupStatus.allCompleted) {
+                allCompleted = false;
+            }
+            if (groupStatus.lastFixtureDate && (!globalLastDate || groupStatus.lastFixtureDate > globalLastDate)) {
+                globalLastDate = groupStatus.lastFixtureDate;
+            }
         }
         
-        // Track the latest fixture date
-        if (match.date) {
-            const matchDate = new Date(match.date);
-            if (!lastFixtureDate || matchDate > lastFixtureDate) {
-                lastFixtureDate = matchDate;
+        return {
+            allCompleted: allCompleted,
+            lastFixtureDate: globalLastDate,
+            qualificationsFinished: allCompleted && globalLastDate && currentDate > globalLastDate
+        };
+    }
+    
+    // Group-specific check
+    // Get all fixtures for this group
+    const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === groupId);
+    
+    if (groupFixtures.length === 0) {
+        // No fixtures found for this group - consider it as having no scheduled matches
+        return {
+            allCompleted: false,
+            lastFixtureDate: null,
+            qualificationsFinished: false,
+            hasFixtures: false
+        };
+    }
+    
+    // Get all matches for this group from fixtures
+    let allMatches = [];
+    let lastFixtureDate = null;
+    
+    groupFixtures.forEach(gameweek => {
+        gameweek.matches.forEach(match => {
+            allMatches.push(match);
+            
+            // Parse the fixture date and time
+            if (match.date && match.time) {
+                const matchDateTime = new Date(`${match.date}T${match.time}:00`);
+                if (!lastFixtureDate || matchDateTime > lastFixtureDate) {
+                    lastFixtureDate = matchDateTime;
+                }
             }
+        });
+    });
+    
+    // Check if all matches have been played (check results data)
+    const groupResults = results.filter(result => result.groupId === groupId);
+    let allGroupMatchesCompleted = true;
+    
+    // For each fixture match, check if there's a corresponding result
+    for (const fixtureMatch of allMatches) {
+        const hasResult = groupResults.some(result => 
+            result.matchId === fixtureMatch.id && result.played === true
+        );
+        if (!hasResult) {
+            allGroupMatchesCompleted = false;
+            break;
         }
     }
     
     return {
         allCompleted: allGroupMatchesCompleted,
         lastFixtureDate: lastFixtureDate,
-        qualificationsFinished: allGroupMatchesCompleted && lastFixtureDate && currentDate > lastFixtureDate
+        qualificationsFinished: allGroupMatchesCompleted && lastFixtureDate && currentDate > lastFixtureDate,
+        hasFixtures: true
     };
 }
 
@@ -1034,6 +1084,13 @@ function updateQualificationDisclaimer() {
     // Check qualification status for the current group only
     const status = checkQualificationStatus(currentGroupId);
     
+    // If no fixtures exist for this group, show no disclaimer
+    if (!status.hasFixtures) {
+        disclaimerElement.style.display = 'none';
+        logger.log('DEBUG: No disclaimer shown - No fixtures found for group', currentGroupId);
+        return;
+    }
+    
     if (status.qualificationsFinished) {
         disclaimerElement.className = 'qualification-disclaimer completed';
         disclaimerElement.innerHTML = `
@@ -1049,17 +1106,25 @@ function updateQualificationDisclaimer() {
         disclaimerElement.innerHTML = `
             <span class="status-icon">✅</span>
             <span class="status-text">Group ${currentGroupId.replace('group-', '').toUpperCase()} Matches Completed!</span>
-            <span class="next-phase">Knockout phase preparations underway...</span>
+            <span class="next-phase">Waiting for final fixture time to pass...</span>
         `;
         disclaimerElement.style.display = 'block';
         
-        logger.log('DEBUG: Qualification disclaimer shown - Group matches completed', currentGroupId);
+        logger.log('DEBUG: Qualification disclaimer shown - Group matches completed, waiting for time', currentGroupId);
     } else {
-        disclaimerElement.className = 'qualification-disclaimer in-progress';
-        disclaimerElement.innerHTML = `<strong>⚠️ Group ${currentGroupId.replace('group-', '').toUpperCase()} In Progress...</strong><br>Group winner is not yet finalized. Complete all group matches to determine knockout stage participants.`;
-        disclaimerElement.style.display = 'block';
-        
-        logger.log('DEBUG: Qualification disclaimer shown - Group in progress', currentGroupId);
+        // Check if current time is before the last fixture date
+        const currentDate = new Date();
+        if (status.lastFixtureDate && currentDate < status.lastFixtureDate) {
+            disclaimerElement.className = 'qualification-disclaimer in-progress';
+            disclaimerElement.innerHTML = `<strong>⚠️ Group ${currentGroupId.replace('group-', '').toUpperCase()} In Progress...</strong><br>Group winner is not yet finalized. Complete all group matches to determine knockout stage participants.`;
+            disclaimerElement.style.display = 'block';
+            
+            logger.log('DEBUG: Qualification disclaimer shown - Group in progress', currentGroupId);
+        } else {
+            // Current time is past last fixture but not all matches are completed
+            disclaimerElement.style.display = 'none';
+            logger.log('DEBUG: No disclaimer shown - Past fixture time but matches incomplete', currentGroupId);
+        }
     }
 }
 

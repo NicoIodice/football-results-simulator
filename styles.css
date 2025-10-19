@@ -3726,7 +3726,9 @@ tr.first-place .goal-diff-negative {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 8px;
+    margin-top: -30px; /* Move VS text up to center with team cards */
 }
 
 .score-inputs {
