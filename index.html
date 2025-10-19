@@ -41,7 +41,7 @@
                 <!-- League Standings Sub-tab -->
                 <div id="league-standings" class="sub-tab-content active">
                     <div class="group-selector">
-                        <label for="selected-group">Select Group:</label>
+                        <label for="selected-group">Group:</label>
                         <div class="group-selector-container">
                             <select id="selected-group" onchange="updateStandingsForGroup()">
                                 <!-- Groups will be populated by JavaScript -->
@@ -243,17 +243,17 @@
                     <!-- Statistics Controls -->
                     <div class="statistics-controls">
                         <div class="control-row">
-                            <div class="checkbox-control">
-                                <label for="show-all-statistics">
-                                    <input type="checkbox" id="show-all-statistics" onchange="toggleAllStatistics()">
-                                    Show All Groups
-                                </label>
-                            </div>
                             <div class="group-selector">
                                 <label for="statistics-group-select">Group:</label>
                                 <select id="statistics-group-select" onchange="updateStatisticsForGroup()">
                                     <!-- Groups will be populated by JavaScript -->
                                 </select>
+                            </div>
+                            <div class="checkbox-control">
+                                <label for="show-all-statistics">
+                                    <input type="checkbox" id="show-all-statistics" onchange="toggleAllStatistics()">
+                                    Show All Groups
+                                </label>
                             </div>
                         </div>
                     </div>
@@ -285,12 +285,6 @@
                         </div>
                         <div class="topscorers-controls">
                             <div class="control-row">
-                                <div class="checkbox-control">
-                                    <label for="show-all-topscorers">
-                                        <input type="checkbox" id="show-all-topscorers" onchange="toggleAllTopScorers()">
-                                        Show All Groups
-                                    </label>
-                                </div>
                                 <div class="filter-selector">
                                     <label for="topscorers-filter">Filter by:</label>
                                     <select id="topscorers-filter" onchange="updateTopScorersFilter()">
@@ -298,17 +292,23 @@
                                         <option value="team">Team</option>
                                     </select>
                                 </div>
-                                <div class="group-selector" id="topscorers-group-selector">
+                                <div class="group-selector-inline" id="topscorers-group-selector">
                                     <label for="topscorers-group-select">Group:</label>
                                     <select id="topscorers-group-select" onchange="updateTopScorers()">
                                         <!-- Groups will be populated by JavaScript -->
                                     </select>
                                 </div>
-                                <div class="team-selector" id="topscorers-team-selector" style="display: none;">
+                                <div class="team-selector-inline" id="topscorers-team-selector" style="display: none;">
                                     <label for="topscorers-team-select">Team:</label>
                                     <select id="topscorers-team-select" onchange="updateTopScorers()">
                                         <!-- Teams will be populated by JavaScript -->
                                     </select>
+                                </div>
+                                <div class="checkbox-control">
+                                    <label for="show-all-topscorers">
+                                        <input type="checkbox" id="show-all-topscorers" onchange="toggleAllTopScorers()">
+                                        Show All Groups
+                                    </label>
                                 </div>
                             </div>
                         </div>
@@ -323,7 +323,7 @@
             <div id="teams" class="tab-content">
                 <h2>Team Lineup & Squad</h2>
                 <div class="team-selector">
-                    <label for="selected-team-lineup">Select Team:</label>
+                    <label for="selected-team-lineup">Team:</label>
                     <select id="selected-team-lineup" onchange="updateTeamLineup()">
                         <!-- Teams will be populated by JavaScript -->
                     </select>
@@ -471,17 +471,17 @@
                 <!-- Fixtures Controls -->
                 <div class="fixtures-controls">
                     <div class="control-row">
-                        <div class="checkbox-control">
-                            <label for="show-all-fixtures">
-                                <input type="checkbox" id="show-all-fixtures" onchange="toggleAllFixtures()">
-                                Show All Fixtures
-                            </label>
-                        </div>
                         <div class="group-selector">
                             <label for="fixtures-group-select">Group:</label>
                             <select id="fixtures-group-select" onchange="updateFixturesForGroup()">
                                 <!-- Groups will be populated by JavaScript -->
                             </select>
+                        </div>
+                        <div class="checkbox-control">
+                            <label for="show-all-fixtures">
+                                <input type="checkbox" id="show-all-fixtures" onchange="toggleAllFixtures()">
+                                Show All Fixtures
+                            </label>
                         </div>
                     </div>
                 </div>
@@ -496,7 +496,7 @@
                 <h2>Championship Simulator</h2>
                 <div class="simulator-controls">
                     <div class="team-selector">
-                        <label for="selected-team">Select Team to Analyze:</label>
+                        <label for="selected-team">Team to Analyze:</label>
                         <select id="selected-team" onchange="updateSimulation()">
                             <!-- Teams will be populated by JavaScript -->
                         </select>
@@ -518,12 +518,10 @@
                 <!-- Forecast Controls -->
                 <div class="forecast-controls">
                     <div class="control-row">
-                        <div class="group-selector">
-                            <label for="forecast-group-select">Group:</label>
-                            <select id="forecast-group-select" onchange="updateForecastForGroup()">
-                                <!-- Groups will be populated by JavaScript -->
-                            </select>
-                        </div>
+                        <label for="forecast-group-select">Group:</label>
+                        <select id="forecast-group-select" onchange="updateForecastForGroup()">
+                            <!-- Groups will be populated by JavaScript -->
+                        </select>
                     </div>
                 </div>
                 

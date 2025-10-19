@@ -706,7 +706,7 @@ tr.first-place .goal-diff-negative {
 .team-selector {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 5px;
 }
 
 .team-selector label {
@@ -1456,16 +1456,18 @@ tr.first-place .goal-diff-negative {
 /* Forecast Controls */
 .forecast-controls {
     margin: 20px 0;
-    padding: 15px;
+    padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
+    border-left: 4px solid #3498db;
     border: 1px solid #e0e0e0;
+    border-left: 4px solid #3498db;
 }
 
 .forecast-controls .control-row {
     display: flex;
     align-items: center;
-    gap: 30px;
+    gap: 15px;
     flex-wrap: wrap;
 }
 
@@ -1482,26 +1484,25 @@ tr.first-place .goal-diff-negative {
 }
 
 .forecast-controls select {
-    padding: 8px 12px;
-    border: 2px solid #9b59b6;
+    padding: 10px 15px;
+    border: 2px solid #e9ecef;
     border-radius: 6px;
     background-color: white;
-    font-size: 14px;
-    font-weight: 500;
-    color: #2c3e50;
+    font-size: 1rem;
+    color: #495057;
     min-width: 150px;
     cursor: pointer;
     transition: border-color 0.3s ease;
 }
 
 .forecast-controls select:hover {
-    border-color: #8e44ad;
+    border-color: #3498db;
 }
 
 .forecast-controls select:focus {
     outline: none;
-    border-color: #9b59b6;
-    box-shadow: 0 0 0 3px rgba(155, 89, 182, 0.1);
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
 /* Forecast Styles */
@@ -1853,7 +1854,7 @@ tr.first-place .goal-diff-negative {
     padding: 8px;
     color: #6c757d;
     font-style: italic;
-    font-size: 0.8em;
+    font-size: 1.1em;
     text-align: center;
     background: #f8f9fa;
     border-radius: 4px;
@@ -4514,9 +4515,19 @@ tr.first-place .goal-diff-negative {
     gap: 10px;
 }
 
+/* Inline selectors without card styling for Top Scorers */
+.topscorers-controls .group-selector-inline,
+.topscorers-controls .team-selector-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .topscorers-controls .filter-selector label,
 .topscorers-controls .group-selector label,
-.topscorers-controls .team-selector label {
+.topscorers-controls .team-selector label,
+.topscorers-controls .group-selector-inline label,
+.topscorers-controls .team-selector-inline label {
     font-weight: 500;
     min-width: 60px;
     white-space: nowrap;
@@ -4675,7 +4686,9 @@ tr.first-place .goal-diff-negative {
     .topscorers-controls .checkbox-control,
     .topscorers-controls .group-selector,
     .topscorers-controls .filter-selector,
-    .topscorers-controls .team-selector {
+    .topscorers-controls .team-selector,
+    .topscorers-controls .group-selector-inline,
+    .topscorers-controls .team-selector-inline {
         justify-content: space-between;
         width: 100%;
     }
