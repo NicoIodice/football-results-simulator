@@ -3863,8 +3863,8 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     ${generateGoalScorerPredictionsHTML(
                         pred.homeTeam.id, 
                         pred.awayTeam.id, 
-                        parseInt(pred.prediction.predictedScore.split(' - ')[0]), 
-                        parseInt(pred.prediction.predictedScore.split(' - ')[1])
+                        (function(){ const s=parsePredictedScore(pred.prediction.predictedScore); return s.home; })(), 
+                        (function(){ const s=parsePredictedScore(pred.prediction.predictedScore); return s.away; })()
                     )}
                 </div>
             `).join('')}
@@ -6809,4 +6809,24 @@ function closeChampionshipCelebration() {
             celebration.remove();
         }, 500);
     }
+}
+
+// Robust parser for predicted score strings like "3-1" or "3 - 1" or with extra spaces
+function parsePredictedScore(scoreStr) {
+    if (typeof scoreStr !== 'string') return { home: 0, away: 0 };
+    const match = scoreStr.trim().match(/^(\d+)\s*-\s*(\d+)$/);
+    if (!match) {
+        // Attempt fallback: remove spaces then split on '-'
+        const compact = scoreStr.replace(/\s+/g, '');
+        const parts = compact.split('-');
+        if (parts.length === 2) {
+            const h = parseInt(parts[0], 10);
+            const a = parseInt(parts[1], 10);
+            return { home: Number.isFinite(h) ? h : 0, away: Number.isFinite(a) ? a : 0 };
+        }
+        return { home: 0, away: 0 };
+    }
+    const home = parseInt(match[1], 10);
+    const away = parseInt(match[2], 10);
+    return { home, away };
 }
