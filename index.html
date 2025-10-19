@@ -37,6 +37,11 @@
                 
                 <!-- League Standings Sub-tab -->
                 <div id="league-standings" class="sub-tab-content active">
+                    <!-- Group Stage Completion Disclaimer -->
+                    <div id="qualification-status-disclaimer" class="qualification-disclaimer" style="display: none;">
+                        <!-- Will be populated dynamically -->
+                    </div>
+                    
                     <div class="group-selector">
                         <label for="selected-group">Select Group:</label>
                         <select id="selected-group" onchange="updateStandingsForGroup()">

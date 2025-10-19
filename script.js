@@ -29,6 +29,9 @@ const logger = {
     error: (...args) => {
         // Always show errors regardless of debug mode
         console.error(...args);
+        
+        // Show toast notification for errors
+        handleError(args[0]);
     },
     info: (...args) => {
         if (config?.ui?.enableDebugMode) {
@@ -41,6 +44,47 @@ const logger = {
         }
     }
 };
+
+// Error handling with toast notifications
+function handleError(error) {
+    let message;
+    let type = 'error';
+    
+    if (typeof error === 'string') {
+        // Business logic errors or custom messages
+        if (error.includes('not found') || error.includes('missing') || error.includes('required')) {
+            message = error; // Show specific business error
+        } else if (error.includes('TypeError') || error.includes('not iterable') || error.includes('undefined')) {
+            message = 'A technical issue occurred. Please refresh the page and try again.';
+        } else {
+            message = error; // Show the error as-is for other cases
+        }
+    } else if (error instanceof Error) {
+        // Technical errors
+        if (error.name === 'TypeError' || error.name === 'ReferenceError' || error.name === 'SyntaxError') {
+            message = 'A technical issue occurred. Please refresh the page and try again.';
+        } else {
+            message = error.message || 'An unexpected error occurred.';
+        }
+    } else {
+        message = 'An unexpected error occurred.';
+    }
+    
+    // Show toast notification
+    showToast(message, type, 5000); // Show for 5 seconds for errors
+}
+
+// Enhanced error wrapper for async functions
+function withErrorHandling(fn) {
+    return async function(...args) {
+        try {
+            return await fn.apply(this, args);
+        } catch (error) {
+            logger.error('Function error:', error);
+            throw error; // Re-throw so caller can handle if needed
+        }
+    };
+}
 
 // OpenRouter API configuration (formerly OpenAI)
 const OPENAI_CONFIG = {
@@ -330,11 +374,15 @@ function populateGroupSelector() {
 
 // Update standings when group changes
 function updateStandingsForGroup() {
-    const groupSelect = document.getElementById('selected-group');
-    if (groupSelect) {
-        selectedGroupId = groupSelect.value;
-        updateStandings();
-        updateTeamSelectorForGroup(); // Update simulator team options
+    try {
+        const groupSelect = document.getElementById('selected-group');
+        if (groupSelect) {
+            selectedGroupId = groupSelect.value;
+            updateStandings();
+            updateTeamSelectorForGroup(); // Update simulator team options
+        }
+    } catch (error) {
+        logger.error('Error updating standings for group:', error);
     }
 }
 
@@ -936,8 +984,91 @@ function calculateStandingsExcludingGameweek(excludeGameweek) {
 }
 
 // Update standings table
+// Check if group stage qualifications are finished
+function checkQualificationStatus(groupId = null) {
+    const currentDate = new Date();
+    let allGroupMatchesCompleted = true;
+    let lastFixtureDate = null;
+    
+    // If groupId is specified, check only that group's matches
+    // If groupId is null, check all matches (global check)
+    const matchesToCheck = groupId 
+        ? results.filter(match => match.groupId === groupId)
+        : results;
+    
+    // Check matches for completion
+    for (const match of matchesToCheck) {
+        if (!match.played) {
+            allGroupMatchesCompleted = false;
+        }
+        
+        // Track the latest fixture date
+        if (match.date) {
+            const matchDate = new Date(match.date);
+            if (!lastFixtureDate || matchDate > lastFixtureDate) {
+                lastFixtureDate = matchDate;
+            }
+        }
+    }
+    
+    return {
+        allCompleted: allGroupMatchesCompleted,
+        lastFixtureDate: lastFixtureDate,
+        qualificationsFinished: allGroupMatchesCompleted && lastFixtureDate && currentDate > lastFixtureDate
+    };
+}
+
+function updateQualificationDisclaimer() {
+    const disclaimerElement = document.getElementById('qualification-status-disclaimer');
+    if (!disclaimerElement) return;
+    
+    // Get current selected group
+    const groupSelect = document.getElementById('selected-group');
+    const currentGroupId = groupSelect ? groupSelect.value : null;
+    
+    if (!currentGroupId) {
+        disclaimerElement.style.display = 'none';
+        return;
+    }
+    
+    // Check qualification status for the current group only
+    const status = checkQualificationStatus(currentGroupId);
+    
+    if (status.qualificationsFinished) {
+        disclaimerElement.className = 'qualification-disclaimer completed';
+        disclaimerElement.innerHTML = `
+            <span class="status-icon">🏁</span>
+            <span class="status-text">Group ${currentGroupId.replace('group-', '').toUpperCase()} Completed!</span>
+            <span class="next-phase">All matches in this group have finished. Ready for knockout phase! 🏆</span>
+        `;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Qualification disclaimer shown - Group completed', currentGroupId);
+    } else if (status.allCompleted && !status.qualificationsFinished) {
+        disclaimerElement.className = 'qualification-disclaimer completed';
+        disclaimerElement.innerHTML = `
+            <span class="status-icon">✅</span>
+            <span class="status-text">Group ${currentGroupId.replace('group-', '').toUpperCase()} Matches Completed!</span>
+            <span class="next-phase">Knockout phase preparations underway...</span>
+        `;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Qualification disclaimer shown - Group matches completed', currentGroupId);
+    } else {
+        disclaimerElement.className = 'qualification-disclaimer in-progress';
+        disclaimerElement.innerHTML = `<strong>⚠️ Group ${currentGroupId.replace('group-', '').toUpperCase()} In Progress...</strong><br>Group winner is not yet finalized. Complete all group matches to determine knockout stage participants.`;
+        disclaimerElement.style.display = 'block';
+        
+        logger.log('DEBUG: Qualification disclaimer shown - Group in progress', currentGroupId);
+    }
+}
+
 function updateStandings() {
-    const standings = calculateStandings();
+    try {
+        // Update qualification status disclaimer
+        updateQualificationDisclaimer();
+        
+        const standings = calculateStandings();
     const tbody = document.getElementById('standings-body');
     tbody.innerHTML = '';
     
@@ -986,11 +1117,22 @@ function updateStandings() {
 
         // Check if this team is in first place (tied for first)
         const isFirstPlace = firstPlaceTeams.includes(team);
+        const isActualFirst = index === 0; // True first place after tie-breakers
         
-        // Add first place class to row if team is tied for first
-        if (isFirstPlace) {
-            row.classList.add('first-place');
+        // Check qualification status for current group to determine highlighting behavior
+        const groupSelect = document.getElementById('selected-group');
+        const currentGroupId = groupSelect ? groupSelect.value : null;
+        const qualificationStatus = checkQualificationStatus(currentGroupId);
+        
+        // Add appropriate classes based on position, tie status, and qualification completion
+        if (isActualFirst) {
+            // True first place - always gets crown and green highlight
+            row.classList.add('champion-first-place');
+        } else if (isFirstPlace && !qualificationStatus.qualificationsFinished) {
+            // Tied for first but lost tie-breaker - only gets yellow highlight during qualification period
+            row.classList.add('tied-for-first-place');
         }
+        // Note: After qualifications finish, only the actual winner (position 1) gets highlighting
 
         // Rank and goal difference colors
         const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
@@ -1021,6 +1163,9 @@ function updateStandings() {
     
     // Update knockout stage bracket with current group winners
     updateKnockoutStage();
+    } catch (error) {
+        logger.error('Error updating standings:', error);
+    }
 }
 
 // Generate match history HTML
@@ -6068,6 +6213,9 @@ function updateKnockoutStage() {
     updateKnockoutMatch('semi1', groupAWinner, groupDWinner);
     updateKnockoutMatch('semi2', groupBWinner, groupCWinner);
     
+    // Always update semi-final result displays (winners/losers in final and 3rd place)
+    updateSemiFinalResultDisplays();
+    
     // Update dependent matches based on results
     if (knockoutResults.semi1.played && knockoutResults.semi2.played) {
         const semi1Winner = teams.find(t => t.id === knockoutResults.semi1.winner);
@@ -6077,9 +6225,6 @@ function updateKnockoutStage() {
         
         updateKnockoutMatch('final', semi1Winner, semi2Winner);
         updateKnockoutMatch('third', semi1Loser, semi2Loser);
-        
-        // Update display elements for finals
-        updateSemiFinalResultDisplays();
     }
 }
 
@@ -6099,15 +6244,16 @@ function updateKnockoutDisclaimer() {
     }
 }
 
-function checkAllGroupMatchesComplete() {
+function checkAllGroupMatchesComplete(groupId = null) {
     // Check if all matches in the results data have been played
-    for (const round of Object.values(results)) {
-        for (const group of Object.values(round)) {
-            for (const match of group) {
-                if (!match.played) {
-                    return false;
-                }
-            }
+    // If groupId is specified, check only that group's matches
+    const matchesToCheck = groupId 
+        ? results.filter(match => match.groupId === groupId)
+        : results;
+        
+    for (const match of matchesToCheck) {
+        if (!match.played) {
+            return false;
         }
     }
     return true;
@@ -6159,39 +6305,101 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
 }
 
 function updateSemiFinalResultDisplays() {
-    // Update third place match teams
+    // Update third place match teams and final match teams
     const semi1LoserBox = document.getElementById('semifinal-1-loser');
     const semi2LoserBox = document.getElementById('semifinal-2-loser');
     const semi1WinnerBox = document.getElementById('semifinal-1-winner');
     const semi2WinnerBox = document.getElementById('semifinal-2-winner');
     
+    // Update Semi-Final 1 results
     if (knockoutResults.semi1.played) {
         const winner = teams.find(t => t.id === knockoutResults.semi1.winner);
         const loser = teams.find(t => t.id === knockoutResults.semi1.loser);
         
+        logger.log('DEBUG: Semi-Final 1 completed - Winner:', winner?.name, 'Loser:', loser?.name);
+        
+        // Update final match (winner goes to final)
         if (semi1WinnerBox && winner) {
             semi1WinnerBox.querySelector('.team-name').textContent = winner.name;
             semi1WinnerBox.title = winner.fullName || winner.name;
+            // Update team-label to show actual team
+            const semi1WinnerLabel = semi1WinnerBox.parentElement.querySelector('.team-label');
+            if (semi1WinnerLabel) {
+                semi1WinnerLabel.textContent = `${winner.name} (Semi-Final 1 Winner)`;
+            }
         }
         
+        // Update 3rd place match (loser goes to 3rd place)
         if (semi1LoserBox && loser) {
             semi1LoserBox.querySelector('.team-name').textContent = loser.name;
             semi1LoserBox.title = loser.fullName || loser.name;
+            // Update team-label to show actual team
+            const semi1LoserLabel = semi1LoserBox.parentElement.querySelector('.team-label');
+            if (semi1LoserLabel) {
+                semi1LoserLabel.textContent = `${loser.name} (Semi-Final 1 Loser)`;
+            }
+        }
+    } else {
+        // Reset to default if not played
+        if (semi1WinnerBox) {
+            semi1WinnerBox.querySelector('.team-name').textContent = 'TBD';
+            const semi1WinnerLabel = semi1WinnerBox.parentElement.querySelector('.team-label');
+            if (semi1WinnerLabel) {
+                semi1WinnerLabel.textContent = 'Winner of Semi-Final 1';
+            }
+        }
+        if (semi1LoserBox) {
+            semi1LoserBox.querySelector('.team-name').textContent = 'TBD';
+            const semi1LoserLabel = semi1LoserBox.parentElement.querySelector('.team-label');
+            if (semi1LoserLabel) {
+                semi1LoserLabel.textContent = 'Loser of Semi-Final 1';
+            }
         }
     }
     
+    // Update Semi-Final 2 results
     if (knockoutResults.semi2.played) {
         const winner = teams.find(t => t.id === knockoutResults.semi2.winner);
         const loser = teams.find(t => t.id === knockoutResults.semi2.loser);
         
+        logger.log('DEBUG: Semi-Final 2 completed - Winner:', winner?.name, 'Loser:', loser?.name);
+        
+        // Update final match (winner goes to final)
         if (semi2WinnerBox && winner) {
             semi2WinnerBox.querySelector('.team-name').textContent = winner.name;
             semi2WinnerBox.title = winner.fullName || winner.name;
+            // Update team-label to show actual team
+            const semi2WinnerLabel = semi2WinnerBox.parentElement.querySelector('.team-label');
+            if (semi2WinnerLabel) {
+                semi2WinnerLabel.textContent = `${winner.name} (Semi-Final 2 Winner)`;
+            }
         }
         
+        // Update 3rd place match (loser goes to 3rd place)
         if (semi2LoserBox && loser) {
             semi2LoserBox.querySelector('.team-name').textContent = loser.name;
             semi2LoserBox.title = loser.fullName || loser.name;
+            // Update team-label to show actual team
+            const semi2LoserLabel = semi2LoserBox.parentElement.querySelector('.team-label');
+            if (semi2LoserLabel) {
+                semi2LoserLabel.textContent = `${loser.name} (Semi-Final 2 Loser)`;
+            }
+        }
+    } else {
+        // Reset to default if not played
+        if (semi2WinnerBox) {
+            semi2WinnerBox.querySelector('.team-name').textContent = 'TBD';
+            const semi2WinnerLabel = semi2WinnerBox.parentElement.querySelector('.team-label');
+            if (semi2WinnerLabel) {
+                semi2WinnerLabel.textContent = 'Winner of Semi-Final 2';
+            }
+        }
+        if (semi2LoserBox) {
+            semi2LoserBox.querySelector('.team-name').textContent = 'TBD';
+            const semi2LoserLabel = semi2LoserBox.parentElement.querySelector('.team-label');
+            if (semi2LoserLabel) {
+                semi2LoserLabel.textContent = 'Loser of Semi-Final 2';
+            }
         }
     }
 }
@@ -6322,6 +6530,11 @@ function saveKnockoutScoreModal(matchId, isEdit) {
     // Update knockout stage display
     updateKnockoutStage();
     
+    // Check if this is the final match and trigger celebration
+    if (matchId === 'final') {
+        triggerChampionshipCelebration(matchResult);
+    }
+    
     // Show success message
     const homeTeam = teams.find(t => t.id === matchResult.homeTeam);
     const awayTeam = teams.find(t => t.id === matchResult.awayTeam);
@@ -6356,4 +6569,140 @@ function downloadKnockoutResults() {
     link.download = 'knockout-results.json';
     link.click();
     URL.revokeObjectURL(url);
+}
+
+// Championship Celebration Functions
+function triggerChampionshipCelebration(finalResult) {
+    // Check if current time is past the game time
+    const currentTime = new Date();
+    const gameTime = new Date(finalResult.playedDate);
+    
+    if (currentTime <= gameTime) {
+        logger.log('DEBUG: Championship celebration skipped - game time not yet passed');
+        return;
+    }
+    
+    // Get the championship winner
+    const championTeam = teams.find(t => t.id === finalResult.winner);
+    if (!championTeam) {
+        logger.log('ERROR: Championship team not found');
+        return;
+    }
+    
+    logger.log('DEBUG: Triggering championship celebration for:', championTeam.name);
+    
+    // Start the celebration sequence
+    setTimeout(() => {
+        showChampionshipCelebration(championTeam, finalResult);
+    }, 1000); // Delay to let the UI update first
+}
+
+function showChampionshipCelebration(championTeam, finalResult) {
+    // Create celebration overlay
+    const celebrationHTML = `
+        <div class="championship-overlay" id="championship-celebration">
+            <div class="confetti-container" id="confetti-container"></div>
+            <div class="celebration-content">
+                <div class="trophy-animation">
+                    <div class="trophy">🏆</div>
+                </div>
+                <div class="champion-announcement">
+                    <h1 class="champion-title">CHAMPIONS!</h1>
+                    <h2 class="champion-team">${championTeam.name}</h2>
+                    <p class="champion-subtitle">${championTeam.fullName || championTeam.name}</p>
+                    <div class="final-score">
+                        Final Score: ${finalResult.homeScore} - ${finalResult.awayScore}
+                    </div>
+                </div>
+                <button class="celebration-close" onclick="closeChampionshipCelebration()">
+                    Continue
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Add celebration to DOM
+    document.body.insertAdjacentHTML('beforeend', celebrationHTML);
+    
+    // Start confetti animation
+    createConfetti();
+    
+    // Add trophy to winner's team box
+    setTimeout(() => {
+        addTrophyToWinner(championTeam);
+    }, 2000);
+    
+    // Auto-close after 10 seconds if not manually closed
+    setTimeout(() => {
+        const celebration = document.getElementById('championship-celebration');
+        if (celebration) {
+            closeChampionshipCelebration();
+        }
+    }, 10000);
+}
+
+function createConfetti() {
+    const container = document.getElementById('confetti-container');
+    if (!container) return;
+    
+    const colors = ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#F0E68C'];
+    const shapes = ['circle', 'square', 'triangle'];
+    
+    // Create 100 confetti pieces
+    for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = `confetti ${shapes[Math.floor(Math.random() * shapes.length)]}`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.animationDelay = Math.random() * 3 + 's';
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            container.appendChild(confetti);
+            
+            // Remove confetti after animation
+            setTimeout(() => {
+                if (confetti.parentNode) {
+                    confetti.parentNode.removeChild(confetti);
+                }
+            }, 5000);
+        }, i * 50); // Stagger the confetti creation
+    }
+}
+
+function addTrophyToWinner(championTeam) {
+    // Find the winner's team box in the final match
+    // Check which team won the final match
+    const homeTeam = teams.find(t => t.id === knockoutResults.final.homeTeam);
+    const awayTeam = teams.find(t => t.id === knockoutResults.final.awayTeam);
+    
+    let winnerBox = null;
+    
+    if (knockoutResults.final.homeScore > knockoutResults.final.awayScore) {
+        // Home team (semifinal-1-winner) won
+        winnerBox = document.getElementById('semifinal-1-winner');
+    } else {
+        // Away team (semifinal-2-winner) won
+        winnerBox = document.getElementById('semifinal-2-winner');
+    }
+    
+    if (winnerBox && winnerBox.querySelector('.team-name').textContent === championTeam.name) {
+        // Add trophy to the team box
+        const trophy = document.createElement('div');
+        trophy.className = 'winner-trophy';
+        trophy.innerHTML = '🏆';
+        winnerBox.appendChild(trophy);
+        
+        // Add champion styling to the team box
+        winnerBox.classList.add('champion-team-box');
+    }
+}
+
+function closeChampionshipCelebration() {
+    const celebration = document.getElementById('championship-celebration');
+    if (celebration) {
+        celebration.classList.add('celebration-closing');
+        setTimeout(() => {
+            celebration.remove();
+        }, 500);
+    }
 }
