@@ -5,8 +5,11 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
     // Own goals for each team (should be shown for opponent)
     const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
     const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
-    const homeScorers = matchGoals.filter(g => g.teamId === homeTeamId && g.goalType !== 'own-goal');
-    const awayScorers = matchGoals.filter(g => g.teamId === awayTeamId && g.goalType !== 'own-goal');
+    let homeScorers = matchGoals.filter(g => g.teamId === homeTeamId && g.goalType !== 'own-goal');
+    let awayScorers = matchGoals.filter(g => g.teamId === awayTeamId && g.goalType !== 'own-goal');
+    // Sort by number of goals descending
+    homeScorers = [...homeScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
+    awayScorers = [...awayScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
     let homeContent = '';
     let awayContent = '';
     if (homeScorers.length > 0 || homeOwnGoals.length > 0) {
@@ -6869,6 +6872,8 @@ function getTopScorersAllGroups() {
         const groupGoals = getGoalsForGroup(group.id);
         allGoals = allGoals.concat(groupGoals);
     });
+    // Exclude own goals from statistics
+    allGoals = allGoals.filter(goal => !goal.ownGoal && goal.goalType !== 'own-goal');
     const playersMap = new Map();
     allGoals.forEach(goal => {
         const goalCount = goal.totalGoals || 1;
@@ -6892,7 +6897,9 @@ function getTopScorersAllGroups() {
 
 function getTopScorersForGroup(groupId) {
     if (!groupId) return getTopScorersAllGroups();
-    const groupGoals = getGoalsForGroup(groupId);
+    let groupGoals = getGoalsForGroup(groupId);
+    // Exclude own goals from statistics
+    groupGoals = groupGoals.filter(goal => !goal.ownGoal && goal.goalType !== 'own-goal');
     const playersMap = new Map();
     groupGoals.forEach(goal => {
         const goalCount = goal.goals || goal.totalGoals || 1;
@@ -6925,7 +6932,8 @@ function getTopScorersForTeam(teamId) {
         const groupGoals = getGoalsForGroup(group.id);
         allGoals = allGoals.concat(groupGoals);
     });
-    const teamGoals = allGoals.filter(goal => goal.teamId === teamId);
+    // Exclude own goals from statistics
+    const teamGoals = allGoals.filter(goal => goal.teamId === teamId && !goal.ownGoal && goal.goalType !== 'own-goal');
     const playersMap = new Map();
     teamGoals.forEach(goal => {
         const goalCount = goal.totalGoals || 1;
@@ -6998,7 +7006,7 @@ function generateTopScorersHTML(topScorers, filterType) {
                         <div class="scorer-team">${scorer.teamName} ${renderTeamBadge(scorer.teamId)}</div>
                         ${filterType === 'all' ? `<div class="scorer-group">${scorer.groupName}</div>` : ''}
                     </div>
-                    <div class="scorer-goals">
+                    <div class="scorer-goals scorer-goals-statistics">
                         <span class="goals-count">${scorer.totalGoals}</span>
                         <span class="goals-label">goal${scorer.totalGoals !== 1 ? 's' : ''}</span>
                     </div>

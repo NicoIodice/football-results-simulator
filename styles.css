@@ -1,3 +1,12 @@
+.scorer-goals-statistics {
+    text-align: right;
+    font-weight: bold;
+    color: #3498db;
+    min-width: 32px;
+    font-size: 1.1rem;
+    border-radius: 6px;
+    /* No background color for statistics */
+}
 /* Disabled state for selectors and labels */
 .disabled {
     opacity: 0.6;
