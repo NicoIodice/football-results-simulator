@@ -43,21 +43,44 @@
 }
 @media (max-width: 900px) {
     .match-row {
-        display: block !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        width: 100%;
+        font-size: 15px;
+        gap: 10px;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
     }
     .match-col {
         display: block !important;
         width: 100% !important;
-        justify-content: flex-start !important;
-        align-items: flex-start !important;
+        justify-content: center !important;
+        align-items: center !important;
+        text-align: center !important;
     }
     .match-date, .desktop-date {
         font-size: 1em !important;
         margin-bottom: 2px !important;
+        text-align: center !important;
     }
     .match-score {
         min-width: 80px !important;
         width: 100% !important;
+        margin-top: 4px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+    .match-btns {
+        width: 100% !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
         margin-top: 4px !important;
     }
 }
@@ -65,7 +88,7 @@
 .match-row {
     display: flex;
     align-items: center;
-    gap: 18px;
+    /*gap: 18px;*/
     margin-bottom: 8px;
 }
 .match-col {
@@ -82,9 +105,7 @@
 .match-btns {
     justify-content: center;
 }
-.match-score {
-    justify-content: flex-end;
-}
+
 .own-goal {
     background: #ffeaea !important;
     color: #c0392b !important;
@@ -1076,12 +1097,13 @@ tr.first-place .goal-diff-negative {
     font-weight: bold;
     font-size: 1.1rem;
     color: #2c3e50;
-    min-width: 80px;
+    min-width: 10px;
+    max-width: 80px;
     text-align: center;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border: 2px solid #dee2e6;
     border-radius: 15px;
-    padding: 8px 16px;
+    padding: 12px 12px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }

@@ -79,6 +79,7 @@ function getPlayerNameById(playerId) {
     return playerId;
 }
 // Global variables to store data
+
 let groups = [];
 let teams = [];
 let fixtures = [];
@@ -1137,16 +1138,20 @@ function calculateGoalStatistics() {
     const stats = {};
     groupResults.forEach(match => {
         Object.entries(match.scorers).forEach(([teamId, players]) => {
-            if (!stats[teamId]) stats[teamId] = {};
+            if (!stats[teamId]) {
+                // Find team name from teams array
+                const teamObj = Array.isArray(teams) ? teams.find(t => t.id === teamId) : null;
+                stats[teamId] = { players: {}, teamName: teamObj ? teamObj.name : teamId };
+            }
             players.forEach(player => {
-                if (!stats[teamId][player.id]) {
-                    stats[teamId][player.id] = {
-                        name: player.name,
+                if (!stats[teamId].players[player.id]) {
+                    stats[teamId].players[player.id] = {
+                        playerName: player.name,
                         goals: 0,
                         goalType: player.goalType || 'regular'
                     };
                 }
-                stats[teamId][player.id].goals += player.goals;
+                stats[teamId].players[player.id].goals += player.goals;
             });
         });
     });
@@ -1875,16 +1880,14 @@ function updateOverview() {
             const goalStats = calculateGoalStatistics();
             const teamGoalStats = goalStats[team.id];
             
+
             row.innerHTML = `
                 <td class="rank ${rankClass}">${index + 1}</td>
                 <td class="team-name">${team.name} ${renderTeamBadge(team.id)}</td>
                 <td class="stats">${team.played}</td>
                 <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
                 <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
-                <td class="stats goals-cell" 
-                    onclick="showGoalTooltip(event, '${team.id}')" 
-                    onmouseover="showGoalTooltip(event, '${team.id}')" 
-                    onmouseout="handleTooltipMouseOut(event, '${team.id}')">${team.goalsFor}</td>
+                <td class="stats goals-cell" data-team-id="${team.id}">${team.goalsFor}</td>
                 <td class="stats">${tb3Value}</td>
                 <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
                 <td class="stats points">${team.points}</td>
@@ -1892,6 +1895,9 @@ function updateOverview() {
 
             tbody.appendChild(row);
         });
+
+
+        // Remove modal popup for team scorers in standings table. Goals cell is now static.
         
         // Update knockout stage bracket with current group winners
         updateKnockoutStage();
