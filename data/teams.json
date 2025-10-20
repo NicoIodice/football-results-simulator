@@ -44,8 +44,8 @@
         "isCaptain": false
       },
       {
-        "id": "goncalo-santos",
-        "name": "Gonçalo Santos",
+        "id": "goncalo-lopes",
+        "name": "Gonçalo Lopes",
         "number": 5,
         "position": "forward",
         "status": "fit",
@@ -53,8 +53,8 @@
         "isCaptain": false
       },
       {
-        "id": "jose-costa",
-        "name": "José Costa",
+        "id": "jose-delgado",
+        "name": "José Delgado",
         "number": 6,
         "position": "midfielder",
         "status": "fit",
@@ -202,6 +202,51 @@
         "id": "red-star-fwd",
         "name": "Red Star Forward",
         "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-sub1",
+        "name": "Red Star Sub 1",
+        "number": 6,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-sub2",
+        "name": "Red Star Sub 2",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-sub3",
+        "name": "Red Star Sub 3",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-sub4",
+        "name": "Red Star Sub 4",
+        "number": 9,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "red-star-sub5",
+        "name": "Red Star Sub 5",
+        "number": 10,
         "position": "forward",
         "status": "fit",
         "isStarter": true,
@@ -792,8 +837,8 @@
         "isCaptain": false
       },
       {
-        "id": "logan-def1",
-        "name": "Logan Defender 1",
+        "id": "hugo",
+        "name": "Hugo",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -810,8 +855,8 @@
         "isCaptain": false
       },
       {
-        "id": "logan-mid",
-        "name": "Logan Midfielder",
+        "id": "tiago",
+        "name": "Tiago",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -819,8 +864,8 @@
         "isCaptain": false
       },
       {
-        "id": "logan-fwd",
-        "name": "Logan Forward",
+        "id": "pedro",
+        "name": "Pedro",
         "number": 5,
         "position": "forward",
         "status": "fit",
@@ -837,9 +882,36 @@
         "isCaptain": false
       },
       {
+        "id": "miranda",
+        "name": "Miranda",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
         "id": "logan-sub2",
         "name": "Logan Sub 2",
-        "number": 7,
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "logan-sub3",
+        "name": "Logan Sub 3",
+        "number": 9,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "logan-sub4",
+        "name": "Logan Sub 4",
+        "number": 10,
         "position": "forward",
         "status": "fit",
         "isStarter": false,
@@ -883,8 +955,8 @@
         "isCaptain": false
       },
       {
-        "id": "tech-mid",
-        "name": "Tech Midfielder",
+        "id": "francisco-arantes",
+        "name": "Francisco Arantes",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -892,8 +964,8 @@
         "isCaptain": false
       },
       {
-        "id": "tech-fwd",
-        "name": "Tech Forward",
+        "id": "sergio",
+        "name": "Sérgio",
         "number": 5,
         "position": "forward",
         "status": "fit",
@@ -913,6 +985,33 @@
         "id": "tech-sub2",
         "name": "Tech Sub 2",
         "number": 7,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tech-sub3",
+        "name": "Tech Sub 3",
+        "number": 8,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tech-sub4",
+        "name": "Tech Sub 4",
+        "number": 9,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
+      },
+      {
+        "id": "tech-sub5",
+        "name": "Tech Sub 5",
+        "number": 10,
         "position": "midfielder",
         "status": "fit",
         "isStarter": false,

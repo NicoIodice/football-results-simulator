@@ -1,6 +1,60 @@
 [
   {
-    "matchId": "general",
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "logan-fc",
+    "playerId": "miranda",
+    "playerName": "Miranda",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "logan-fc",
+    "playerId": "hugo",
+    "playerName": "Hugo",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "logan-fc",
+    "playerId": "pedro",
+    "playerName": "Pedro",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "logan-fc",
+    "playerId": "tiago",
+    "playerName": "Tiago",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "critical-techballers",
+    "playerId": "sergio",
+    "playerName": "Sérgio",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c1",
+    "groupId": "group-c",
+    "teamId": "critical-techballers",
+    "playerId": "francisco-arantes",
+    "playerName": "Francisco Arantes",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "critigals",
     "playerId": "daniela-correia",
@@ -9,7 +63,7 @@
     "totalGoals": 2
   },
   {
-    "matchId": "general",
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "underdogs-fc",
     "playerId": "guilherme-imperial",
@@ -18,7 +72,7 @@
     "totalGoals": 6
   },
   {
-    "matchId": "general",
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "underdogs-fc",
     "playerId": "elisio-alexandre-sousa",
@@ -36,7 +90,7 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "underdogs-fc",
     "playerId": "emanuel-barata",
@@ -45,16 +99,16 @@
     "totalGoals": 4
   },
   {
-    "matchId": "general",
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "underdogs-fc",
     "playerId": "joao-bernardo-jorge",
     "playerName": "João Bernardo Jorge",
     "goalType": "regular",
-    "totalGoals": 4
+    "totalGoals": 3
   },
   {
-    "matchId": "general",
+    "matchId": "match-b1",
     "groupId": "group-b",
     "teamId": "underdogs-fc",
     "playerId": "fabio-horta-oliveira",
@@ -126,7 +180,7 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-b2",
     "groupId": "group-b",
     "teamId": "borg-coimbra",
     "playerId": "andre-rainho",
@@ -135,16 +189,16 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-b2",
     "groupId": "group-b",
     "teamId": "borg-coimbra",
     "playerId": "diogo-campos",
     "playerName": "Diogo Campos",
     "goalType": "regular",
-    "totalGoals": 1
+    "totalGoals": 3
   },
   {
-    "matchId": "general",
+    "matchId": "match-b2",
     "groupId": "group-b",
     "teamId": "borg-coimbra",
     "playerId": "jose-miguel-lopes",
@@ -153,7 +207,160 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "sergio-santos",
+    "playerName": "Sérgio Santos",
+    "goalType": "regular",
+    "totalGoals": 6
+  },
+  {
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "simao-santos",
+    "playerName": "Simão Santos",
+    "goalType": "regular",
+    "totalGoals": 6
+  },
+  {
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "pedro-lourenco",
+    "playerName": "Pedro Lourenço",
+    "goalType": "regular",
+    "totalGoals": 3
+  },
+  {
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "alfonso-brandao",
+    "playerName": "Alfonso Brandão",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "tiago-dias",
+    "playerName": "Tiago Dias",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-a6",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "andre-farinha-carvalho",
+    "playerName": "André Farinha Carvalho",
+    "goalType": "regular",
+    "totalGoals": 5
+  },
+  {
+    "matchId": "match-a6",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "goncalo-lopes",
+    "playerName": "Gonçalo Lopes",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
+    "matchId": "match-a6",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "miguel-lopo-ferreira",
+    "playerName": "Miguel Lopo Ferreira",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-a6",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "tiago-jesus",
+    "playerName": "Tiago Jesus",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "denil-baia",
+    "playerName": "Denil Baía",
+    "goalType": "regular",
+    "totalGoals": 4
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "jose-miguel-delgado",
+    "playerName": "José Miguel Delgado",
+    "goalType": "regular",
+    "totalGoals": 3
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "andre-farinha-carvalho",
+    "playerName": "André Farinha Carvalho",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "eduardo-marcal",
+    "playerName": "Eduardo Marçal",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "tiago-jesus",
+    "playerName": "Tiago Jesus",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-a2",
+    "groupId": "group-a",
+    "teamId": "desesperados-fc",
+    "playerId": "goncalo-lopes",
+    "playerName": "Gonçalo Lopes",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b3",
+    "groupId": "group-b",
+    "teamId": "underdogs-fc",
+    "playerId": "joao-bernardo-jorge",
+    "playerName": "João Bernardo Jorge",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
+    "matchId": "match-b3",
+    "groupId": "group-b",
+    "teamId": "underdogs-fc",
+    "playerId": "marcos-soares",
+    "playerName": "Marcos Soares",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b3",
     "groupId": "group-b",
     "teamId": "borg-coimbra",
     "playerId": "sergio-santos",
@@ -162,11 +369,47 @@
     "totalGoals": 3
   },
   {
-    "matchId": "general",
-    "groupId": "group-a",
-    "teamId": "desesperados-fc",
-    "playerId": "andre-farinha-carvalho",
-    "playerName": "André Farinha Carvalho",
+    "matchId": "match-b3",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "andre-rainho",
+    "playerName": "André Rainho",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b3",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "diogo-campos",
+    "playerName": "Diogo Campos",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b3",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "jose-miguel-lopes",
+    "playerName": "José Miguel Lopes",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-b2",
+    "groupId": "group-b",
+    "teamId": "borg-coimbra",
+    "playerId": "tiago-alexandre-dias",
+    "playerName": "Tiago Alexandre Dias",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c3",
+    "groupId": "group-c",
+    "teamId": "francesinha-united",
+    "playerId": "diogo-pedrosa",
+    "playerName": "Diogo Pedrosa",
     "goalType": "regular",
     "totalGoals": 1
   },
@@ -243,6 +486,15 @@
     "totalGoals": 1
   },
   {
+    "matchId": "match-c12",
+    "groupId": "group-c",
+    "teamId": "francesinha-united",
+    "playerId": "paulo-almeida-sousa",
+    "playerName": "Paulo Almeida Sousa",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
     "matchId": "general",
     "groupId": "group-c",
     "teamId": "francesinha-united",
@@ -252,7 +504,7 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-c3",
     "groupId": "group-c",
     "teamId": "francesinha-united",
     "playerId": "jose-barreirinho",
@@ -285,7 +537,7 @@
     "teamId": "sporting-esgaios",
     "playerId": "ricardo-mesquita",
     "playerName": "Ricardo Mesquita",
-    "goalType": "regular",
+    "goalType": "penalti",
     "totalGoals": 1
   },
   {

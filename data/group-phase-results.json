@@ -97,7 +97,19 @@
     "awayScore": 2,
     "gameweek": 1,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+      "logan-fc": [
+        { "id": "miranda", "name": "Miranda", "goals": 1 },
+        { "id": "hugo", "name": "Hugo", "goals": 1 },
+        { "id": "pedro", "name": "Pedro", "goals": 1 },
+        { "id": "tiago", "name": "Tiago", "goals": 1 }
+      ],
+      "critical-techballers": [
+        { "id": "sergio", "name": "Sérgio", "goals": 1 },
+        { "id": "francisco-arantes", "name": "Francisco Arantes", "goals": 1 }
+      ]
+    }
   },
   {
     "matchId": "match-c2",

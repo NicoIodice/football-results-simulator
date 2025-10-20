@@ -1,3 +1,83 @@
+// Show scorers popup for fixtures
+function showScorersPopup(matchId, homeTeamId, awayTeamId) {
+    // Find goals for this match
+    const matchGoals = goals.filter(g => g.matchId === matchId);
+    // Own goals for each team (should be shown for opponent)
+    const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
+    const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
+    const homeScorers = matchGoals.filter(g => g.teamId === homeTeamId && g.goalType !== 'own-goal');
+    const awayScorers = matchGoals.filter(g => g.teamId === awayTeamId && g.goalType !== 'own-goal');
+    let homeContent = '';
+    let awayContent = '';
+    if (homeScorers.length > 0 || homeOwnGoals.length > 0) {
+        homeContent = `<table class='scorers-table'><tbody>` +
+            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
+            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+    } else {
+        homeContent = `<div class=\"no-scorers\">No scorers available</div>`;
+    }
+    if (awayScorers.length > 0 || awayOwnGoals.length > 0) {
+        awayContent = `<table class='scorers-table'><tbody>` +
+            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
+            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+    } else {
+        awayContent = `<div class=\"no-scorers\">No scorers available</div>`;
+    }
+    // Remove any existing popup first
+    const oldPopup = document.querySelector('.scorers-popup');
+    if (oldPopup) document.body.removeChild(oldPopup);
+    const popup = document.createElement('div');
+    popup.className = 'scorers-popup';
+    popup.innerHTML = `
+        <div class='scorers-header'>
+            <span class='scorers-title'>⚽ Match Scorers</span>
+            <span class='scorers-close'>&times;</span>
+        </div>
+        <div class='scorers-teams'>
+            <div class='scorers-team'>
+                <div class='scorers-team-title'>Home</div>
+                ${homeContent}
+            </div>
+            <div class='scorers-team'>
+                <div class='scorers-team-title'>Away</div>
+                ${awayContent}
+            </div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+    popup.style.position = 'fixed';
+    popup.style.left = '50%';
+    popup.style.top = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.zIndex = 9999;
+    // Dismiss on close button or outside click
+    popup.querySelector('.scorers-close').onclick = function(e) {
+        document.body.removeChild(popup);
+        e.stopPropagation();
+    };
+    setTimeout(() => {
+        document.addEventListener('mousedown', function handler(e) {
+            if (!popup.contains(e.target)) {
+                if (document.body.contains(popup)) document.body.removeChild(popup);
+                document.removeEventListener('mousedown', handler);
+            }
+        });
+    }, 0);
+}
+// Utility to get player name by ID from teams data
+function getPlayerNameById(playerId) {
+    if (!Array.isArray(teams)) return playerId;
+    for (const team of teams) {
+        if (team.players) {
+            for (const player of team.players) {
+                if (player.id === playerId) {
+                    return player.name;
+                }
+            }
+        }
+    }
+    return playerId;
+}
 // Global variables to store data
 let groups = [];
 let teams = [];
@@ -1705,10 +1785,22 @@ function updateGroupStatusIndicator() {
         statusElement.style.display = 'flex';
     } else {
         // Group in progress
+        // Calculate missing matches
+        const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === currentGroupId);
+        let totalMatches = 0;
+        let playedMatches = 0;
+        groupFixtures.forEach(gameweek => {
+            totalMatches += gameweek.matches.length;
+            gameweek.matches.forEach(match => {
+                const hasResult = results.some(result => result.matchId === match.id && result.played === true);
+                if (hasResult) playedMatches++;
+            });
+        });
+        const missingMatches = totalMatches - playedMatches;
         statusElement.className = 'group-status-indicator in-progress';
         statusElement.innerHTML = `
             <span class="status-icon">⚠️</span>
-            <span class="status-text">Group matches in progress...</span>
+            <span class="status-text">Group matches in progress${missingMatches > 0 ? ` (${missingMatches} missing)` : ''}...</span>
         `;
         statusElement.style.display = 'flex';
     }
@@ -2112,13 +2204,27 @@ function createMatchElement(match, showGroupIndicator) {
             ${matchIndicator}
             ${groupIndicator}
         </div>
-        <div class="match-datetime-container">
-            ${addResultButton}
-            ${editResultButton}
-            <div class="match-datetime">${venueLink}${formattedDate} - ${match.time}</div>
+        <div class="match-row">
+            <div class="match-col match-date">${venueLink}${formattedDate} - ${match.time}</div>
+            <div class="match-col match-btns">${addResultButton || editResultButton}</div>
+            <div class="match-col match-score ${scoreClass}" style="cursor:${result ? 'pointer' : 'default'};">${scoreDisplay}</div>
         </div>
-        <div class="match-score ${scoreClass}">${scoreDisplay}</div>
     `;
+    // Add scorers modal trigger on result
+    if (result) {
+        const scoreElem = matchDiv.querySelector('.match-score');
+        if (scoreElem) {
+            scoreElem.addEventListener('click', function(e) {
+                showScorersPopup(match.id, match.homeTeam, match.awayTeam);
+            });
+            scoreElem.addEventListener('mouseenter', function(e) {
+                scoreElem.style.textDecoration = 'underline';
+            });
+            scoreElem.addEventListener('mouseleave', function(e) {
+                scoreElem.style.textDecoration = '';
+            });
+        }
+    }
     
     return matchDiv;
 }
