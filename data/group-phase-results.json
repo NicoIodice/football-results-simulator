@@ -17,7 +17,17 @@
     "awayScore": 12,
     "gameweek": 2,
     "groupId": "group-a",
-    "played": true
+    "played": true,
+    "scorers": {
+      "desesperados-fc": [
+        { "id": "denil-baia", "name": "Denil Baía", "goals": 4, "goalType": "regular" },
+        { "id": "jose-miguel-delgado", "name": "José Miguel Delgado", "goals": 3, "goalType": "regular" },
+        { "id": "andre-farinha-carvalho", "name": "André Farinha Carvalho", "goals": 2, "goalType": "regular" },
+        { "id": "eduardo-marcal", "name": "Eduardo Marçal", "goals": 1, "goalType": "regular" },
+        { "id": "tiago-jesus", "name": "Tiago Jesus", "goals": 1, "goalType": "regular" },
+        { "id": "goncalo-lopes", "name": "Gonçalo Lopes", "goals": 1, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-a1",
@@ -28,6 +38,7 @@
     "gameweek": 1,
     "groupId": "group-a",
     "played": true
+
   },
   {
     "matchId": "match-a2",
@@ -38,6 +49,7 @@
     "gameweek": 1,
     "groupId": "group-a",
     "played": true
+
   },
   {
     "matchId": "match-a5",
@@ -48,6 +60,7 @@
     "gameweek": 3,
     "groupId": "group-a",
     "played": true
+
   },
   {
     "matchId": "match-b4",
@@ -57,7 +70,20 @@
     "awayScore": 6,
     "gameweek": 2,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "underdogs-fc": [
+        { "id": "joao-bernardo-jorge", "name": "João Bernardo Jorge", "goals": 2, "goalType": "regular" },
+        { "id": "marcos-soares", "name": "Marcos Soares", "goals": 1, "goalType": "regular" }
+      ],
+      "borg-coimbra": [
+        { "id": "sergio-santos", "name": "Sérgio Santos", "goals": 3, "goalType": "regular" },
+          { "id": "andre-rainho", "name": "André Rainho", "goals": 1, "goalType": "regular" },
+          { "id": "diogo-campos", "name": "Diogo Campos", "goals": 1, "goalType": "regular" },
+          { "id": "jose-miguel-lopes", "name": "José Miguel Lopes", "goals": 1, "goalType": "regular" }
+        ]
+      }
+
   },
   {
     "matchId": "match-b2",
@@ -68,6 +94,7 @@
     "gameweek": 1,
     "groupId": "group-b",
     "played": true
+
   },
   {
     "matchId": "match-b1",
@@ -77,7 +104,19 @@
     "awayScore": 23,
     "gameweek": 1,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "critigals": [
+        { "id": "daniela-correia", "name": "Daniela Correia", "goals": 2, "goalType": "regular" }
+      ],
+      "underdogs-fc": [
+        { "id": "guilherme-imperial", "name": "Guilherme Imperial", "goals": 6, "goalType": "regular" },
+        { "id": "elisio-alexandre-sousa", "name": "Elísio Alexandre Sousa", "goals": 6, "goalType": "regular" },
+        { "id": "emanuel-barata", "name": "Emanuel Barata", "goals": 4, "goalType": "regular" },
+        { "id": "joao-bernardo-jorge", "name": "João Bernardo Jorge", "goals": 3, "goalType": "regular" },
+        { "id": "fabio-horta-oliveira", "name": "Fábio Horta de Oliveira", "goals": 4, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-b7",
@@ -87,7 +126,18 @@
     "awayScore": 21,
     "gameweek": 4,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+        "borg-coimbra": [
+          { "id": "simao-santos", "name": "Simão Santos", "goals": 6, "goalType": "regular" },
+          { "id": "sergio-santos", "name": "Sérgio Santos", "goals": 6, "goalType": "regular" },
+          { "id": "pedro-lourenco", "name": "Pedro Lourenço", "goals": 3, "goalType": "regular" },
+          { "id": "diogo-campos", "name": "Diogo Campos", "goals": 3, "goalType": "regular" },
+          { "id": "alfonso-brandao", "name": "Alfonso Brandão", "goals": 2, "goalType": "regular" },
+          { "id": "tiago-dias", "name": "Tiago Dias", "goals": 1, "goalType": "regular" }
+        ]
+      }
+
   },
   {
     "matchId": "match-c1",
@@ -100,14 +150,14 @@
     "played": true,
     "scorers": {
       "logan-fc": [
-        { "id": "miranda", "name": "Miranda", "goals": 1 },
-        { "id": "hugo", "name": "Hugo", "goals": 1 },
-        { "id": "pedro", "name": "Pedro", "goals": 1 },
-        { "id": "tiago", "name": "Tiago", "goals": 1 }
+        { "id": "miranda", "name": "Miranda", "goals": 1, "goalType": "regular" },
+        { "id": "hugo", "name": "Hugo", "goals": 1, "goalType": "regular" },
+        { "id": "pedro", "name": "Pedro", "goals": 1, "goalType": "regular" },
+        { "id": "tiago", "name": "Tiago", "goals": 1, "goalType": "regular" }
       ],
       "critical-techballers": [
-        { "id": "sergio", "name": "Sérgio", "goals": 1 },
-        { "id": "francisco-arantes", "name": "Francisco Arantes", "goals": 1 }
+        { "id": "sergio", "name": "Sérgio", "goals": 1, "goalType": "regular" },
+        { "id": "francisco-arantes", "name": "Francisco Arantes", "goals": 1, "goalType": "regular" }
       ]
     }
   },
@@ -119,7 +169,12 @@
     "awayScore": 1,
     "gameweek": 1,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "sporting-esgaios": [
+          { "id": "francisco-ferreira", "name": "Francisco Ferreira", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-c3",
@@ -129,7 +184,13 @@
     "awayScore": 3,
     "gameweek": 1,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "francesinha-united": [
+          { "id": "jose-barreirinho", "name": "José Barreirinho", "goals": 2, "goalType": "regular" },
+          { "id": "diogo-pedrosa", "name": "Diogo Pedrosa", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-c4",
@@ -139,7 +200,18 @@
     "awayScore": 3,
     "gameweek": 2,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "sporting-esgaios": [
+          { "id": "ricardo-mesquita", "name": "Ricardo Mesquita", "goals": 1, "goalType": "penalty" },
+          { "id": "francisco-ferreira", "name": "Francisco Ferreira", "goals": 1, "goalType": "regular" },
+          { "id": "bruno-gandres", "name": "Bruno Gandres", "goals": 1, "goalType": "regular" }
+        ],
+        "logan-fc": [
+          { "id": "tiago", "name": "Tiago", "goals": 1, "goalType": "regular" },
+          { "id": "pedro", "name": "Pedro", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-c5",
@@ -189,7 +261,13 @@
     "awayScore": 1,
     "gameweek": 3,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "sporting-esgaios": [
+          { "id": "ricardo-mesquita", "name": "Ricardo Mesquita", "goals": 1, "goalType": "regular" },
+          { "id": "marcio-veiga", "name": "Márcio Veiga", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-c10",
@@ -209,7 +287,15 @@
     "awayScore": 7,
     "gameweek": 3,
     "groupId": "group-a",
-    "played": true
+    "played": true,
+    "scorers": {
+        "desesperados-fc": [
+          { "id": "andre-farinha-carvalho", "name": "André Farinha Carvalho", "goals": 5, "goalType": "regular" },
+          { "id": "goncalo-lopes", "name": "Gonçalo Lopes", "goals": 2, "goalType": "regular" },
+          { "id": "miguel-lopo-ferreira", "name": "Miguel Lopo Ferreira", "goals": 1, "goalType": "regular" },
+          { "id": "tiago-jesus", "name": "Tiago Jesus", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-b5",
@@ -259,6 +345,19 @@
     "awayScore": 2,
     "gameweek": 4,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "sporting-esgaios": [
+          { "id": "marcio-veiga", "name": "Márcio Veiga", "goals": 6, "goalType": "regular" },
+          { "id": "sandro-carvalho", "name": "Sandro Carvalho", "goals": 1, "goalType": "regular" },
+          { "id": "joao-amorim", "name": "João Amorim", "goals": 1, "goalType": "regular" },
+          { "id": "ricardo-mesquita", "name": "Ricardo Mesquita", "goals": 1, "goalType": "regular" },
+          { "id": "bruno-gandres", "name": "Bruno Gandres", "goals": 2, "goalType": "regular" }
+        ],
+        "francesinha-united": [
+          { "id": "paulo-almeida-sousa", "name": "Paulo Sousa", "goals": 2, "goalType": "regular" },
+          { "id": "paulo-almeida-sousa", "name": "Paulo Sousa", "goals": 1, "goalType": "own-goal" }
+        ]
+    }
   }
 ]

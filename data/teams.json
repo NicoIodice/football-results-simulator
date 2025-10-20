@@ -126,8 +126,8 @@
         "isCaptain": true
       },
       {
-        "id": "bestsellers-def2",
-        "name": "BestSellers Defender 2",
+        "id": "filipe-foncesa",
+        "name": "Filipe Fonseca",
         "number": 3,
         "position": "defender",
         "status": "fit",
@@ -135,8 +135,8 @@
         "isCaptain": false
       },
       {
-        "id": "bestsellers-mid",
-        "name": "BestSellers Midfielder",
+        "id": "joao-correi",
+        "name": "João Correia",
         "number": 4,
         "position": "midfielder",
         "status": "fit",
@@ -144,9 +144,54 @@
         "isCaptain": false
       },
       {
-        "id": "bestsellers-fwd",
-        "name": "BestSellers Forward",
+        "id": "david-carvalho",
+        "name": "David Carvalho",
         "number": 5,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-sub1",
+        "name": "BestSellers Sub 1",
+        "number": 6,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "unknown",
+        "name": "Unknown",
+        "number": 7,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-sub3",
+        "name": "BestSellers Sub 3",
+        "number": 8,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-sub4",
+        "name": "BestSellers Sub 4",
+        "number": 9,
+        "position": "forward",
+        "status": "fit",
+        "isStarter": true,
+        "isCaptain": false
+      },
+      {
+        "id": "bestsellers-sub5",
+        "name": "BestSellers Sub 5",
+        "number": 10,
         "position": "forward",
         "status": "fit",
         "isStarter": true,

@@ -1,7 +1,7 @@
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
-    // Find goals for this match
-    const matchGoals = goals.filter(g => g.matchId === matchId);
+    // Find goals for this match using scorers from group-phase-results.json
+    const matchGoals = getGoalsForGroup().filter(g => g.matchId === matchId);
     // Own goals for each team (should be shown for opponent)
     const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
     const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
@@ -11,15 +11,15 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
     let awayContent = '';
     if (homeScorers.length > 0 || homeOwnGoals.length > 0) {
         homeContent = `<table class='scorers-table'><tbody>` +
-            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
-            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') +
+            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') + `</tbody></table>`;
     } else {
         homeContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }
     if (awayScorers.length > 0 || awayOwnGoals.length > 0) {
         awayContent = `<table class='scorers-table'><tbody>` +
-            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
-            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') +
+            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') + `</tbody></table>`;
     } else {
         awayContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }
@@ -54,7 +54,7 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
     popup.querySelector('.scorers-close').onclick = function(e) {
         document.body.removeChild(popup);
         e.stopPropagation();
-    };
+    }
     setTimeout(() => {
         document.addEventListener('mousedown', function handler(e) {
             if (!popup.contains(e.target)) {
@@ -84,7 +84,7 @@ let teams = [];
 let fixtures = [];
 let results = [];
 let knockoutResults = {};
-let goals = [];
+// let goals = []; // REMOVED: All goal data now comes from group-phase-results.json
 let defaults = {}; // Add defaults configuration
 let selectedGroupId = null;
 
@@ -969,13 +969,12 @@ function saveConfig() {
 // Load JSON data
 async function loadData() {
     try {
-        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, goalsResponse, knockoutResponse] = await Promise.all([
+        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, knockoutResponse] = await Promise.all([
             fetch('data/config.json'),
             fetch('data/groups.json'),
             fetch('data/teams.json'),
             fetch('data/fixtures.json'),
             fetch('data/group-phase-results.json'),
-            fetch('data/goals.json'),
             fetch('data/knockout-results.json')
         ]);
         
@@ -985,7 +984,7 @@ async function loadData() {
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await groupPhaseResultsResponse.json();
-        goals = await goalsResponse.json();
+    // goals.json is deprecated; all goal data comes from group-phase-results.json
         knockoutResults = await knockoutResponse.json();
         
         // Set default group based on config.json
@@ -1106,95 +1105,84 @@ function getResultsForGroup(groupId = selectedGroupId) {
     return results.filter(result => result.groupId === groupId);
 }
 
+// getGoalsForGroup is now deprecated. Use scorers from results in group-phase-results.json
+// All goal/statistics logic should use the scorers property in results.
 function getGoalsForGroup(groupId = selectedGroupId) {
-    return goals.filter(goal => goal.groupId === groupId);
+    // Aggregate all scorers from results for the group
+    const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
+    let goals = [];
+    groupResults.forEach(match => {
+        Object.entries(match.scorers).forEach(([teamId, players]) => {
+            players.forEach(player => {
+                goals.push({
+                    matchId: match.matchId,
+                    groupId: match.groupId,
+                    teamId,
+                    playerId: player.id,
+                    playerName: player.name,
+                    goalType: player.goalType || 'regular',
+                    totalGoals: player.goals
+                });
+            });
+        });
+    });
+    return goals;
 }
 
 // Calculate goal statistics by team and player for current group
 function calculateGoalStatistics() {
-    const groupGoals = getGoalsForGroup();
-    const teamStats = {};
-    
-    // Initialize stats for each team
-    const groupTeams = getTeamsForGroup();
-    groupTeams.forEach(team => {
-        teamStats[team.id] = {
-            teamName: team.name,
-            totalGoals: 0,
-            players: {},
-            topScorer: null
-        };
-        
-        // Initialize player stats
-        if (team.players) {
-            team.players.forEach(player => {
-                teamStats[team.id].players[player.id] = {
-                    playerName: player.name,
-                    goals: 0,
-                    matches: []
-                };
+    // Use scorers from results (group-phase-results.json)
+    const groupId = selectedGroupId;
+    const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
+    const stats = {};
+    groupResults.forEach(match => {
+        Object.entries(match.scorers).forEach(([teamId, players]) => {
+            if (!stats[teamId]) stats[teamId] = {};
+            players.forEach(player => {
+                if (!stats[teamId][player.id]) {
+                    stats[teamId][player.id] = {
+                        name: player.name,
+                        goals: 0,
+                        goalType: player.goalType || 'regular'
+                    };
+                }
+                stats[teamId][player.id].goals += player.goals;
             });
-        }
-    });
-    
-    // Count goals by player and team
-    groupGoals.forEach(goal => {
-        if (goal.goalType === 'own-goal') return; // Exclude own goals from top scorers
-        if (teamStats[goal.teamId]) {
-            // Use totalGoals if available, otherwise count as 1
-            const goalCount = goal.totalGoals || 1;
-            teamStats[goal.teamId].totalGoals += goalCount;
-            
-            if (!teamStats[goal.teamId].players[goal.playerId]) {
-                teamStats[goal.teamId].players[goal.playerId] = {
-                    playerName: getPlayerNameById(goal.playerId),
-                    goals: 0,
-                    matches: []
-                };
-            }
-            
-            teamStats[goal.teamId].players[goal.playerId].goals += goalCount;
-            teamStats[goal.teamId].players[goal.playerId].matches.push({
-                matchId: goal.matchId,
-                goalType: goal.goalType,
-                totalGoals: goalCount
-            });
-        }
-    });
-    
-    // Find top scorer for each team
-    Object.keys(teamStats).forEach(teamId => {
-        const players = teamStats[teamId].players;
-        let topScorer = null;
-        let maxGoals = 0;
-        
-        Object.keys(players).forEach(playerId => {
-            if (players[playerId].goals > maxGoals) {
-                maxGoals = players[playerId].goals;
-                topScorer = {
-                    playerId: playerId,
-                    playerName: players[playerId].playerName,
-                    goals: maxGoals
-                };
-            }
         });
-        
-        teamStats[teamId].topScorer = topScorer;
     });
-    
-    return teamStats;
+    return stats;
+}
+function calculateGoalStatistics() {
+    // Use group-phase-results.json scorers property
+    const groupId = selectedGroupId;
+    const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
+    const stats = {};
+    groupResults.forEach(match => {
+        Object.entries(match.scorers).forEach(([teamId, players]) => {
+            if (!stats[teamId]) stats[teamId] = {};
+            players.forEach(player => {
+                if (!stats[teamId][player.id]) {
+                    stats[teamId][player.id] = {
+                        name: player.name,
+                        goals: 0,
+                        goalType: player.goalType || 'regular'
+                    };
+                }
+                stats[teamId][player.id].goals += player.goals;
+            });
+        });
+    });
+    return stats;
 }
 
 // Show goal tooltip on hover (desktop) or click (mobile)
 function showGoalTooltip(event, teamId) {
     const goalStats = calculateGoalStatistics();
     const teamStats = goalStats[teamId];
-    
-    if (!teamStats || teamStats.totalGoals === 0) return;
-    
+        if (!teamStats || !teamStats.players) return; // Prevent Object.keys error
+    // Optionally, you can show a 'No scorer data' tooltip here
     // Check if this is a mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
     // Create tooltip if it doesn't exist
     let tooltip = document.getElementById('goal-tooltip');
     if (!tooltip) {
@@ -1218,7 +1206,6 @@ function showGoalTooltip(event, teamId) {
         }))
         .filter(player => player.goals > 0)
         .sort((a, b) => b.goals - a.goals);
-    
     if (sortedPlayers.length === 0) {
         tooltip.style.display = 'none';
         return;
@@ -1821,10 +1808,12 @@ function updateOverview() {
         const groupStatus = checkQualificationStatus(currentGroupId);
         
         // Determine first place teams (all teams with same points as leader)
+        if (!standings || standings.length === 0) return;
         const firstPlacePoints = standings[0].points;
         const firstPlaceTeams = standings.filter(team => team.points === firstPlacePoints);
-        
+
         standings.forEach((team, index) => {
+            if (!team) return; // Guard against undefined team
             const row = document.createElement('tr');
 
             // TB3 logic: show '-' by default, only show head-to-head points if two teams are tied on points
@@ -4347,26 +4336,8 @@ function predictMatch(homeTeam, awayTeam) {
 
 function generatePredictionReasoning(homeTeam, awayTeam, strengthDiff) {
     const reasons = [];
-    
-    if (Math.abs(strengthDiff) > 1.5) {
-        const stronger = strengthDiff > 0 ? homeTeam : awayTeam;
-        reasons.push(`${stronger.name} has significantly better form and performance`);
-    }
-    
-    if (homeTeam.recentForm > awayTeam.recentForm + 0.3) {
-        reasons.push(`${homeTeam.name} in much better recent form`);
-    } else if (awayTeam.recentForm > homeTeam.recentForm + 0.3) {
-        reasons.push(`${awayTeam.name} in much better recent form`);
-    }
-    
-    if (homeTeam.attackingStrength > awayTeam.defensiveStrength + 1) {
-        reasons.push(`${homeTeam.name}'s attack vs ${awayTeam.name}'s defense favors home team`);
-    } else if (awayTeam.attackingStrength > homeTeam.defensiveStrength + 1) {
-        reasons.push(`${awayTeam.name}'s attack could exploit ${homeTeam.name}'s defense`);
-    }
-    
+    // Example: add more reasoning logic here if needed
     reasons.push(`Home advantage for ${homeTeam.name}`);
-    
     return reasons.slice(0, 3).join('. ') + '.';
 }
 
@@ -4577,37 +4548,36 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
 
 // Get goal scorer statistics for a team
 function getTeamGoalScorers(teamId) {
-    const teamGoals = goals.filter(goal => goal.teamId === teamId);
-    const scorerStats = {};
-    
-    teamGoals.forEach(goal => {
-        if (!scorerStats[goal.playerId]) {
-            scorerStats[goal.playerId] = {
-                name: goal.playerName,
-                goals: 0,
-                penalties: 0,
-                regularGoals: 0
-            };
-        }
-        
-        // Use totalGoals if available, otherwise count as 1
-        const goalCount = goal.totalGoals || 1;
-        scorerStats[goal.playerId].goals += goalCount;
-        
-        if (goal.goalType === 'penalti') {
-            scorerStats[goal.playerId].penalties += goalCount;
-        } else {
-            scorerStats[goal.playerId].regularGoals += goalCount;
+    // Use group-phase-results.json scorers property
+    let scorerStats = {};
+    results.forEach(match => {
+        if (match.scorers && match.scorers[teamId]) {
+            match.scorers[teamId].forEach(player => {
+                if (!scorerStats[player.id]) {
+                    scorerStats[player.id] = {
+                        name: player.name,
+                        goals: 0,
+                        penalties: 0,
+                        regularGoals: 0
+                    };
+                }
+                const goalCount = player.goals || 1;
+                scorerStats[player.id].goals += goalCount;
+                if (player.goalType === 'penalti') {
+                    scorerStats[player.id].penalties += goalCount;
+                } else {
+                    scorerStats[player.id].regularGoals += goalCount;
+                }
+            });
         }
     });
-    
-    // Convert to array and sort by goals
     return Object.values(scorerStats).sort((a, b) => b.goals - a.goals);
 }
 
 // Check if team has goal scorer data
 function hasGoalScorerData(teamId) {
-    return goals.some(goal => goal.teamId === teamId);
+    // Use scorers from results (group-phase-results.json)
+    return results.some(match => match.scorers && match.scorers[teamId] && match.scorers[teamId].length > 0);
 }
 
 // Predict likely goal scorers for a match
@@ -4716,6 +4686,47 @@ function generateGoalScorerPredictionsHTML(homeTeamId, awayTeamId, predictedHome
     // Generate unique ID for this match's scorer predictions
     const uniqueId = `scorer-${homeTeamId}-${awayTeamId}-${Date.now()}`;
     
+    // Precompute HTML for home and away scorers to avoid nested parentheses in template literals
+    let homeScorersHtml = '';
+    if (homeHasData) {
+        if (predictedHomeScore > 0) {
+            if (scorerPredictions.home.length > 0) {
+                homeScorersHtml = scorerPredictions.home.map(scorer => `
+                    <div class="scorer-prediction">
+                        <span class="scorer-name">${scorer.name}</span>
+                        <span class="scorer-probability">${scorer.probability}%</span>
+                    </div>
+                `).join('');
+            } else {
+                homeScorersHtml = '<div class="no-data">No qualifying scorers</div>';
+            }
+        } else {
+            homeScorersHtml = '<div class="no-data">No goals predicted</div>';
+        }
+    } else {
+        homeScorersHtml = '<div class="no-data">No scorer data available</div>';
+    }
+
+    let awayScorersHtml = '';
+    if (awayHasData) {
+        if (predictedAwayScore > 0) {
+            if (scorerPredictions.away.length > 0) {
+                awayScorersHtml = scorerPredictions.away.map(scorer => `
+                    <div class="scorer-prediction">
+                        <span class="scorer-name">${scorer.name}</span>
+                        <span class="scorer-probability">${scorer.probability}%</span>
+                    </div>
+                `).join('');
+            } else {
+                awayScorersHtml = '<div class="no-data">No qualifying scorers</div>';
+            }
+        } else {
+            awayScorersHtml = '<div class="no-data">No goals predicted</div>';
+        }
+    } else {
+        awayScorersHtml = '<div class="no-data">No scorer data available</div>';
+    }
+
     return `
         <div class="goal-scorer-predictions">
             <div class="scorer-section">
@@ -4727,34 +4738,11 @@ function generateGoalScorerPredictionsHTML(homeTeamId, awayTeamId, predictedHome
                     <div class="teams-scorer-columns">
                         <div class="team-scorers home-scorers">
                             <h6>${homeTeam ? homeTeam.name : 'Home Team'}</h6>
-                            ${homeHasData ? (
-                                predictedHomeScore > 0 ? (
-                                    scorerPredictions.home.length > 0 ? 
-                                        scorerPredictions.home.map(scorer => `
-                                            <div class="scorer-prediction">
-                                                <span class="scorer-name">${scorer.name}</span>
-                                                <span class="scorer-probability">${scorer.probability}%</span>
-                                            </div>
-                                        `).join('') : 
-                                        '<div class="no-data">No qualifying scorers</div>'
-                                ) : '<div class="no-data">No goals predicted</div>'
-                            ) : '<div class="no-data">No scorer data available</div>'}
+                            ${homeScorersHtml}
                         </div>
-                        
                         <div class="team-scorers away-scorers">
                             <h6>${awayTeam ? awayTeam.name : 'Away Team'}</h6>
-                            ${awayHasData ? (
-                                predictedAwayScore > 0 ? (
-                                    scorerPredictions.away.length > 0 ? 
-                                        scorerPredictions.away.map(scorer => `
-                                            <div class="scorer-prediction">
-                                                <span class="scorer-name">${scorer.name}</span>
-                                                <span class="scorer-probability">${scorer.probability}%</span>
-                                            </div>
-                                        `).join('') : 
-                                        '<div class="no-data">No qualifying scorers</div>'
-                                ) : '<div class="no-data">No goals predicted</div>'
-                            ) : '<div class="no-data">No scorer data available</div>'}
+                            ${awayScorersHtml}
                         </div>
                     </div>
                 </div>
@@ -4840,26 +4828,22 @@ function generateStatisticalInsightsHTML(standings, teamAnalysis) {
                     <div class="insight-team">${topScorer.name}</div>
                     <div class="insight-value">${topScorer.goalsFor} goals (${topScorer.attackingStrength}/game)</div>
                 </div>
-                
                 <div class="insight-card">
                     <div class="insight-title">🛡️ Best Defense</div>
                     <div class="insight-team">${bestDefense.name}</div>
                     <div class="insight-value">${bestDefense.goalsAgainst} conceded (${bestDefense.defensiveStrength}/game)</div>
                 </div>
-                
                 <div class="insight-card">
                     <div class="insight-title">📈 Best Form</div>
                     <div class="insight-team">${bestForm.name}</div>
                     <div class="insight-value">${bestForm.formDescription.icon} ${bestForm.formDescription.text}</div>
                 </div>
-                
                 <div class="insight-card">
                     <div class="insight-title">⚖️ Most Consistent</div>
                     <div class="insight-team">${mostConsistent.name}</div>
                     <div class="insight-value">${Math.round(mostConsistent.consistency * 100)}% consistency</div>
                 </div>
             </div>
-            
             <div class="league-stats">
                 <h4>League Statistics:</h4>
                 <div class="stats-grid">
@@ -6545,6 +6529,47 @@ function validateFutsalFormation(formation) {
 document.addEventListener('DOMContentLoaded', function() {
     // Load players data when page loads
     loadPlayersData();
+
+    // Add event listeners for statistics tab controls
+    setTimeout(function() {
+        const statisticsGroupSelect = document.getElementById('statistics-group-select');
+        const showAllStatisticsCheckbox = document.getElementById('show-all-statistics');
+        if (statisticsGroupSelect) {
+            statisticsGroupSelect.addEventListener('change', function() {
+                updateStatisticsForGroup();
+            });
+        }
+        if (showAllStatisticsCheckbox) {
+            showAllStatisticsCheckbox.addEventListener('change', function() {
+                toggleAllStatistics();
+            });
+        }
+        // Top scorers controls event listeners
+        const topscorersGroupSelect = document.getElementById('topscorers-group-select');
+        const topscorersTeamSelect = document.getElementById('topscorers-team-select');
+        const topscorersFilter = document.getElementById('topscorers-filter');
+        const showAllTopscorersCheckbox = document.getElementById('show-all-topscorers');
+        if (topscorersGroupSelect) {
+            topscorersGroupSelect.addEventListener('change', function() {
+                updateTopScorers();
+            });
+        }
+        if (topscorersTeamSelect) {
+            topscorersTeamSelect.addEventListener('change', function() {
+                updateTopScorers();
+            });
+        }
+        if (topscorersFilter) {
+            topscorersFilter.addEventListener('change', function() {
+                updateTopScorersFilter();
+            });
+        }
+        if (showAllTopscorersCheckbox) {
+            showAllTopscorersCheckbox.addEventListener('change', function() {
+                toggleAllTopScorers();
+            });
+        }
+    }, 0);
 });
 
 // Statistics functionality
@@ -6636,10 +6661,13 @@ function populateTopScorersTeamSelector() {
 function toggleAllStatistics() {
     const checkbox = document.getElementById('show-all-statistics');
     const groupSelect = document.getElementById('statistics-group-select');
-    
+    const groupSelector = groupSelect ? groupSelect.parentElement : null;
+
     if (checkbox && groupSelect) {
         groupSelect.disabled = checkbox.checked;
-        
+        if (groupSelector) {
+            groupSelector.classList.toggle('disabled', checkbox.checked);
+        }
         if (checkbox.checked) {
             selectedStatisticsGroupId = null;
         } else {
@@ -6648,9 +6676,7 @@ function toggleAllStatistics() {
             selectedStatisticsGroupId = defaultGroupId;
             groupSelect.value = selectedStatisticsGroupId;
         }
-        
-        updateTeamPerformanceAnalysis();
-        updateStatisticalInsights();
+        updateStatisticsForGroup();
     }
 }
 
@@ -6659,19 +6685,27 @@ function toggleAllTopScorers() {
     const filterSelect = document.getElementById('topscorers-filter');
     const groupSelector = document.getElementById('topscorers-group-selector');
     const teamSelector = document.getElementById('topscorers-team-selector');
-    
-    if (checkbox && filterSelect && groupSelector) {
+
+    if (checkbox && filterSelect && groupSelector && teamSelector) {
         filterSelect.disabled = checkbox.checked;
-        
-        if (checkbox.checked) {
-            // Hide all specific selectors when showing all groups
-            groupSelector.style.display = 'none';
+        // Determine which selector is visible
+        const filterValue = filterSelect.value;
+        const groupDropdown = document.getElementById('topscorers-group-select');
+        const teamDropdown = document.getElementById('topscorers-team-select');
+        if (filterValue === 'group') {
+            groupSelector.style.display = 'flex';
             teamSelector.style.display = 'none';
-        } else {
-            // Show appropriate selector based on filter type
+            if (groupDropdown) groupDropdown.disabled = checkbox.checked;
+            groupSelector.classList.toggle('disabled', checkbox.checked);
+        } else if (filterValue === 'team') {
+            groupSelector.style.display = 'none';
+            teamSelector.style.display = 'flex';
+            if (teamDropdown) teamDropdown.disabled = checkbox.checked;
+            teamSelector.classList.toggle('disabled', checkbox.checked);
+        }
+        if (!checkbox.checked) {
             updateTopScorersFilter();
         }
-        
         updateTopScorers();
     }
 }
@@ -6815,43 +6849,24 @@ function updateTopScorers() {
     }
     
     content.innerHTML = generateTopScorersHTML(topScorers, filterType);
+        // Always refresh and re-sort top scorers for all groups
+        if (filterType === 'all') {
+            topScorers = getTopScorersAllGroups();
+        }
+        content.innerHTML = generateTopScorersHTML(topScorers, filterType);
 }
 
 function getTopScorersAllGroups() {
-    const allGoals = [];
-    
-    goals.forEach(goal => {
-        const goalCount = goal.totalGoals || 1;
-        const existingPlayer = allGoals.find(g => g.playerId === goal.playerId);
-        
-        if (existingPlayer) {
-            existingPlayer.totalGoals += goalCount;
-        } else {
-            allGoals.push({
-                playerId: goal.playerId,
-                playerName: goal.playerName,
-                teamId: goal.teamId,
-                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
-                groupId: goal.groupId,
-                groupName: groups.find(g => g.id === goal.groupId)?.name || 'Unknown Group',
-                totalGoals: goalCount
-            });
-        }
+    // Aggregate all goals from all groups using getGoalsForGroup
+    let allGoals = [];
+    groups.forEach(group => {
+        const groupGoals = getGoalsForGroup(group.id);
+        allGoals = allGoals.concat(groupGoals);
     });
-    
-    return allGoals.sort((a, b) => b.totalGoals - a.totalGoals).slice(0, 20);
-}
-
-function getTopScorersForGroup(groupId) {
-    if (!groupId) return getTopScorersAllGroups();
-    
-    const groupGoals = goals.filter(goal => goal.groupId === groupId);
     const playersMap = new Map();
-    
-    groupGoals.forEach(goal => {
+    allGoals.forEach(goal => {
         const goalCount = goal.totalGoals || 1;
         const playerId = goal.playerId;
-        
         if (playersMap.has(playerId)) {
             playersMap.get(playerId).totalGoals += goalCount;
         } else {
@@ -6866,7 +6881,30 @@ function getTopScorersForGroup(groupId) {
             });
         }
     });
-    
+    return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals).slice(0, 20);
+}
+
+function getTopScorersForGroup(groupId) {
+    if (!groupId) return getTopScorersAllGroups();
+    const groupGoals = getGoalsForGroup(groupId);
+    const playersMap = new Map();
+    groupGoals.forEach(goal => {
+        const goalCount = goal.goals || goal.totalGoals || 1;
+        const playerId = goal.playerId;
+        if (playersMap.has(playerId)) {
+            playersMap.get(playerId).totalGoals += goalCount;
+        } else {
+            playersMap.set(playerId, {
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                groupId: goal.groupId,
+                groupName: groups.find(g => g.id === goal.groupId)?.name || 'Unknown Group',
+                totalGoals: goalCount
+            });
+        }
+    });
     return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
 }
 
@@ -6875,14 +6913,17 @@ function getTopScorersForTeam(teamId) {
         // If no team selected, return empty array
         return [];
     }
-    
-    const teamGoals = goals.filter(goal => goal.teamId === teamId);
+    // Aggregate all goals for the team from all groups
+    let allGoals = [];
+    groups.forEach(group => {
+        const groupGoals = getGoalsForGroup(group.id);
+        allGoals = allGoals.concat(groupGoals);
+    });
+    const teamGoals = allGoals.filter(goal => goal.teamId === teamId);
     const playersMap = new Map();
-    
     teamGoals.forEach(goal => {
         const goalCount = goal.totalGoals || 1;
         const playerId = goal.playerId;
-        
         if (playersMap.has(playerId)) {
             playersMap.get(playerId).totalGoals += goalCount;
         } else {
@@ -6897,7 +6938,6 @@ function getTopScorersForTeam(teamId) {
             });
         }
     });
-    
     return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
 }
 
@@ -7482,32 +7522,28 @@ function isWithinEditWindow(playedDate) {
 
 function downloadKnockoutResults() {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    if (isMobile) {
-        showToast('Download is not available on mobile devices.', 'warning', 4000);
-        return;
+    if (!teamId) {
+        // If no team selected, return empty array
+        return [];
     }
-    const dataStr = JSON.stringify(knockoutResults, null, 2);
-    const dataBlob = new Blob([dataStr], {type: 'application/json'});
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'knockout-results.json';
-    link.click();
-    URL.revokeObjectURL(url);
-}
-
-// Championship Celebration Functions
-function triggerChampionshipCelebration(finalResult) {
-    // Check if current time is past the game time
-    const currentTime = new Date();
-    const gameTime = new Date(finalResult.playedDate);
-    
-    if (currentTime <= gameTime) {
-        logger.log('DEBUG: Championship celebration skipped - game time not yet passed');
-        return;
-    }
-    
-    // Get the championship winner
+    const teamGoals = getGoalsForGroup().filter(goal => goal.teamId === teamId);
+    const playersMap = new Map();
+    teamGoals.forEach(goal => {
+        const goalCount = goal.goals || goal.totalGoals || 1;
+        const playerId = goal.playerId;
+        if (playersMap.has(playerId)) {
+            playersMap.get(playerId).totalGoals += goalCount;
+        } else {
+            playersMap.set(playerId, {
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                totalGoals: goalCount
+            });
+        }
+    });
+    return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
     const championTeam = teams.find(t => t.id === finalResult.winner);
     if (!championTeam) {
         logger.log('ERROR: Championship team not found');

@@ -1,3 +1,8 @@
+/* Disabled state for selectors and labels */
+.disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
 /* Scorers table styling for modal */
 .scorers-table {
     width: 100%;
@@ -25,7 +30,7 @@
     border-radius: 6px;
 }
 .scorers-table tr.own-goal td.scorer-goals {
-    color: black
+    color: black;
     background: #3498db;
 }
 .scorers-table tr:last-child td {
