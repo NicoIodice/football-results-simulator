@@ -1059,6 +1059,7 @@ function calculateGoalStatistics() {
     
     // Count goals by player and team
     groupGoals.forEach(goal => {
+        if (goal.goalType === 'own-goal') return; // Exclude own goals from top scorers
         if (teamStats[goal.teamId]) {
             // Use totalGoals if available, otherwise count as 1
             const goalCount = goal.totalGoals || 1;
@@ -1066,7 +1067,7 @@ function calculateGoalStatistics() {
             
             if (!teamStats[goal.teamId].players[goal.playerId]) {
                 teamStats[goal.teamId].players[goal.playerId] = {
-                    playerName: goal.playerName,
+                    playerName: getPlayerNameById(goal.playerId),
                     goals: 0,
                     matches: []
                 };
@@ -1167,6 +1168,8 @@ function showGoalTooltip(event, teamId) {
     content += '</div>';
     tooltip.innerHTML = content;
     tooltip.dataset.currentTeam = teamId; // Track which team tooltip is showing
+    tooltip.style.maxWidth = '320px';
+    tooltip.style.whiteSpace = 'normal';
     
     // Position tooltip
     if (isMobile) {

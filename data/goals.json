@@ -189,39 +189,57 @@
     "totalGoals": 1
   },
   {
-    "matchId": "general",
+    "matchId": "match-c12",
     "groupId": "group-c",
     "teamId": "sporting-esgaios",
     "playerId": "ricardo-mesquita",
     "playerName": "Ricardo Mesquita",
     "goalType": "regular",
-    "totalGoals": 2
-  },
-  {
-    "matchId": "general",
-    "groupId": "group-c",
-    "teamId": "sporting-esgaios",
-    "playerId": "bruno-gandres",
-    "playerName": "Bruno Gandres",
-    "goalType": "regular",
     "totalGoals": 1
   },
   {
-    "matchId": "general",
-    "groupId": "group-c",
-    "teamId": "sporting-esgaios",
-    "playerId": "francisco-ferreira",
-    "playerName": "Francisco Ferreira",
-    "goalType": "regular",
-    "totalGoals": 2
-  },
-  {
-    "matchId": "general",
+    "matchId": "match-c12",
     "groupId": "group-c",
     "teamId": "sporting-esgaios",
     "playerId": "marcio-veiga",
     "playerName": "Márcio Veiga",
     "goalType": "regular",
+    "totalGoals": 6
+  },
+  {
+    "matchId": "match-c12",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "joao-manuel-amorim",
+    "playerName": "João Amorim",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c12",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "sandro-carvalho",
+    "playerName": "Sandro Carvalho",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c12",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "bruno-gandres",
+    "playerName": "Bruno Gandres",
+    "goalType": "regular",
+    "totalGoals": 2
+  },
+  {
+    "matchId": "match-c12",
+    "groupId": "group-c",
+    "teamId": "francesinha-united",
+    "playerId": "paulo-almeida-sousa",
+    "playerName": "Paulo Almeida Sousa",
+    "goalType": "own-goal",
     "totalGoals": 1
   },
   {
@@ -241,5 +259,60 @@
     "playerName": "José Barreirinho",
     "goalType": "regular",
     "totalGoals": 2
+  }
+  ,
+  {
+    "matchId": "match-c2",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "francisco-ferreira",
+    "playerName": "Francisco Ferreira",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c4",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "francisco-ferreira",
+    "playerName": "Francisco Ferreira",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c4",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "ricardo-mesquita",
+    "playerName": "Ricardo Mesquita",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c4",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "bruno-gandres",
+    "playerName": "Bruno Gandres",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c9",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "ricardo-mesquita",
+    "playerName": "Ricardo Mesquita",
+    "goalType": "regular",
+    "totalGoals": 1
+  },
+  {
+    "matchId": "match-c9",
+    "groupId": "group-c",
+    "teamId": "sporting-esgaios",
+    "playerId": "marcio-veiga",
+    "playerName": "Márcio Veiga",
+    "goalType": "regular",
+    "totalGoals": 1
   }
 ]
