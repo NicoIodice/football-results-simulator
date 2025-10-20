@@ -1,10 +1,10 @@
 {
   "tabVisibility": {
     "standings": true,
-    "simulator": true,
-    "forecast": true,
     "teams": true,
-    "fixtures": true
+    "fixtures": true,
+    "forecast": true,
+    "simulator": true
   },
   "subTabs": {
     "standings": {

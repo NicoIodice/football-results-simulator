@@ -546,16 +546,15 @@ function createGroupDropdown(selected) {
     const select = document.createElement('select');
     select.className = 'config-input';
     select.dataset.path = 'General.defaultGroup';
-    // Use global groups if available
-    if (window.groups && Array.isArray(window.groups)) {
-        window.groups.forEach(g => {
-            const option = document.createElement('option');
-            option.value = g.id;
-            option.textContent = g.name || g.id;
-            if (g.id === selected) option.selected = true;
-            select.appendChild(option);
-        });
-    }
+    // Use global groups if available, fallback to loaded groups
+    const groupList = (typeof groups !== 'undefined' && Array.isArray(groups) && groups.length) ? groups : (window.groups || []);
+    groupList.forEach(g => {
+        const option = document.createElement('option');
+        option.value = g.id;
+        option.textContent = g.name || g.id;
+        if (g.id === selected) option.selected = true;
+        select.appendChild(option);
+    });
     select.onchange = onConfigInputChange;
     return select;
 }
@@ -564,21 +563,21 @@ function createTeamDropdown(selected) {
     const select = document.createElement('select');
     select.className = 'config-input';
     select.dataset.path = 'General.defaultTeam';
-    // Group teams by group
-    if (window.groups && window.teams && Array.isArray(window.groups) && Array.isArray(window.teams)) {
-        window.groups.forEach(g => {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = g.name || g.id;
-            window.teams.filter(t => t.groupId === g.id).forEach(team => {
-                const option = document.createElement('option');
-                option.value = team.id;
-                option.textContent = team.name;
-                if (team.id === selected) option.selected = true;
-                optgroup.appendChild(option);
-            });
-            select.appendChild(optgroup);
+    // Use global groups/teams if available, fallback to loaded groups/teams
+    const groupList = (typeof groups !== 'undefined' && Array.isArray(groups) && groups.length) ? groups : (window.groups || []);
+    const teamList = (typeof teams !== 'undefined' && Array.isArray(teams) && teams.length) ? teams : (window.teams || []);
+    groupList.forEach(g => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = g.name || g.id;
+        teamList.filter(t => t.groupId === g.id).forEach(team => {
+            const option = document.createElement('option');
+            option.value = team.id;
+            option.textContent = team.name;
+            if (team.id === selected) option.selected = true;
+            optgroup.appendChild(option);
         });
-    }
+        select.appendChild(optgroup);
+    });
     select.onchange = onConfigInputChange;
     return select;
 }
@@ -594,9 +593,10 @@ function createDatePicker(value) {
 }
 
 function renderVenuesEditor(panel) {
-    // Render venues for group and knockout games, allow add/edit (placeholder for now)
+    // Render venues for group and knockout games, allow add/edit
     const heading = document.createElement('h1');
     heading.textContent = 'Venues';
+    heading.style.marginBottom = '24px';
     panel.appendChild(heading);
 
     // Group phase venues
@@ -609,7 +609,62 @@ function renderVenuesEditor(panel) {
         const groupName = group ? group.name : groupId;
         const venueDiv = document.createElement('div');
         venueDiv.className = 'venue-row';
-        venueDiv.innerHTML = `<strong>${groupName}:</strong> <span>${venue.name || ''}</span> <a href="${venue.googleMapsUrl || '#'}" target="_blank">Map</a>`;
+        venueDiv.style.marginBottom = '20px';
+
+        // Group name on its own line
+        const groupNameDiv = document.createElement('div');
+        groupNameDiv.className = 'venue-group-name';
+        groupNameDiv.textContent = groupName;
+        groupNameDiv.style.fontWeight = 'bold';
+        groupNameDiv.style.marginBottom = '6px';
+        venueDiv.appendChild(groupNameDiv);
+
+        // Name and Google Maps label/fields on next line
+        const fieldsRow = document.createElement('div');
+        fieldsRow.style.display = 'flex';
+        fieldsRow.style.gap = '12px';
+        fieldsRow.style.alignItems = 'center';
+
+        // Venue name
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = 'Name:';
+        nameLabel.htmlFor = `venue-name-${groupId}`;
+        nameLabel.style.marginRight = '4px';
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = venue.name || '';
+        nameInput.className = 'config-input venue-name-input';
+        nameInput.id = `venue-name-${groupId}`;
+        nameInput.dataset.path = `groupPhase.venues.${groupId}.name`;
+        nameInput.oninput = onConfigInputChange;
+
+        // Google Maps URL
+        const urlLabel = document.createElement('label');
+        urlLabel.textContent = 'Google Maps:';
+        urlLabel.htmlFor = `venue-url-${groupId}`;
+        urlLabel.style.marginLeft = '12px';
+        urlLabel.style.marginRight = '4px';
+        const urlInput = document.createElement('input');
+        urlInput.type = 'text';
+        urlInput.value = venue.googleMapsUrl || '';
+        urlInput.className = 'config-input venue-url-input';
+        urlInput.id = `venue-url-${groupId}`;
+        urlInput.dataset.path = `groupPhase.venues.${groupId}.googleMapsUrl`;
+        urlInput.oninput = onConfigInputChange;
+
+        // Google Maps link/button
+        const mapBtn = document.createElement('a');
+        mapBtn.href = venue.googleMapsUrl || '#';
+        mapBtn.target = '_blank';
+        mapBtn.className = 'venue-map-link-btn';
+        mapBtn.textContent = 'Open Map';
+
+        fieldsRow.appendChild(nameLabel);
+        fieldsRow.appendChild(nameInput);
+        fieldsRow.appendChild(urlLabel);
+        fieldsRow.appendChild(urlInput);
+        fieldsRow.appendChild(mapBtn);
+        venueDiv.appendChild(fieldsRow);
         groupVenueList.appendChild(venueDiv);
     });
     panel.appendChild(groupVenueList);
@@ -619,7 +674,62 @@ function renderVenuesEditor(panel) {
     if (knockoutVenue) {
         const knockoutDiv = document.createElement('div');
         knockoutDiv.className = 'venue-row';
-        knockoutDiv.innerHTML = `<h3>Knockout Venue</h3><strong>${knockoutVenue.name || ''}</strong> <a href="${knockoutVenue.googleMapsUrl || '#'}" target="_blank">Map</a>`;
+        knockoutDiv.style.marginBottom = '20px';
+
+        // Knockout label on its own line
+        const knockoutLabelDiv = document.createElement('div');
+        knockoutLabelDiv.className = 'venue-group-name';
+        knockoutLabelDiv.textContent = 'Knockout';
+        knockoutLabelDiv.style.fontWeight = 'bold';
+        knockoutLabelDiv.style.marginBottom = '6px';
+        knockoutDiv.appendChild(knockoutLabelDiv);
+
+        // Name and Google Maps label/fields on next line
+        const fieldsRow = document.createElement('div');
+        fieldsRow.style.display = 'flex';
+        fieldsRow.style.gap = '12px';
+        fieldsRow.style.alignItems = 'center';
+
+        // Venue name
+        const nameLabel = document.createElement('label');
+        nameLabel.textContent = 'Name:';
+        nameLabel.htmlFor = `venue-name-knockout`;
+        nameLabel.style.marginRight = '4px';
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.value = knockoutVenue.name || '';
+        nameInput.className = 'config-input venue-name-input';
+        nameInput.id = `venue-name-knockout`;
+        nameInput.dataset.path = `knockout.venue.name`;
+        nameInput.oninput = onConfigInputChange;
+
+        // Google Maps URL
+        const urlLabel = document.createElement('label');
+        urlLabel.textContent = 'Google Maps:';
+        urlLabel.htmlFor = `venue-url-knockout`;
+        urlLabel.style.marginLeft = '12px';
+        urlLabel.style.marginRight = '4px';
+        const urlInput = document.createElement('input');
+        urlInput.type = 'text';
+        urlInput.value = knockoutVenue.googleMapsUrl || '';
+        urlInput.className = 'config-input venue-url-input';
+        urlInput.id = `venue-url-knockout`;
+        urlInput.dataset.path = `knockout.venue.googleMapsUrl`;
+        urlInput.oninput = onConfigInputChange;
+
+        // Google Maps link/button
+        const mapBtn = document.createElement('a');
+        mapBtn.href = knockoutVenue.googleMapsUrl || '#';
+        mapBtn.target = '_blank';
+        mapBtn.className = 'venue-map-link-btn';
+        mapBtn.textContent = 'Open Map';
+
+        fieldsRow.appendChild(nameLabel);
+        fieldsRow.appendChild(nameInput);
+        fieldsRow.appendChild(urlLabel);
+        fieldsRow.appendChild(urlInput);
+        fieldsRow.appendChild(mapBtn);
+        knockoutDiv.appendChild(fieldsRow);
         panel.appendChild(knockoutDiv);
     }
 }
