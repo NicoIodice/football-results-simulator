@@ -11,15 +11,15 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
     let awayContent = '';
     if (homeScorers.length > 0 || homeOwnGoals.length > 0) {
         homeContent = `<table class='scorers-table'><tbody>` +
-            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') +
-            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
+            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
     } else {
         homeContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }
     if (awayScorers.length > 0 || awayOwnGoals.length > 0) {
         awayContent = `<table class='scorers-table'><tbody>` +
-            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') +
-            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.goals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
+            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
     } else {
         awayContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }

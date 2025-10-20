@@ -350,7 +350,7 @@
         "sporting-esgaios": [
           { "id": "marcio-veiga", "name": "Márcio Veiga", "goals": 6, "goalType": "regular" },
           { "id": "sandro-carvalho", "name": "Sandro Carvalho", "goals": 1, "goalType": "regular" },
-          { "id": "joao-amorim", "name": "João Amorim", "goals": 1, "goalType": "regular" },
+          { "id": "joao-manuel-amorim", "name": "João Amorim", "goals": 1, "goalType": "regular" },
           { "id": "ricardo-mesquita", "name": "Ricardo Mesquita", "goals": 1, "goalType": "regular" },
           { "id": "bruno-gandres", "name": "Bruno Gandres", "goals": 2, "goalType": "regular" }
         ],
