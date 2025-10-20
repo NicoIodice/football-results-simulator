@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load any pending results from session storage (mobile)
     loadPendingResults();
 
-    showTab('standings');
+    showTab('overview');
 
     // Initialize OpenRouter only if enabled
     if (config?.simulation?.useOpenAI) {
@@ -385,31 +385,29 @@ let selectedConfigCategory = 'General';
 
 const configCategoryLabels = {
     General: 'General',
-    tabVisibility: 'Tabs Visibility',
-    subTabs: 'Sub Tabs',
+    featureToggles: 'Feature Toggles',
     groupPhase: 'Group Phase',
     knockout: 'Knockout',
-    admin: 'Admin',
     simulation: 'Simulation',
-    ui: 'UI',
-    venues: 'Venues'
+    venues: 'Venues',
+    admin: 'Admin'
 };
+
+const categories = [
+    'General',
+    'featureToggles',
+    'groupPhase',
+    'knockout',
+    'simulation',
+    'venues',
+    'admin'
+];
 
 function renderConfigCategories() {
     const panel = document.getElementById('config-categories-panel');
     if (!panel || !config) return;
     panel.innerHTML = '';
-    const categories = [
-        'General',
-        'tabVisibility',
-        'subTabs',
-        'groupPhase',
-        'knockout',
-        'admin',
-        'simulation',
-        'ui',
-        'venues'
-    ];
+
     categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = 'config-category-item' + (selectedConfigCategory === cat ? ' active' : '');
@@ -436,6 +434,9 @@ function renderConfigFieldsPanel(category) {
                 fields[key] = config[key];
             }
         }
+    } else if (category === 'featureToggles') {
+        renderFeatureTogglesPanel(panel);
+        return;
     } else if (category === 'venues') {
         // Venues editor (group and knockout)
         renderVenuesEditor(panel);
@@ -459,6 +460,109 @@ function renderConfigFieldsPanel(category) {
         list.appendChild(fieldRow);
     }
     panel.appendChild(list);
+}
+
+function renderFeatureTogglesPanel(panel) {
+    panel.innerHTML = '';
+    const heading = document.createElement('h1');
+    heading.textContent = 'Feature Toggles';
+    heading.style.marginBottom = '24px';
+    panel.appendChild(heading);
+
+    // Tabs Visibility
+    const tabsSection = document.createElement('div');
+    tabsSection.className = 'feature-toggles-tabs-section';
+    const tabsTitle = document.createElement('h2');
+    tabsTitle.textContent = 'Tabs Visibility';
+    tabsSection.appendChild(tabsTitle);
+
+    const tabs = config.featureToggles.tabs;
+    const subTabs = config.featureToggles.subTabs;
+    for (const tab in tabs) {
+        const tabRow = document.createElement('div');
+        tabRow.className = 'feature-toggle-tab-row';
+        const tabCheckbox = document.createElement('input');
+        tabCheckbox.type = 'checkbox';
+        tabCheckbox.checked = tabs[tab];
+        tabCheckbox.id = `feature-toggle-tab-${tab}`;
+        tabCheckbox.dataset.tab = tab;
+        tabCheckbox.onchange = (e) => {
+            tabs[tab] = e.target.checked;
+            renderFeatureTogglesPanel(panel);
+            updateConfigSaveButton();
+        };
+        const tabLabel = document.createElement('label');
+        tabLabel.textContent = tab.charAt(0).toUpperCase() + tab.slice(1);
+        tabLabel.htmlFor = tabCheckbox.id;
+        tabRow.appendChild(tabCheckbox);
+        tabRow.appendChild(tabLabel);
+
+        // Sub-tabs toggles (expand if tab enabled and subTabs exist)
+        if (tabs[tab] && subTabs[tab]) {
+            const subTabSection = document.createElement('div');
+            subTabSection.className = 'feature-toggle-subtabs-section';
+            subTabSection.style.marginLeft = '32px';
+            subTabSection.style.marginTop = '6px';
+            subTabSection.style.marginBottom = '10px';
+            subTabSection.style.borderLeft = '2px solid #e0e0e0';
+            subTabSection.style.paddingLeft = '16px';
+            for (const subTab in subTabs[tab]) {
+                if (subTab === 'enabled') continue;
+                const subTabRow = document.createElement('div');
+                subTabRow.className = 'feature-toggle-subtab-row';
+                subTabRow.style.display = 'flex';
+                subTabRow.style.alignItems = 'center';
+                subTabRow.style.gap = '8px';
+                const subTabCheckbox = document.createElement('input');
+                subTabCheckbox.type = 'checkbox';
+                subTabCheckbox.checked = subTabs[tab][subTab];
+                subTabCheckbox.id = `feature-toggle-subtab-${tab}-${subTab}`;
+                subTabCheckbox.dataset.tab = tab;
+                subTabCheckbox.dataset.subtab = subTab;
+                subTabCheckbox.onchange = (e) => {
+                    subTabs[tab][subTab] = e.target.checked;
+                    updateConfigSaveButton();
+                };
+                const subTabLabel = document.createElement('label');
+                subTabLabel.textContent = subTab.charAt(0).toUpperCase() + subTab.slice(1);
+                subTabLabel.htmlFor = subTabCheckbox.id;
+                subTabRow.appendChild(subTabCheckbox);
+                subTabRow.appendChild(subTabLabel);
+                subTabSection.appendChild(subTabRow);
+            }
+            tabRow.appendChild(subTabSection);
+        }
+        tabsSection.appendChild(tabRow);
+    }
+    panel.appendChild(tabsSection);
+
+    // UI Toggles
+    const uiSection = document.createElement('div');
+    uiSection.className = 'feature-toggles-ui-section';
+    const uiTitle = document.createElement('h2');
+    uiTitle.textContent = 'UI';
+    uiSection.appendChild(uiTitle);
+    const ui = config.featureToggles.ui;
+    for (const key in ui) {
+        const uiRow = document.createElement('div');
+        uiRow.className = 'feature-toggle-ui-row';
+        const uiCheckbox = document.createElement('input');
+        uiCheckbox.type = 'checkbox';
+        uiCheckbox.checked = ui[key];
+        uiCheckbox.id = `feature-toggle-ui-${key}`;
+        uiCheckbox.dataset.key = key;
+        uiCheckbox.onchange = (e) => {
+            ui[key] = e.target.checked;
+            updateConfigSaveButton();
+        };
+        const uiLabel = document.createElement('label');
+        uiLabel.textContent = key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        uiLabel.htmlFor = uiCheckbox.id;
+        uiRow.appendChild(uiCheckbox);
+        uiRow.appendChild(uiLabel);
+        uiSection.appendChild(uiRow);
+    }
+    panel.appendChild(uiSection);
 }
 
 function getUserFriendlyLabel(key, category) {
@@ -491,7 +595,7 @@ function getUserFriendlyLabel(key, category) {
         statistics: 'Statistics',
         enabled: 'Enabled'
     };
-    if (category === 'subTabs' && key === 'standings') return 'Overview Tabs';
+    if (category === 'subTabs' && key === 'overview') return 'Overview Tabs';
     return labels[key] || key.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
 }
 
@@ -619,12 +723,11 @@ function renderVenuesEditor(panel) {
         groupNameDiv.style.marginBottom = '6px';
         venueDiv.appendChild(groupNameDiv);
 
-        // Name and Google Maps label/fields on next line
-        const fieldsRow = document.createElement('div');
-        fieldsRow.style.display = 'flex';
-        fieldsRow.style.gap = '12px';
-        fieldsRow.style.alignItems = 'center';
-
+        // Venue name field
+        const nameRow = document.createElement('div');
+        nameRow.style.display = 'flex';
+        nameRow.style.gap = '12px';
+        nameRow.style.alignItems = 'center';
         // Venue name
         const nameLabel = document.createElement('label');
         nameLabel.textContent = 'Name:';
@@ -637,12 +740,23 @@ function renderVenuesEditor(panel) {
         nameInput.id = `venue-name-${groupId}`;
         nameInput.dataset.path = `groupPhase.venues.${groupId}.name`;
         nameInput.oninput = onConfigInputChange;
+        nameRow.appendChild(nameLabel);
+        nameRow.appendChild(nameInput);
+        venueDiv.appendChild(nameRow);
 
+        // Add a break line between name and Google Maps
+        venueDiv.appendChild(document.createElement('br'));
+
+        // Google Maps label/fields row
+        const fieldsRow = document.createElement('div');
+        fieldsRow.style.display = 'flex';
+        fieldsRow.style.gap = '12px';
+        fieldsRow.style.alignItems = 'center';
         // Google Maps URL
         const urlLabel = document.createElement('label');
         urlLabel.textContent = 'Google Maps:';
         urlLabel.htmlFor = `venue-url-${groupId}`;
-        urlLabel.style.marginLeft = '12px';
+        urlLabel.style.marginLeft = '0px';
         urlLabel.style.marginRight = '4px';
         const urlInput = document.createElement('input');
         urlInput.type = 'text';
@@ -651,16 +765,12 @@ function renderVenuesEditor(panel) {
         urlInput.id = `venue-url-${groupId}`;
         urlInput.dataset.path = `groupPhase.venues.${groupId}.googleMapsUrl`;
         urlInput.oninput = onConfigInputChange;
-
         // Google Maps link/button
         const mapBtn = document.createElement('a');
         mapBtn.href = venue.googleMapsUrl || '#';
         mapBtn.target = '_blank';
         mapBtn.className = 'venue-map-link-btn';
         mapBtn.textContent = 'Open Map';
-
-        fieldsRow.appendChild(nameLabel);
-        fieldsRow.appendChild(nameInput);
         fieldsRow.appendChild(urlLabel);
         fieldsRow.appendChild(urlInput);
         fieldsRow.appendChild(mapBtn);
@@ -847,7 +957,7 @@ function updateStandingsForGroup() {
         const groupSelect = document.getElementById('selected-group');
         if (groupSelect) {
             selectedGroupId = groupSelect.value;
-            updateStandings();
+            updateOverview();
             updateTeamSelectorForGroup(); // Update simulator team options
         }
     } catch (error) {
@@ -1136,27 +1246,30 @@ function showTab(tabName) {
     tabButtons.forEach(button => button.classList.remove('active'));
     
     // Show selected tab content
-    document.getElementById(tabName).classList.add('active');
-    
+    const tabContent = document.getElementById(tabName);
+    if (tabContent) {
+        tabContent.classList.add('active');
+    }
+
     // Add active class to clicked button
     const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
     if (activeButton) {
         activeButton.classList.add('active');
     }
-    
+
     // Update content based on tab
     switch(tabName) {
-        case 'standings':
-            updateStandings();
+        case 'overview':
+            updateOverview();
             break;
         case 'fixtures':
             updateFixtures();
             break;
-        case 'simulator':
-            updateSimulation();
-            break;
         case 'forecast':
             updateForecast();
+            break;
+        case 'simulator':
+            updateSimulation();
             break;
     }
 }
@@ -1170,7 +1283,7 @@ function applyTabVisibilitySettings() {
     
     // Map of tab names to their selectors
     const tabMapping = {
-        'standings': { button: 'button[onclick="showTab(\'standings\')"]', content: '#standings' },
+        'overview': { button: 'button[onclick="showTab(\'overview\')"]', content: '#overview' },
         'teams': { button: 'button[onclick="showTab(\'teams\')"]', content: '#teams' },
         'fixtures': { button: 'button[onclick="showTab(\'fixtures\')"]', content: '#fixtures' },
         'simulator': { button: 'button[onclick="showTab(\'simulator\')"]', content: '#simulator' },
@@ -1198,8 +1311,8 @@ function applyTabVisibilitySettings() {
     }
     
     // Apply sub-tab configurations if they exist in defaults
-    if (defaults.subTabs && defaults.subTabs.standings) {
-        const subTabConfig = defaults.subTabs.standings;
+    if (defaults.subTabs && defaults.subTabs.overview) {
+        const subTabConfig = defaults.subTabs.overview;
         const subTabsContainer = document.querySelector('.sub-tabs');
         
         // Hide/show sub-tabs container based on configuration
@@ -1598,106 +1711,106 @@ function updateGroupStatusIndicator() {
     }
 }
 
-function updateStandings() {
+function updateOverview() {
     try {
         // Update group status indicator
         updateGroupStatusIndicator();
         
         const standings = calculateStandings();
-    const tbody = document.getElementById('standings-body');
-    tbody.innerHTML = '';
-    
-    // Get current group's completion status for crown logic
-    const groupSelect = document.getElementById('selected-group');
-    const currentGroupId = groupSelect ? groupSelect.value : null;
-    const groupStatus = checkQualificationStatus(currentGroupId);
-    
-    // Determine first place teams (all teams with same points as leader)
-    const firstPlacePoints = standings[0].points;
-    const firstPlaceTeams = standings.filter(team => team.points === firstPlacePoints);
-    
-    standings.forEach((team, index) => {
-        const row = document.createElement('tr');
+        const tbody = document.getElementById('standings-body');
+        tbody.innerHTML = '';
+        
+        // Get current group's completion status for crown logic
+        const groupSelect = document.getElementById('selected-group');
+        const currentGroupId = groupSelect ? groupSelect.value : null;
+        const groupStatus = checkQualificationStatus(currentGroupId);
+        
+        // Determine first place teams (all teams with same points as leader)
+        const firstPlacePoints = standings[0].points;
+        const firstPlaceTeams = standings.filter(team => team.points === firstPlacePoints);
+        
+        standings.forEach((team, index) => {
+            const row = document.createElement('tr');
 
-        // TB3 logic: show '-' by default, only show head-to-head points if two teams are tied on points
-        let tb3Value = '-';
-        // Find all teams with the same points
-        const tiedTeams = standings.filter(t => t.points === team.points);
-        if (tiedTeams.length === 2) {
-            // Only two teams tied, show head-to-head points for the other team
-            const otherTeam = tiedTeams.find(t => t.id !== team.id);
-            if (otherTeam) {
-                // Find the result of the match between these two teams
-                let headToHeadPoints = 0;
-                let foundHeadToHeadMatch = false;
-                results.forEach(result => {
-                    if (
-                        ((result.homeTeam === team.id && result.awayTeam === otherTeam.id) ||
-                        (result.homeTeam === otherTeam.id && result.awayTeam === team.id)) &&
-                        result.played
-                    ) {
-                        foundHeadToHeadMatch = true;
-                        if (result.homeTeam === team.id) {
-                            if (result.homeScore > result.awayScore) headToHeadPoints += 3;
-                            else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
-                            // If homeScore < awayScore, headToHeadPoints remains 0 (loss)
-                        } else if (result.awayTeam === team.id) {
-                            if (result.awayScore > result.homeScore) headToHeadPoints += 3;
-                            else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
-                            // If awayScore < homeScore, headToHeadPoints remains 0 (loss)
+            // TB3 logic: show '-' by default, only show head-to-head points if two teams are tied on points
+            let tb3Value = '-';
+            // Find all teams with the same points
+            const tiedTeams = standings.filter(t => t.points === team.points);
+            if (tiedTeams.length === 2) {
+                // Only two teams tied, show head-to-head points for the other team
+                const otherTeam = tiedTeams.find(t => t.id !== team.id);
+                if (otherTeam) {
+                    // Find the result of the match between these two teams
+                    let headToHeadPoints = 0;
+                    let foundHeadToHeadMatch = false;
+                    results.forEach(result => {
+                        if (
+                            ((result.homeTeam === team.id && result.awayTeam === otherTeam.id) ||
+                            (result.homeTeam === otherTeam.id && result.awayTeam === team.id)) &&
+                            result.played
+                        ) {
+                            foundHeadToHeadMatch = true;
+                            if (result.homeTeam === team.id) {
+                                if (result.homeScore > result.awayScore) headToHeadPoints += 3;
+                                else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
+                                // If homeScore < awayScore, headToHeadPoints remains 0 (loss)
+                            } else if (result.awayTeam === team.id) {
+                                if (result.awayScore > result.homeScore) headToHeadPoints += 3;
+                                else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
+                                // If awayScore < homeScore, headToHeadPoints remains 0 (loss)
+                            }
                         }
+                    });
+                    // Only show TB3 value if a head-to-head match was found between the tied teams
+                    if (foundHeadToHeadMatch) {
+                        tb3Value = headToHeadPoints;
                     }
-                });
-                // Only show TB3 value if a head-to-head match was found between the tied teams
-                if (foundHeadToHeadMatch) {
-                    tb3Value = headToHeadPoints;
                 }
             }
-        }
 
-        // Check if this team is in first place (tied for first)
-        const isFirstPlace = firstPlaceTeams.includes(team);
-        const isActualFirst = index === 0; // True first place after tie-breakers
+            // Check if this team is in first place (tied for first)
+            const isFirstPlace = firstPlaceTeams.includes(team);
+            const isActualFirst = index === 0; // True first place after tie-breakers
+            
+            // Add appropriate classes based on position and group completion status
+            if (isActualFirst && (groupStatus.allCompleted || groupStatus.isSingleTeamGroup)) {
+                // True first place AND (group completed OR single team group) - gets crown and green highlight
+                row.classList.add('champion-first-place');
+            } else if (isFirstPlace && !groupStatus.allCompleted && !groupStatus.isSingleTeamGroup) {
+                // Tied for first but group not completed (and not single team) - only gets yellow highlight
+                row.classList.add('tied-for-first-place');
+            }
+            // Note: Crown appears when group is completed OR when it's a single team group
+
+            // Rank and goal difference colors
+            const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
+            const goalDiffClass = team.goalDifference > 0 ? 'goal-diff-positive' : 
+                                team.goalDifference < 0 ? 'goal-diff-negative' : 'goal-diff-zero';
+
+            // Get goal statistics for this team
+            const goalStats = calculateGoalStatistics();
+            const teamGoalStats = goalStats[team.id];
+            
+            row.innerHTML = `
+                <td class="rank ${rankClass}">${index + 1}</td>
+                <td class="team-name">${team.name} ${renderTeamBadge(team.id)}</td>
+                <td class="stats">${team.played}</td>
+                <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
+                <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
+                <td class="stats goals-cell" 
+                    onclick="showGoalTooltip(event, '${team.id}')" 
+                    onmouseover="showGoalTooltip(event, '${team.id}')" 
+                    onmouseout="handleTooltipMouseOut(event, '${team.id}')">${team.goalsFor}</td>
+                <td class="stats">${tb3Value}</td>
+                <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
+                <td class="stats points">${team.points}</td>
+            `;
+
+            tbody.appendChild(row);
+        });
         
-        // Add appropriate classes based on position and group completion status
-        if (isActualFirst && (groupStatus.allCompleted || groupStatus.isSingleTeamGroup)) {
-            // True first place AND (group completed OR single team group) - gets crown and green highlight
-            row.classList.add('champion-first-place');
-        } else if (isFirstPlace && !groupStatus.allCompleted && !groupStatus.isSingleTeamGroup) {
-            // Tied for first but group not completed (and not single team) - only gets yellow highlight
-            row.classList.add('tied-for-first-place');
-        }
-        // Note: Crown appears when group is completed OR when it's a single team group
-
-        // Rank and goal difference colors
-        const rankClass = index === 0 ? 'first' : index === 1 ? 'second' : index === 2 ? 'third' : '';
-        const goalDiffClass = team.goalDifference > 0 ? 'goal-diff-positive' : 
-                             team.goalDifference < 0 ? 'goal-diff-negative' : 'goal-diff-zero';
-
-        // Get goal statistics for this team
-        const goalStats = calculateGoalStatistics();
-        const teamGoalStats = goalStats[team.id];
-        
-        row.innerHTML = `
-            <td class="rank ${rankClass}">${index + 1}</td>
-            <td class="team-name">${team.name} ${renderTeamBadge(team.id)}</td>
-            <td class="stats">${team.played}</td>
-            <td class="stats">${team.wins}-${team.losses}-${team.draws}</td>
-            <td class="stats ${goalDiffClass}">${team.goalDifference > 0 ? '+' : ''}${team.goalDifference}</td>
-            <td class="stats goals-cell" 
-                onclick="showGoalTooltip(event, '${team.id}')" 
-                onmouseover="showGoalTooltip(event, '${team.id}')" 
-                onmouseout="handleTooltipMouseOut(event, '${team.id}')">${team.goalsFor}</td>
-            <td class="stats">${tb3Value}</td>
-            <td class="match-history">${generateMatchHistoryHTML(team.matchHistory)}</td>
-            <td class="stats points">${team.points}</td>
-        `;
-
-        tbody.appendChild(row);
-    });
-    
-    // Update knockout stage bracket with current group winners
-    updateKnockoutStage();
+        // Update knockout stage bracket with current group winners
+        updateKnockoutStage();
     } catch (error) {
         logger.error('Error updating standings:', error);
     }
@@ -1718,7 +1831,7 @@ function generateMatchHistoryHTML(history) {
 
 // Update all tabs
 function updateAllTabs() {
-    updateStandings();
+    updateOverview();
     updateFixtures();
     updateStatistics();
     

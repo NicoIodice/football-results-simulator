@@ -1,17 +1,24 @@
 {
-  "tabVisibility": {
-    "standings": true,
-    "teams": true,
-    "fixtures": true,
-    "forecast": true,
-    "simulator": true
-  },
-  "subTabs": {
-    "standings": {
-      "enabled": true,
-      "leagueStandings": true,
-      "knockoutStage": true,
-      "statistics": true
+  "featureToggles": {
+    "tabs": {
+      "overview": true,
+      "teams": true,
+      "fixtures": true,
+      "forecast": true,
+      "simulator": true
+    },
+    "subTabs": {
+      "overview": {
+        "enabled": true,
+        "leagueStandings": true,
+        "knockoutStage": true,
+        "statistics": true
+      }
+    },
+    "ui": {
+      "showLoadingMask": true,
+      "enableDebugMode": false,
+      "enableDarkMode": true
     }
   },
   "defaultGroup": "group-c",
@@ -46,10 +53,6 @@
     },
     "description": "Championship knockout stage featuring semi-finals, 3rd place playoff, and final"
   },
-  "admin": {
-    "role": "admin",
-    "validateTime": false
-  },
   "simulation": {
     "useOpenAI": false,
     "pointsGapLimit": 3,
@@ -59,5 +62,9 @@
     "showLoadingMask": true,
     "enableDebugMode": false,
     "enableDarkMode": true
-  }
+  },
+   "admin": {
+    "role": "admin",
+    "validateTime": false
+  } 
 }
