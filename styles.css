@@ -109,8 +109,12 @@ body.config-modal-open {
     }
     html, body {
         overflow-x: hidden !important;
-        max-width: 100vw;
+        max-width: 100vw !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        overflow-y: auto !important;
     }
+
     .config-categories-panel {
         width: 100%;
         border-right: none;
@@ -127,32 +131,49 @@ body.config-modal-open {
         padding: 24px 12px;
     }
 
-    /* Move and shrink settings/dark mode icons for mobile */
-    .settings-toggle, .dark-mode-toggle {
+    /* Floating action buttons: stack vertically bottom right on mobile */
+    .fab-vertical-stack {
         position: fixed !important;
-        bottom: 24px;
-        right: 24px;
-        width: 38px !important;
-        height: 38px !important;
-        z-index: 2000 !important;
+        bottom: 120px;
+        right: 5px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        z-index: 9999 !important;
+        pointer-events: auto;
+        align-items: flex-end !important;
+    }
+    .fab-vertical-stack > button {
+        display: block !important;
+        width: 44px !important;
+        height: 44px !important;
+        margin: 0 !important;
+        border-radius: 50% !important;
         box-shadow: 0 2px 8px rgba(44,62,80,0.18);
         background: #fff !important;
         border: 2px solid #e9ecef !important;
-        opacity: 0.95;
+        opacity: 0.98;
+        pointer-events: auto;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .fab-vertical-stack > button {
+        width: 44px !important;
+        height: 44px !important;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.18);
+        background: #fff !important;
+        border: 2px solid #e9ecef !important;
+        opacity: 0.98;
         margin: 0 !important;
-    }
-    .settings-toggle {
-        right: 24px;
-        bottom: 24px;
-    }
-    .dark-mode-toggle {
-        right: 74px;
-        bottom: 24px;
+        pointer-events: auto;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        border-radius: 50% !important;
     }
     .settings-icon, .dark-mode-icon {
         font-size: 1.1rem !important;
     }
-
 }
 /* Settings Icon in Header */
 .settings-toggle {
