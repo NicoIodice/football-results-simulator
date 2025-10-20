@@ -126,6 +126,33 @@ body.config-modal-open {
     .config-fields-panel {
         padding: 24px 12px;
     }
+
+    /* Move and shrink settings/dark mode icons for mobile */
+    .settings-toggle, .dark-mode-toggle {
+        position: fixed !important;
+        bottom: 24px;
+        right: 24px;
+        width: 38px !important;
+        height: 38px !important;
+        z-index: 2000 !important;
+        box-shadow: 0 2px 8px rgba(44,62,80,0.18);
+        background: #fff !important;
+        border: 2px solid #e9ecef !important;
+        opacity: 0.95;
+        margin: 0 !important;
+    }
+    .settings-toggle {
+        right: 24px;
+        bottom: 24px;
+    }
+    .dark-mode-toggle {
+        right: 74px;
+        bottom: 24px;
+    }
+    .settings-icon, .dark-mode-icon {
+        font-size: 1.1rem !important;
+    }
+
 }
 /* Settings Icon in Header */
 .settings-toggle {
