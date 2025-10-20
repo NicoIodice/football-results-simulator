@@ -1,11 +1,11 @@
 .scorer-goals-statistics {
     text-align: right;
     font-weight: bold;
-    color: #3498db;
     min-width: 32px;
     font-size: 1.1rem;
     border-radius: 6px;
-    /* No background color for statistics */
+    color: #2c3e50;
+    background: none;
 }
 /* Disabled state for selectors and labels */
 .disabled {
@@ -32,11 +32,15 @@
 .scorer-goals {
     text-align: right;
     font-weight: bold;
-    color: #3498db;
     min-width: 32px;
     font-size: 1.1rem;
-    background: #f0f8ff;
     border-radius: 6px;
+}
+
+/* Only color and background for scorer-goals inside modal */
+.scorers-table .scorer-goals {
+    color: #3498db;
+    background: #f0f8ff;
 }
 .scorers-table tr.own-goal td.scorer-goals {
     color: black;
@@ -3428,7 +3432,7 @@ tr.first-place .goal-diff-negative {
     
     .proj-probability {
         font-size: 0.8rem !important;
-        white-space: nowrap !important;
+        /*white-space: nowrap !important;*/
     }
     
     .proj-rank {
