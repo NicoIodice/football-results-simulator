@@ -328,6 +328,16 @@
     "played": true
   },
   {
+    "matchId": "match-b8",
+    "homeTeam": "underdogs-fc",
+    "awayTeam": "fc-zerolhos",
+    "homeScore": 3,
+    "awayScore": 6,
+    "gameweek": 4,
+    "groupId": "group-b",
+    "played": true
+  },
+  {
     "matchId": "match-c11",
     "homeTeam": "logan-fc",
     "awayTeam": "dataki",
