@@ -4484,7 +4484,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                                         <span class="predicted-score-small">Predicted: ${pred.prediction.predictedScore}</span>
                                     </div>
                                     <div class="actual-score-large">
-                                        <span class="actual-score-main">${pred.actualResult.homeScore} - ${pred.actualResult.awayScore}</span>
+                                        <span class="actual-score-main">${pred.actualResult.homeScore}-${pred.actualResult.awayScore}</span>
                                         <small class="actual-label">Actual Result</small>
                                     </div>
                                 </div>
@@ -4521,8 +4521,16 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     
                     <div class="prediction-reasoning">
                         <strong>Analysis:</strong> ${pred.prediction.reasoning}
+                        <ul class="extra-analysis">
+                            <li><strong>Recent Form:</strong> ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text} vs ${pred.awayTeam.formDescription.icon} ${pred.awayTeam.formDescription.text}</li>
+                            <li><strong>Momentum:</strong> ${pred.homeTeam.momentum.icon} ${pred.homeTeam.momentum.direction} vs ${pred.awayTeam.momentum.icon} ${pred.awayTeam.momentum.direction}</li>
+                            <li><strong>Win Rate:</strong> ${pred.homeTeam.winPercentage}% vs ${pred.awayTeam.winPercentage}%</li>
+                            <li><strong>Avg. Goals Scored:</strong> ${pred.homeTeam.attackingStrength} vs ${pred.awayTeam.attackingStrength}</li>
+                            <li><strong>Avg. Goals Conceded:</strong> ${pred.homeTeam.defensiveStrength} vs ${pred.awayTeam.defensiveStrength}</li>
+                            <li><strong>Points per Game:</strong> ${pred.homeTeam.pointsPerGame} vs ${pred.awayTeam.pointsPerGame}</li>
+                            <li><strong>Consistency:</strong> ${Math.round(pred.homeTeam.consistency * 100)}% vs ${Math.round(pred.awayTeam.consistency * 100)}%</li>
+                        </ul>
                     </div>
-                    
                     ${generateGoalScorerPredictionsHTML(
                         pred.homeTeam.id, 
                         pred.awayTeam.id, 
