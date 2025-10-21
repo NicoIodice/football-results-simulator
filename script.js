@@ -4159,79 +4159,50 @@ function findCurrentGameweekForGroup(groupId) {
     
     logger.log('DEBUG: Current day of week:', currentDayOfWeek, 'isNextMondayOrLater:', isNextMondayOrLater);
     
-    // Find the most advanced gameweek that has had any matches played
-    let actualCurrentGameweek = null;
-    let nextAvailableGameweek = null;
-    
-    // Find the highest gameweek number that has at least one match played
-    for (let i = groupGameweeks.length - 1; i >= 0; i--) {
-        const gameweekObj = groupGameweeks[i];
-        const hasAnyMatchPlayed = gameweekObj.matches.some(match => {
+    // 1. Find the first gameweek with any unplayed matches
+    let currentGameweekObj = null;
+    let allGameweeksComplete = true;
+    for (let i = 0; i < groupGameweeks.length; i++) {
+        const gw = groupGameweeks[i];
+        const allPlayed = gw.matches.every(match => {
             return groupResults.some(result => 
-                result.gameweek === gameweekObj.gameweek &&
+                result.gameweek === gw.gameweek &&
                 result.homeTeam === match.homeTeam &&
                 result.awayTeam === match.awayTeam
             );
         });
-        
-        logger.log('DEBUG: Checking gameweek', gameweekObj.gameweek, 'hasAnyMatchPlayed:', hasAnyMatchPlayed);
-        
-        if (hasAnyMatchPlayed) {
-            // This is the most advanced gameweek with matches played
-            actualCurrentGameweek = gameweekObj;
-            logger.log('DEBUG: Found actual current gameweek:', actualCurrentGameweek.gameweek);
+        if (!allPlayed) {
+            currentGameweekObj = gw;
+            allGameweeksComplete = false;
             break;
         }
     }
-    
-    // If no gameweek has matches played yet, use the first gameweek
-    if (!actualCurrentGameweek) {
-        actualCurrentGameweek = groupGameweeks[0];
-        logger.log('DEBUG: No played gameweeks found, using first:', actualCurrentGameweek.gameweek);
+    // 2. If all gameweeks are complete, return null (for review message)
+    if (!currentGameweekObj && groupGameweeks.length > 0) {
+        // All gameweeks complete
+        return null;
     }
-    
-    // Find the next gameweek after the actual current one
-    const currentGameweekIndex = groupGameweeks.findIndex(gw => gw.gameweek === actualCurrentGameweek.gameweek);
-    if (currentGameweekIndex < groupGameweeks.length - 1) {
-        nextAvailableGameweek = groupGameweeks[currentGameweekIndex + 1];
-    }
-    
-    // Decision logic based on completion and day of week
-    let currentGameweek = null;
-    
-    const currentGameweekAllComplete = actualCurrentGameweek.matches.every(match => {
+    // 3. If all matches in current gameweek are played
+    const allCurrentPlayed = currentGameweekObj.matches.every(match => {
         return groupResults.some(result => 
-            result.gameweek === actualCurrentGameweek.gameweek &&
+            result.gameweek === currentGameweekObj.gameweek &&
             result.homeTeam === match.homeTeam &&
             result.awayTeam === match.awayTeam
         );
     });
-    
-    logger.log('DEBUG: actualCurrentGameweek:', actualCurrentGameweek.gameweek, 'allComplete:', currentGameweekAllComplete);
-    logger.log('DEBUG: nextAvailableGameweek:', nextAvailableGameweek?.gameweek || 'none');
-    
-    if (!currentGameweekAllComplete) {
-        // Current gameweek has unplayed matches - always show it
-        currentGameweek = actualCurrentGameweek;
-        logger.log('DEBUG: Showing current gameweek (has unplayed matches):', currentGameweek.gameweek);
-    } else if (currentGameweekAllComplete && !isNextMondayOrLater) {
-        // Current gameweek is complete but it's not Monday yet - stay for review
-        currentGameweek = actualCurrentGameweek;
-        logger.log('DEBUG: Showing current gameweek for review (not Monday yet):', currentGameweek.gameweek);
-    } else if (currentGameweekAllComplete && isNextMondayOrLater && nextAvailableGameweek) {
-        // Current gameweek is complete, it's Monday, and there's a next gameweek - advance
-        currentGameweek = nextAvailableGameweek;
-        logger.log('DEBUG: Advancing to next gameweek (Monday):', currentGameweek.gameweek);
-    } else {
-        // Fallback: stay on current gameweek
-        currentGameweek = actualCurrentGameweek;
-        logger.log('DEBUG: Fallback to current gameweek:', currentGameweek.gameweek);
+    // 4. If all matches played and it's Monday, advance to next gameweek if exists
+    let _now = new Date();
+    let _currentDayOfWeek = _now.getDay(); // 0 = Sunday, 1 = Monday, etc.
+    const isMonday = _currentDayOfWeek === 1;
+    const currentIndex = groupGameweeks.findIndex(gw => gw.gameweek === currentGameweekObj.gameweek);
+    if (allCurrentPlayed && isMonday && currentIndex < groupGameweeks.length - 1) {
+        // Advance to next gameweek
+        currentGameweekObj = groupGameweeks[currentIndex + 1];
     }
-    
-    // Return the gameweek object with all matches
+    // 5. Return the current gameweek object
     return {
-        gameweek: currentGameweek.gameweek,
-        matches: currentGameweek.matches
+        gameweek: currentGameweekObj.gameweek,
+        matches: currentGameweekObj.matches
     };
 }
 
@@ -4246,20 +4217,29 @@ function generateMatchPredictionsForGameweek(gameweek, teamAnalysis) {
     return gameweek.matches.map(match => {
         const homeTeam = teamAnalysisForPrediction.find(t => t.id === match.homeTeam);
         const awayTeam = teamAnalysisForPrediction.find(t => t.id === match.awayTeam);
-        
         if (!homeTeam || !awayTeam) return null;
-        
+
+        // Debug: log all results for this gameweek and teams
+        logger.log('[DEBUG] Checking actualResult for match:', {
+            matchId: match.id,
+            homeTeam: match.homeTeam,
+            awayTeam: match.awayTeam,
+            gameweek: gameweek.gameweek
+        });
+        const possibleResults = results.filter(r => r.homeTeam === match.homeTeam && r.awayTeam === match.awayTeam);
+        logger.log('[DEBUG] Possible results for this match:', possibleResults);
+
         // Check if this match has already been played
-        // Use the gameweek number from the gameweek object, not from the individual match
         const actualResult = results.find(r => 
             r.homeTeam === match.homeTeam && 
             r.awayTeam === match.awayTeam && 
             r.gameweek === gameweek.gameweek
         );
-        
+        logger.log('[DEBUG] actualResult found:', actualResult);
+
         // Always use prediction based on pre-current-gameweek data
         const prediction = predictMatch(homeTeam, awayTeam);
-        
+
         return {
             match,
             homeTeam,
