@@ -37,7 +37,14 @@
     "awayScore": 5,
     "gameweek": 1,
     "groupId": "group-a",
-    "played": true
+    "played": true,
+    "scorers": {
+      "desesperados-fc": [
+        { "id": "andre-farinha-carvalho", "name": "André Farinha Carvalho", "goals": 2, "goalType": "regular" },
+        { "id": "denil-baia", "name": "Denil Baía", "goals": 1, "goalType": "regular" },
+        { "id": "pedro-salgado", "name": "Pedro Salgado", "goals": 1, "goalType": "regular" }
+      ]
+    }
 
   },
   {
@@ -73,7 +80,7 @@
     "played": true,
     "scorers": {
       "underdogs-fc": [
-        { "id": "joao-bernardo-jorge", "name": "João Bernardo Jorge", "goals": 2, "goalType": "regular" },
+        { "id": "joao-bernardo-jorge", "name": "João Bernardo Jorge", "goals": 1, "goalType": "regular" },
         { "id": "marcos-soares", "name": "Marcos Soares", "goals": 1, "goalType": "regular" }
       ],
       "borg-coimbra": [
@@ -82,8 +89,7 @@
           { "id": "diogo-campos", "name": "Diogo Campos", "goals": 1, "goalType": "regular" },
           { "id": "jose-miguel-lopes", "name": "José Miguel Lopes", "goals": 1, "goalType": "regular" }
         ]
-      }
-
+    }
   },
   {
     "matchId": "match-b2",
@@ -93,8 +99,18 @@
     "awayScore": 5,
     "gameweek": 1,
     "groupId": "group-b",
-    "played": true
-
+    "played": true,
+    "scorers": {
+      "borussia-doutromundo": [
+        { "id": "gustavo-lemos", "name": "Gustavo Lemos", "goals": 3, "goalType": "regular" },
+        { "id": "fernando-costa", "name": "Fernando Costa", "goals": 2, "goalType": "regular" },
+        { "id": "daniel-santos", "name": "Daniel Santos", "goals": 2, "goalType": "regular" }
+      ],
+      "fc-zerolhos": [
+        { "id": "mario-pires", "name": "Mário Pires", "goals": 3, "goalType": "regular" },
+        { "id": "tomas-martins", "name": "Tomás Martins", "goals": 2, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-b1",
@@ -137,7 +153,6 @@
           { "id": "tiago-dias", "name": "Tiago Dias", "goals": 1, "goalType": "regular" }
         ]
       }
-
   },
   {
     "matchId": "match-c1",
@@ -241,7 +256,12 @@
     "awayScore": 1,
     "gameweek": 3,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "scorers": {
+        "francesinha-united": [
+          { "id": "filipe-moreira", "name": "Filipe Moreira", "goals": 1, "goalType": "regular" }
+        ]
+    }
   },
   {
     "matchId": "match-c8",
@@ -305,7 +325,18 @@
     "awayScore": 19,
     "gameweek": 3,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "critigals": [
+        { "id": "daniela-correia", "name": "Daniela Correia", "goals": 1, "goalType": "regular" }
+      ],
+      "fc-zerolhos": [
+        { "id": "joao-jacinto", "name": "João Jacinto", "goals": 8, "goalType": "regular" },
+        { "id": "damiao-santos", "name": "Damião Santos", "goals": 7, "goalType": "regular" },
+        { "id": "hugo-miguel-pereira", "name": "Hugo Pereira", "goals": 3, "goalType": "regular" },
+        { "id": "cesar-neves", "name": "César Neves", "goals": 1, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-b6",
@@ -315,7 +346,20 @@
     "awayScore": 4,
     "gameweek": 3,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "borussia-doutromundo": [
+        { "id": "nuno-silva", "name": "Nuno Silva", "goals": 3, "goalType": "regular" },
+        { "id": "hugo-marques", "name": "Hugo Marques", "goals": 2, "goalType": "regular" },
+        { "id": "adriano-tavares", "name": "Adriano Tavares", "goals": 2, "goalType": "regular" }
+      ],
+      "borg-coimbra": [
+        { "id": "diogo-campos", "name": "Diogo Campos", "goals": 1, "goalType": "regular" },
+        { "id": "pedro-lourenco", "name": "Pedro Lourenço", "goals": 1, "goalType": "regular" },
+        { "id": "rui-miguel-barbosa", "name": "Rui Barbosa", "goals": 1, "goalType": "regular" },
+        { "id": "tiago-alexandre-dias", "name": "Tiago Dias", "goals": 1, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-a8",
@@ -335,7 +379,16 @@
     "awayScore": 6,
     "gameweek": 4,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "underdogs-fc": [
+        { "id": "raul-rosero", "name": "Raul Rosero", "goals": 2, "goalType": "regular" },
+        { "id": "fabio-horta-oliveira", "name": "Fábio Horta de Oliveira", "goals": 1, "goalType": "regular" }
+      ],
+      "fc-zerolhos": [
+        { "id": "joao-catalao-antunes", "name": "João Antunes", "goals": 6, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-c11",
