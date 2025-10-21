@@ -422,5 +422,15 @@
           { "id": "paulo-almeida-sousa", "name": "Paulo Sousa", "goals": 1, "goalType": "own-goal" }
         ]
     }
+  },
+    {
+    "matchId": "match-c13",
+    "homeTeam": "logan-fc",
+    "awayTeam": "francesinha-united",
+    "homeScore": 3,
+    "awayScore": 0,
+    "gameweek": 4,
+    "groupId": "group-c",
+    "played": true
   }
 ]
