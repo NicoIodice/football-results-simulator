@@ -2515,6 +2515,10 @@ tr.first-place .goal-diff-negative {
         grid-template-columns: 1fr;
         gap: 10px;
     }
+
+    .win-probability {
+        font-size: 0.9em;
+    }
     
     .scorer-prediction {
         padding: 8px;
@@ -2955,6 +2959,14 @@ tr.first-place .goal-diff-negative {
 
     .prediction-correct {
         font-size: 12px;
+    }
+
+    .actual-score-main {
+        font-size: 1.5em;
+    }
+
+    .predicted-score {
+        font-size: 1.5em;
     }
 }
 
@@ -3404,7 +3416,8 @@ tr.first-place .goal-diff-negative {
     }
     #forecast-content .prediction-reasoning {
         width: 100% !important;
-        margin: 12px -10px -10px -10px !important;
+        /*margin: 12px -10px -10px -10px !important;*/
+        margin: 12px 0 !important;
         padding: 10px 16px !important;
         border-radius: 0 0 12px 12px !important;
         white-space: normal !important;
@@ -3430,7 +3443,7 @@ tr.first-place .goal-diff-negative {
     }
     #forecast-content .goal-scorer-predictions {
         width: 100% !important;
-        margin: 14px -10px -4px -10px !important;
+        /*margin: 14px -10px -4px -10px !important;*/
         padding: 10px 16px !important;
     }
     
