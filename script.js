@@ -1992,12 +1992,22 @@ function updateTodaysGamesHeader() {
         todaysMatches.forEach(match => {
             const matchItem = document.createElement('div');
             matchItem.className = 'todays-match-item';
+            // Calculate match end time
+            let endInfo = '';
+            if (match.time) {
+                const [hour, minute] = match.time.split(':').map(Number);
+                const matchStart = new Date(match.date + 'T' + match.time + ':00');
+                const matchEnd = new Date(matchStart.getTime() + 90 * 60000); // 90 min match
+                if (new Date() > matchEnd) {
+                    endInfo = '<span class="match-ended">END</span>';
+                }
+            }
             matchItem.innerHTML = `
                 <div class="todays-match-teams">
                     ${match.homeTeam.name} vs ${match.awayTeam.name}
                     <span class="fixture-group-indicator">${match.group.name}</span>
                 </div>
-                <div class="todays-match-time">${match.time}</div>
+                <div class="todays-match-time">${match.time} ${endInfo}</div>
             `;
             todaysGamesList.appendChild(matchItem);
         });
@@ -4324,10 +4334,37 @@ function predictMatch(homeTeam, awayTeam) {
 }
 
 function generatePredictionReasoning(homeTeam, awayTeam, strengthDiff) {
-    const reasons = [];
-    // Example: add more reasoning logic here if needed
-    reasons.push(`Home advantage for ${homeTeam.name}`);
-    return reasons.slice(0, 3).join('. ') + '.';
+    // Natural, 3-4 line paragraph combining all analysis points
+    let advantage = '';
+    if (strengthDiff > 1) {
+        advantage = `${homeTeam.name} holds a clear edge, combining strong form and home advantage.`;
+    } else if (strengthDiff < -1) {
+        advantage = `${awayTeam.name} appears stronger and could surprise on the road.`;
+    } else {
+        advantage = `Both teams seem evenly matched, making this a close contest.`;
+    }
+
+    let scoring = '';
+    if (homeTeam.attackingStrength > 1.5 && awayTeam.attackingStrength > 1.5) {
+        scoring = `Expect plenty of action as both sides have shown attacking flair.`;
+    } else if (homeTeam.defensiveStrength < 1 && awayTeam.defensiveStrength < 1) {
+        scoring = `Defenses are solid, so goals may be at a premium.`;
+    } else if (homeTeam.attackingStrength > awayTeam.attackingStrength) {
+        scoring = `${homeTeam.name} tends to score more, but ${awayTeam.name} is tough to break down.`;
+    } else if (awayTeam.attackingStrength > homeTeam.attackingStrength) {
+        scoring = `${awayTeam.name} is more dangerous going forward.`;
+    }
+
+    let form = '';
+    if (homeTeam.formDescription.text === 'Excellent' || awayTeam.formDescription.text === 'Excellent') {
+        form = `Recent form could be decisive in tipping the balance.`;
+    }
+
+    // Add a short summary of win rate and momentum
+    let extra = ` ${homeTeam.name} has a win rate of ${homeTeam.winPercentage}%, while ${awayTeam.name} is at ${awayTeam.winPercentage}%. Momentum favors ${homeTeam.momentum.direction.toLowerCase()} for ${homeTeam.name} and ${awayTeam.momentum.direction.toLowerCase()} for ${awayTeam.name}.`;
+
+    // Build paragraph
+    return `${advantage} ${scoring} ${form}${extra}`.replace(/ +/g, ' ').trim();
 }
 
 function generateChampionshipForecast(standings, teamAnalysis) {
@@ -4521,15 +4558,6 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                     
                     <div class="prediction-reasoning">
                         <strong>Analysis:</strong> ${pred.prediction.reasoning}
-                        <ul class="extra-analysis">
-                            <li><strong>Recent Form:</strong> ${pred.homeTeam.formDescription.icon} ${pred.homeTeam.formDescription.text} vs ${pred.awayTeam.formDescription.icon} ${pred.awayTeam.formDescription.text}</li>
-                            <li><strong>Momentum:</strong> ${pred.homeTeam.momentum.icon} ${pred.homeTeam.momentum.direction} vs ${pred.awayTeam.momentum.icon} ${pred.awayTeam.momentum.direction}</li>
-                            <li><strong>Win Rate:</strong> ${pred.homeTeam.winPercentage}% vs ${pred.awayTeam.winPercentage}%</li>
-                            <li><strong>Avg. Goals Scored:</strong> ${pred.homeTeam.attackingStrength} vs ${pred.awayTeam.attackingStrength}</li>
-                            <li><strong>Avg. Goals Conceded:</strong> ${pred.homeTeam.defensiveStrength} vs ${pred.awayTeam.defensiveStrength}</li>
-                            <li><strong>Points per Game:</strong> ${pred.homeTeam.pointsPerGame} vs ${pred.awayTeam.pointsPerGame}</li>
-                            <li><strong>Consistency:</strong> ${Math.round(pred.homeTeam.consistency * 100)}% vs ${Math.round(pred.awayTeam.consistency * 100)}%</li>
-                        </ul>
                     </div>
                     ${generateGoalScorerPredictionsHTML(
                         pred.homeTeam.id, 
