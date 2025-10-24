@@ -451,7 +451,15 @@
     "awayScore": 5,
     "gameweek": 5,
     "groupId": "group-a",
-    "played": true
+    "played": true,
+    "scorers": {
+        "desesperados-fc": [
+          { "id": "andre-farinha-carvalho", "name": "André Farinha Carvalho", "goals": 2, "goalType": "regular" },
+          { "id": "goncalo-lopes", "name": "Gonçalo Lopes", "goals": 1, "goalType": "regular" },
+          { "id": "pedro-salgado", "name": "Pedro Salgado", "goals": 1, "goalType": "regular" },
+          { "id": "denil-baia", "name": "Denil Baía", "goals": 1, "goalType": "regular" }
+        ]
+      }
   },
   {
     "matchId": "match-b9",
