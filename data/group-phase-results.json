@@ -432,5 +432,15 @@
     "gameweek": 5,
     "groupId": "group-c",
     "played": true
+  },
+  {
+    "matchId": "match-b3",
+    "homeTeam": "critigals",
+    "awayTeam": "borussia-doutromundo",
+    "homeScore": 1,
+    "awayScore": 14,
+    "gameweek": 2,
+    "groupId": "group-b",
+    "played": true
   }
 ]

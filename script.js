@@ -4483,9 +4483,22 @@ function generateTeamAnalysisHTML(teamAnalysis) {
 }
 
 function generateMatchPredictionsHTML(predictions, gameweek) {
-    return `
+    function getFirstLine(text) {
+        const lines = text.split(/\n|\. /);
+        return lines[0] ? lines[0].trim() : text;
+    }
+    function getRestLines(text) {
+        const lines = text.split(/\n|\. /);
+        return lines.slice(1).join('. ').trim();
+    }
+    const html = `
         <div class="match-predictions">
-            ${predictions.map(pred => `
+            ${predictions.map(pred => {
+                const reasoning = pred.prediction.reasoning;
+                const firstLine = getFirstLine(reasoning);
+                const restLines = getRestLines(reasoning);
+                const uniqueId = `analysis-panel-${pred.match.id}`;
+                return `
                 <div class="match-prediction-card ${pred.actualResult ? 'completed-match' : 'upcoming-match'}">
                     <div class="match-header">
                         <div class="match-status">
@@ -4556,8 +4569,14 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         </div>
                     </div>
                     
-                    <div class="prediction-reasoning">
-                        <strong>Analysis:</strong> ${pred.prediction.reasoning}
+                    <div class="analysis-panel">
+                        <div class="analysis-summary" onclick="toggleAnalysisPanel('${uniqueId}')">
+                            <strong>Analysis:</strong> <span>${firstLine}</span>
+                            <span class="analysis-arrow" id="${uniqueId}-arrow">▼</span>
+                        </div>
+                        <div class="analysis-details collapsed" id="${uniqueId}">
+                            ${restLines ? `<div class="analysis-details-text">${restLines}</div>` : ''}
+                        </div>
                     </div>
                     ${generateGoalScorerPredictionsHTML(
                         pred.homeTeam.id, 
@@ -4566,9 +4585,31 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
                         (function(){ const s=parsePredictedScore(pred.prediction.predictedScore); return s.away; })()
                     )}
                 </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
     `;
+    // Add expand/collapse logic after rendering
+    setTimeout(() => {
+        document.querySelectorAll('.analysis-panel .analysis-summary').forEach(summary => {
+            summary.addEventListener('click', function() {
+                const arrow = summary.querySelector('.analysis-arrow');
+                const detailsId = summary.getAttribute('onclick').match(/'([^']+)'/)[1];
+                const details = document.getElementById(detailsId);
+                if (!details) return;
+                if (details.classList.contains('collapsed')) {
+                    details.classList.remove('collapsed');
+                    details.classList.add('expanded');
+                    if (arrow) arrow.textContent = '▲';
+                } else {
+                    details.classList.remove('expanded');
+                    details.classList.add('collapsed');
+                    if (arrow) arrow.textContent = '▼';
+                }
+            });
+        });
+    }, 0);
+    return html;
 }
 
 // Get goal scorer statistics for a team
