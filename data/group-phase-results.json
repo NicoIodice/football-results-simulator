@@ -423,11 +423,11 @@
         ]
     }
   },
-    {
+  {
     "matchId": "match-c13",
     "homeTeam": "logan-fc",
     "awayTeam": "francesinha-united",
-    "homeScore": 3,
+    "homeScore": 1,
     "awayScore": 0,
     "gameweek": 5,
     "groupId": "group-c",
@@ -451,6 +451,16 @@
     "awayScore": 5,
     "gameweek": 5,
     "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-b9",
+    "homeTeam": "underdogs-fc",
+    "awayTeam": "borussia-doutromundo",
+    "homeScore": 1,
+    "awayScore": 10,
+    "gameweek": 5,
+    "groupId": "group-b",
     "played": true
   }
 ]
