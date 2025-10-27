@@ -469,6 +469,11 @@
     "awayScore": 10,
     "gameweek": 5,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+        "underdogs-fc": [
+          { "id": "raul-rosero", "name": "Raúl Rosero", "goals": 1, "goalType": "regular" }
+        ]
+      }
   }
 ]
