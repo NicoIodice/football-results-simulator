@@ -475,5 +475,35 @@
           { "id": "raul-rosero", "name": "Raúl Rosero", "goals": 1, "goalType": "regular" }
         ]
       }
+  },
+  {
+    "matchId": "match-a7",
+    "homeTeam": "red-star-lx",
+    "awayTeam": "shadow-x",
+    "homeScore": 0,
+    "awayScore": 1,
+    "gameweek": 4,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-a10",
+    "homeTeam": "bestsellers",
+    "awayTeam": "shadow-x",
+    "homeScore": 4,
+    "awayScore": 9,
+    "gameweek": 5,
+    "groupId": "group-a",
+    "played": true
+  },
+  {
+    "matchId": "match-b10",
+    "homeTeam": "fc-zerolhos",
+    "awayTeam": "borg-coimbra",
+    "homeScore": 4,
+    "awayScore": 6,
+    "gameweek": 5,
+    "groupId": "group-b",
+    "played": true
   }
 ]
