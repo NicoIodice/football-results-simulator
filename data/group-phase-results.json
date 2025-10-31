@@ -505,5 +505,15 @@
     "gameweek": 5,
     "groupId": "group-b",
     "played": true
+  },
+  {
+    "matchId": "match-c14",
+    "homeTeam": "critical-techballers",
+    "awayTeam": "sporting-esgaios",
+    "homeScore": 0,
+    "awayScore": 1,
+    "gameweek": 5,
+    "groupId": "group-c",
+    "played": true
   }
 ]
