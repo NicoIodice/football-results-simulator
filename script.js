@@ -6742,7 +6742,9 @@ function toggleAllStatistics() {
             selectedStatisticsGroupId = defaultGroupId;
             groupSelect.value = selectedStatisticsGroupId;
         }
-        updateStatisticsForGroup();
+    // Always refresh Team Performance Analysis and Statistical Insights for all groups when toggled
+    updateTeamPerformanceAnalysis();
+    updateStatisticalInsights();
     }
 }
 
