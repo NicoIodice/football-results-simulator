@@ -24,6 +24,10 @@ function hideScorerWarningPopup() {
 }
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
+    // Find the match to check if it's cancelled
+    const match = results.find(r => r.matchId === matchId);
+    const isCancelled = match && match.matchStatus === 'cancelled';
+    
     // Find goals for this match using scorers from group-phase-results.json
     const matchGoals = getGoalsForGroup().filter(g => g.matchId === matchId);
     // Own goals for each team (should be shown for opponent)
@@ -60,6 +64,7 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
             <span class='scorers-title'>⚽ Match Scorers</span>
             <span class='scorers-close'>&times;</span>
         </div>
+        ${isCancelled ? '<div class="match-cancelled-notice">🚫 This match was cancelled</div>' : ''}
         <div class='scorers-teams'>
             <div class='scorers-team'>
                 <div class='scorers-team-title'>Home</div>
