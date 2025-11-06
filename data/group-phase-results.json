@@ -102,7 +102,7 @@
     "played": true,
     "scorers": {
       "borussia-doutromundo": [
-        { "id": "gustavo-lemos", "name": "Gustavo Lemos", "goals": 3, "goalType": "regular" },
+        { "id": "gustavo-lemos", "name": "Gustavo Lemos", "goals": 2, "goalType": "regular" },
         { "id": "fernando-costa", "name": "Fernando Costa", "goals": 2, "goalType": "regular" },
         { "id": "daniel-santos", "name": "Daniel Santos", "goals": 2, "goalType": "regular" }
       ],
@@ -349,7 +349,7 @@
     "played": true,
     "scorers": {
       "borussia-doutromundo": [
-        { "id": "nuno-silva", "name": "Nuno Silva", "goals": 3, "goalType": "regular" },
+        { "id": "nuno-silva", "name": "Nuno Silva", "goals": 2, "goalType": "regular" },
         { "id": "hugo-marques", "name": "Hugo Marques", "goals": 2, "goalType": "regular" },
         { "id": "adriano-tavares", "name": "Adriano Tavares", "goals": 2, "goalType": "regular" }
       ],
@@ -382,7 +382,7 @@
     "played": true,
     "scorers": {
       "underdogs-fc": [
-        { "id": "raul-rosero", "name": "Raul Rosero", "goals": 2, "goalType": "regular" },
+        { "id": "raul-rosero", "name": "Raúl Rosero", "goals": 2, "goalType": "regular" },
         { "id": "fabio-horta-oliveira", "name": "Fábio Horta de Oliveira", "goals": 1, "goalType": "regular" }
       ],
       "fc-zerolhos": [
@@ -441,7 +441,15 @@
     "awayScore": 14,
     "gameweek": 2,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "borussia-doutromundo": [
+        { "id": "fernando-costa", "name": "Fernando Costa", "goals": 3, "goalType": "regular" },
+        { "id": "hugo-monteiro", "name": "Hugo Monteiro", "goals": 2, "goalType": "regular" },
+        { "id": "adriano-tavares", "name": "Adriano Tavares", "goals": 3, "goalType": "regular" },
+        { "id": "henrique-fonseca", "name": "Henrique Fonseca", "goals": 6, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-a9",
@@ -471,10 +479,15 @@
     "groupId": "group-b",
     "played": true,
     "scorers": {
-        "underdogs-fc": [
-          { "id": "raul-rosero", "name": "Raúl Rosero", "goals": 1, "goalType": "regular" }
-        ]
-      }
+      "underdogs-fc": [
+        { "id": "raul-rosero", "name": "Raúl Rosero", "goals": 1, "goalType": "regular" }
+      ],
+      "borussia-doutromundo": [
+        { "id": "gustavo-lemos", "name": "Gustavo Lemos", "goals": 3, "goalType": "regular" },
+        { "id": "nuno-silva", "name": "Nuno Silva", "goals": 5, "goalType": "regular" },
+        { "id": "daniel-santos", "name": "Daniel Santos", "goals": 2, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-a7",
@@ -504,7 +517,19 @@
     "awayScore": 6,
     "gameweek": 5,
     "groupId": "group-b",
-    "played": true
+    "played": true,
+    "scorers": {
+      "fc-zerolhos": [
+        { "id": "damiao-santos", "name": "Damião Santos", "goals": 2, "goalType": "regular" },
+        { "id": "joao-jacinto", "name": "João Jacinto", "goals": 1, "goalType": "regular" }
+      ],
+      "borg-coimbra": [
+        { "id": "diogo-campos", "name": "Diogo Campos", "goals": 1, "goalType": "regular" },
+        { "id": "sergio-santos", "name": "Sérgio Santos", "goals": 1, "goalType": "regular" },
+        { "id": "simao-santos", "name": "Simão Santos", "goals": 3, "goalType": "regular" },
+        { "id": "tiago-dias", "name": "Tiago Dias", "goals": 1, "goalType": "regular" }
+      ]
+    }
   },
   {
     "matchId": "match-c14",
