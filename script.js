@@ -1,3 +1,27 @@
+// Show/hide scorer warning popup for mismatch in Top Scorers panel
+function showScorerWarningPopup(event, teamName, teamTotalGoals, sumPlayerGoals) {
+    let popup = document.getElementById('scorer-warning-popup');
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'scorer-warning-popup';
+        popup.className = 'scorer-warning-popup';
+        document.body.appendChild(popup);
+    }
+    popup.innerHTML = `<b>Warning:</b> The sum of top scorers for <b>${teamName}</b> is <b>${sumPlayerGoals}</b>, but the team total goals is <b>${teamTotalGoals}</b>. There may be missing or extra goals in the scorers list.`;
+    popup.style.display = 'block';
+    const rect = event.target.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.left = (rect.right + 8) + 'px';
+    popup.style.top = (rect.top - 8) + 'px';
+    popup.style.zIndex = 9999;
+}
+
+function hideScorerWarningPopup() {
+    const popup = document.getElementById('scorer-warning-popup');
+    if (popup) {
+        popup.style.display = 'none';
+    }
+}
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
     // Find goals for this match using scorers from group-phase-results.json
@@ -7020,22 +7044,67 @@ function generateTopScorersHTML(topScorers, filterType) {
     }
     
     let title = 'Top Scorers';
+    let warningHtml = '';
     switch (filterType) {
         case 'all':
             title = 'Top Scorers - All Groups';
             break;
-        case 'group':
+        case 'group': {
             const groupSelect = document.getElementById('topscorers-group-select');
             const groupId = groupSelect ? groupSelect.value : null;
             const groupName = groups.find(g => g.id === groupId)?.name || 'Selected Group';
             title = `Top Scorers - ${groupName}`;
             break;
-        case 'team':
+        }
+        case 'team': {
             const teamSelect = document.getElementById('topscorers-team-select');
             const teamId = teamSelect ? teamSelect.value : null;
             const teamName = teams.find(t => t.id === teamId)?.name || 'Selected Team';
             title = `Top Scorers - ${teamName}`;
+            // Only show warning if a real team is selected
+            if (teamId && teamId !== 'null') {
+                // Calculate sum of player goals from topScorers
+                const sumPlayerGoals = topScorers.reduce((sum, p) => sum + (p.totalGoals || 0), 0);
+                
+                // Get team's total goals from results (homeScore + awayScore)
+                const teamObj = teams.find(t => t.id === teamId);
+                let groupId = teamObj && teamObj.groupId ? teamObj.groupId : null;
+                
+                let teamTotalGoals = 0;
+                if (groupId) {
+                    // Calculate from results in the group, excluding cancelled matches
+                    const groupResults = results.filter(r => r.groupId === groupId && r.played && r.matchStatus !== 'cancelled');
+                    groupResults.forEach(match => {
+                        // Count goals from this match, excluding own goals scored BY the opposing team (which benefited our team)
+                        if (match.homeTeam === teamId) {
+                            // Start with total score
+                            let goalsToCount = match.homeScore || 0;
+                            // Subtract own goals scored by the AWAY team (opposing team) that benefited us
+                            if (match.scorers && match.scorers[match.awayTeam]) {
+                                const opponentOwnGoals = match.scorers[match.awayTeam].filter(s => s.goalType === 'own-goal').reduce((sum, s) => sum + (s.goals || 0), 0);
+                                goalsToCount -= opponentOwnGoals;
+                            }
+                            teamTotalGoals += goalsToCount;
+                        }
+                        if (match.awayTeam === teamId) {
+                            // Start with total score
+                            let goalsToCount = match.awayScore || 0;
+                            // Subtract own goals scored by the HOME team (opposing team) that benefited us
+                            if (match.scorers && match.scorers[match.homeTeam]) {
+                                const opponentOwnGoals = match.scorers[match.homeTeam].filter(s => s.goalType === 'own-goal').reduce((sum, s) => sum + (s.goals || 0), 0);
+                                goalsToCount -= opponentOwnGoals;
+                            }
+                            teamTotalGoals += goalsToCount;
+                        }
+                    });
+                }
+                
+                if (sumPlayerGoals !== teamTotalGoals) {
+                    warningHtml = `<span class="scorer-warning-icon" title="Goal count mismatch" onmouseenter="showScorerWarningPopup(event, '${teamName.replace(/'/g, "&#39;")}', ${teamTotalGoals}, ${sumPlayerGoals})" onmouseleave="hideScorerWarningPopup()">⚠️</span>`;
+                }
+            }
             break;
+        }
     }
     
     // Function to get medal emoji based on position
@@ -7049,7 +7118,7 @@ function generateTopScorersHTML(topScorers, filterType) {
     }
     
     return `
-        <h4>${title}</h4>
+        <h4>${title}${warningHtml}</h4>
         <div class="topscorers-list">
             ${topScorers.map((scorer, index) => {
                 const position = index + 1;
@@ -7074,6 +7143,30 @@ function generateTopScorersHTML(topScorers, filterType) {
             }).join('')}
         </div>
     `;
+// Show/hide scorer warning popup for mismatch
+function showScorerWarningPopup(event, teamName, teamTotalGoals, sumPlayerGoals) {
+    let popup = document.getElementById('scorer-warning-popup');
+    if (!popup) {
+        popup = document.createElement('div');
+        popup.id = 'scorer-warning-popup';
+        popup.className = 'scorer-warning-popup';
+        document.body.appendChild(popup);
+    }
+    popup.innerHTML = `<b>Warning:</b> The sum of top scorers for <b>${teamName}</b> is <b>${sumPlayerGoals}</b>, but the team total goals is <b>${teamTotalGoals}</b>. There may be missing or extra goals in the scorers list.`;
+    popup.style.display = 'block';
+    const rect = event.target.getBoundingClientRect();
+    popup.style.position = 'fixed';
+    popup.style.left = (rect.right + 8) + 'px';
+    popup.style.top = (rect.top - 8) + 'px';
+    popup.style.zIndex = 9999;
+}
+
+function hideScorerWarningPopup() {
+    const popup = document.getElementById('scorer-warning-popup');
+    if (popup) {
+        popup.style.display = 'none';
+    }
+}
 }
 
 // Sub-tab functionality for Standings

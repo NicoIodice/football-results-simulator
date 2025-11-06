@@ -431,7 +431,8 @@
     "awayScore": 0,
     "gameweek": 5,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "matchStatus": "cancelled"
   },
   {
     "matchId": "match-b3",
@@ -539,13 +540,14 @@
     "awayScore": 1,
     "gameweek": 5,
     "groupId": "group-c",
-    "played": true
+    "played": true,
+    "matchStatus": "cancelled"
   },
   {
     "matchId": "match-c15",
     "homeTeam": "ctrl-shift-golo",
     "awayTeam": "dataki",
-    "homeScore": 9,
+    "homeScore": 8,
     "awayScore": 2,
     "gameweek": 5,
     "groupId": "group-c",
