@@ -166,7 +166,7 @@
     "scorers": {
       "logan-fc": [
         { "id": "miranda", "name": "Miranda", "goals": 1, "goalType": "regular" },
-        { "id": "hugo", "name": "Hugo", "goals": 1, "goalType": "regular" },
+        { "id": "hugo-ribeiro", "name": "Hugo", "goals": 1, "goalType": "regular" },
         { "id": "pedro", "name": "Pedro", "goals": 1, "goalType": "regular" },
         { "id": "tiago", "name": "Tiago", "goals": 1, "goalType": "regular" }
       ],

@@ -8,8 +8,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "eduardo-marcal",
-        "name": "Eduardo Marçal",
+        "id": "andre-farinha-carvalho",
+        "name": "André Farinha Carvalho",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -17,8 +17,8 @@
         "isCaptain": false
       },
       {
-        "id": "andre-farinha-carvalho",
-        "name": "André Farinha Carvalho",
+        "id": "eduardo-marcal",
+        "name": "Eduardo Marçal",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -117,8 +117,8 @@
         "isCaptain": false
       },
       {
-        "id": "bestsellers-def1",
-        "name": "BestSellers Defender 1",
+        "id": "henrique-silva",
+        "name": "Henrique Macías Silva",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -217,8 +217,8 @@
         "isCaptain": false
       },
       {
-        "id": "red-star-def1",
-        "name": "Red Star Defender 1",
+        "id": "miguel-silva",
+        "name": "Miguel Silva",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -317,8 +317,8 @@
         "isCaptain": false
       },
       {
-        "id": "critical-underdogs-def1",
-        "name": "Critical Underdogs Defender 1",
+        "id": "ricardo-santos",
+        "name": "Ricardo Santos",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -372,8 +372,8 @@
         "isCaptain": false
       },
       {
-        "id": "shadow-x-def1",
-        "name": "Shadow X Defender 1",
+        "id": "rodrigo-gomes",
+        "name": "Rodrigo Gomes",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -424,7 +424,7 @@
         "position": "goalkeeper",
         "status": "fit",
         "isStarter": true,
-        "isCaptain": false
+        "isCaptain": true
       },
       {
         "id": "ana-rita-pires",
@@ -433,7 +433,7 @@
         "position": "defender",
         "status": "fit",
         "isStarter": true,
-        "isCaptain": true
+        "isCaptain": false
       },
       {
         "id": "catarina-proenca",
@@ -518,8 +518,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "guilherme-imperial",
-        "name": "Guilherme Imperial",
+        "id": "elisio-alexandre-sousa",
+        "name": "Elísio Alexandre Sousa",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -527,8 +527,8 @@
         "isCaptain": false
       },
       {
-        "id": "elisio-alexandre-sousa",
-        "name": "Elísio Alexandre Sousa",
+        "id": "guilherme-imperial",
+        "name": "Guilherme Imperial",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -600,8 +600,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "henrique-fonseca",
-        "name": "Henrique Fonseca",
+        "id": "adriano-tavares",
+        "name": "Adriano Tavares",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -609,8 +609,8 @@
         "isCaptain": false
       },
       {
-        "id": "adriano-tavares",
-        "name": "Adriano Tavares",
+        "id": "henrique-fonseca",
+        "name": "Henrique Fonseca",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -682,8 +682,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "joao-catalao-antunes",
-        "name": "João Catalão Antunes",
+        "id": "damiao-santos",
+        "name": "Damião Santos",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -691,8 +691,8 @@
         "isCaptain": false
       },
       {
-        "id": "damiao-santos",
-        "name": "Damião Santos",
+        "id": "joao-catalao-antunes",
+        "name": "João Catalão Antunes",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -773,8 +773,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "pedro-martins",
-        "name": "Pedro Martins",
+        "id": "alfonso-brandao",
+        "name": "Alfonso Brandão",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -782,8 +782,8 @@
         "isCaptain": false
       },
       {
-        "id": "alfonso-brandao",
-        "name": "Alfonso Brandão",
+        "id": "pedro-martins",
+        "name": "Pedro Martins",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -882,8 +882,8 @@
         "isCaptain": false
       },
       {
-        "id": "hugo",
-        "name": "Hugo",
+        "id": "hugo-ribeiro",
+        "name": "Hugo Ribeiro",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -982,8 +982,8 @@
         "isCaptain": false
       },
       {
-        "id": "tech-def1",
-        "name": "Tech Defender 1",
+        "id": "mario-macedo",
+        "name": "Mário Macedo",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -1083,15 +1083,6 @@
         "isCaptain": false
       },
       {
-        "id": "francisco-ferreira", 
-        "name": "Francisco Ferreira",
-        "number": 3,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
         "id": "ricardo-mesquita",
         "name": "Ricardo Mesquita",
         "number": 7,
@@ -1099,6 +1090,15 @@
         "status": "fit",
         "isStarter": true,
         "isCaptain": true
+      },
+      {
+        "id": "francisco-ferreira", 
+        "name": "Francisco Ferreira",
+        "number": 3,
+        "position": "midfielder",
+        "status": "fit",
+        "isStarter": false,
+        "isCaptain": false
       },
       {
         "id": "bruno-gandres",
@@ -1184,8 +1184,8 @@
         "isCaptain": false
       },
       {
-        "id": "golo-def1",
-        "name": "Golo Defender 1",
+        "id": "francisco-martins",
+        "name": "Francisco Arrabaça Martins",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -1248,8 +1248,8 @@
         "isCaptain": false
       },
       {
-        "id": "dataki-def1",
-        "name": "Dataki Defender 1",
+        "id": "guilherme-amorim",
+        "name": "Guilherme Amorim",
         "number": 2,
         "position": "defender",
         "status": "fit",
@@ -1394,8 +1394,8 @@
     "formation": "2-1-1",
     "players": [
       {
-        "id": "joao-afonso-almeida",
-        "name": "João Afonso Almeida",
+        "id": "alexandre-gabriel",
+        "name": "Alexandre Gabriel",
         "number": 1,
         "position": "goalkeeper",
         "status": "fit",
@@ -1403,8 +1403,8 @@
         "isCaptain": false
       },
       {
-        "id": "alexandre-gabriel",
-        "name": "Alexandre Gabriel",
+        "id": "joao-afonso-almeida",
+        "name": "João Afonso Almeida",
         "number": 2,
         "position": "defender",
         "status": "fit",
