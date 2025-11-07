@@ -75,11 +75,11 @@
   },
   "ui": {
     "showLoadingMask": true,
-    "enableDebugMode": true,
+    "enableDebugMode": false,
     "enableDarkMode": true
   },
    "admin": {
     "role": "admin",
-    "validateTime": false
+    "validateTime": true
   } 
 }

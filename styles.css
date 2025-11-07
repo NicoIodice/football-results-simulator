@@ -1153,6 +1153,19 @@ header p {
     transition: all 0.3s ease;
     border-bottom: 3px solid transparent;
     text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-icon {
+    font-size: 1.2rem;
+    display: none; /* Hidden on desktop */
+}
+
+.tab-label {
+    display: inline;
 }
 
 .tab-button:hover {
@@ -2108,16 +2121,46 @@ tr.first-place .goal-diff-negative {
     }
     
     .tabs {
-        flex-direction: column;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        margin-bottom: 11%;
+        border-radius: 0;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+        background-color: white;
+        flex-direction: row;
     }
     
     .tab-button {
-        border-bottom: 1px solid #e9ecef;
-        border-radius: 0;
+        flex-direction: column;
+        padding: 8px 4px;
+        border-bottom: none;
+        border-top: 3px solid transparent;
+        gap: 4px;
+        font-size: 0.7rem;
+    }
+    
+    .tab-icon {
+        display: block;
+        font-size: 1.5rem;
+    }
+    
+    .tab-label {
+        display: block;
+        font-size: 0.7rem;
     }
     
     .tab-button.active {
-        border-bottom-color: var(--primary-color);
+        border-bottom: none;
+        border-top-color: var(--primary-color);
+    }
+    
+    /* Add padding to main content to prevent overlap with bottom nav */
+    main {
+        padding-bottom: 80px;
     }
     
     .tab-content {
@@ -6283,6 +6326,18 @@ body.dark-mode .tab-button:hover {
 body.dark-mode .tab-button.active {
     background-color: #2c5282;
     color: white;
+}
+
+/* Dark mode mobile bottom nav */
+@media (max-width: 768px) {
+    body.dark-mode .tabs {
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5);
+        border-top: 1px solid #3a3a3a;
+    }
+    
+    body.dark-mode .tab-button.active {
+        border-top-color: var(--primary-color);
+    }
 }
 
 body.dark-mode .tab-content {
