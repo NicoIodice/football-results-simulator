@@ -5371,6 +5371,16 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
 }
 
+/* Winner indicator for knockout matches */
+.team-box.winner {
+    border: 3px solid #27ae60;
+    box-shadow: 0 2px 8px rgba(39, 174, 96, 0.4), 0 0 15px rgba(39, 174, 96, 0.2);
+}
+
+.team-box.winner:hover {
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.5), 0 0 20px rgba(39, 174, 96, 0.3);
+}
+
 .team-name {
     font-weight: bold;
     font-size: 1rem;
@@ -6863,6 +6873,16 @@ body.dark-mode .knockout-warning-content .replacement-team {
 
 body.dark-mode .knockout-warning-content .original-team {
     color: #ef5350;
+}
+
+/* Dark mode winner indicator */
+body.dark-mode .team-box.winner {
+    border-color: #4caf50;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.5), 0 0 15px rgba(76, 175, 80, 0.3);
+}
+
+body.dark-mode .team-box.winner:hover {
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.6), 0 0 20px rgba(76, 175, 80, 0.4);
 }
 
 /* Mobile Responsive for Celebration */

@@ -7868,6 +7868,25 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
     const editBtn = document.getElementById(`${matchId}-edit-btn`);
     const scoreDisplay = document.getElementById(`${matchId}-score`);
     
+    // Get team boxes for this match to add winner indicator
+    let homeTeamBox = null;
+    let awayTeamBox = null;
+    
+    // Map match IDs to their team box IDs
+    if (matchId === 'semi1') {
+        homeTeamBox = document.getElementById('group-b-winner');
+        awayTeamBox = document.getElementById('group-d-winner');
+    } else if (matchId === 'semi2') {
+        homeTeamBox = document.getElementById('group-a-winner');
+        awayTeamBox = document.getElementById('group-c-winner');
+    } else if (matchId === 'final') {
+        homeTeamBox = document.getElementById('semifinal-1-winner');
+        awayTeamBox = document.getElementById('semifinal-2-winner');
+    } else if (matchId === 'third') {
+        homeTeamBox = document.getElementById('semifinal-1-loser');
+        awayTeamBox = document.getElementById('semifinal-2-loser');
+    }
+    
     if (matchResult.played) {
         // Match has been played - show score and conditional edit button
         if (scoreDisplay) {
@@ -7879,6 +7898,20 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
             }
             
             scoreDisplay.innerHTML = scoreText;
+        }
+        
+        // Add winner indicator to team boxes
+        if (homeTeamBox && awayTeamBox && matchResult.winner) {
+            // Remove winner class from both boxes first
+            homeTeamBox.classList.remove('winner');
+            awayTeamBox.classList.remove('winner');
+            
+            // Add winner class to the winning team
+            if (matchResult.winner === matchResult.homeTeam) {
+                homeTeamBox.classList.add('winner');
+            } else if (matchResult.winner === matchResult.awayTeam) {
+                awayTeamBox.classList.add('winner');
+            }
         }
         
         if (addBtn) addBtn.style.display = 'none';
@@ -7894,6 +7927,10 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
         if (scoreDisplay) {
             scoreDisplay.textContent = ' - ';
         }
+        
+        // Remove winner indicators if match not played
+        if (homeTeamBox) homeTeamBox.classList.remove('winner');
+        if (awayTeamBox) awayTeamBox.classList.remove('winner');
         
         if (editBtn) editBtn.style.display = 'none';
         
