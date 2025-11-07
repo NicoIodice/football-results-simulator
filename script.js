@@ -7871,7 +7871,14 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
     if (matchResult.played) {
         // Match has been played - show score and conditional edit button
         if (scoreDisplay) {
-            scoreDisplay.textContent = `${matchResult.homeScore} - ${matchResult.awayScore}`;
+            let scoreText = `${matchResult.homeScore} - ${matchResult.awayScore}`;
+            
+            // Add penalty score if match went to penalties
+            if (matchResult.homePenalties !== undefined && matchResult.awayPenalties !== undefined) {
+                scoreText += `<br><span class="penalty-score">(${matchResult.homePenalties} - ${matchResult.awayPenalties} pen)</span>`;
+            }
+            
+            scoreDisplay.innerHTML = scoreText;
         }
         
         if (addBtn) addBtn.style.display = 'none';
@@ -8041,7 +8048,7 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                             <div class="team-name team-name-modal">${homeTeam.name}</div>
                             <input type="number" id="knockout-home-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.homeScore : ''}" 
-                                   class="score-input">
+                                   class="score-input" oninput="checkKnockoutScoreTie()">
                         </div>
                         <div class="vs-section">
                             <span class="vs-text">VS</span>
@@ -8050,12 +8057,37 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                             <div class="team-name team-name-modal">${awayTeam.name}</div>
                             <input type="number" id="knockout-away-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.awayScore : ''}" 
-                                   class="score-input">
+                                   class="score-input" oninput="checkKnockoutScoreTie()">
                         </div>
                     </div>
+                    
+                    <div id="penalty-shootout-container" class="penalty-shootout-container" style="display: none;">
+                        <div class="penalty-shootout-header">
+                            <h4>⚽ Penalty Shootout Required</h4>
+                            <p>The match is tied. Please enter penalty shootout results.</p>
+                        </div>
+                        <div class="penalty-scores">
+                            <div class="penalty-section">
+                                <label>${homeTeam.name}</label>
+                                <input type="number" id="knockout-home-penalties" min="0" max="99" 
+                                       placeholder="0" value="${isEdit && matchResult.homePenalties !== undefined ? matchResult.homePenalties : ''}" 
+                                       class="penalty-input" oninput="validatePenaltyInputs()">
+                            </div>
+                            <div class="penalty-vs">
+                                <span>PEN</span>
+                            </div>
+                            <div class="penalty-section">
+                                <label>${awayTeam.name}</label>
+                                <input type="number" id="knockout-away-penalties" min="0" max="99" 
+                                       placeholder="0" value="${isEdit && matchResult.awayPenalties !== undefined ? matchResult.awayPenalties : ''}" 
+                                       class="penalty-input" oninput="validatePenaltyInputs()">
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions">
                         <button class="cancel-btn" onclick="closeKnockoutScoreModal()">Cancel</button>
-                        <button class="save-btn" onclick="saveKnockoutScoreModal('${matchId}', ${isEdit})">
+                        <button class="save-btn" id="knockout-save-btn" onclick="saveKnockoutScoreModal('${matchId}', ${isEdit})">
                             ${action} Result
                         </button>
                     </div>
@@ -8076,6 +8108,10 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
     // Focus on first input
     setTimeout(() => {
         document.getElementById('knockout-home-score').focus();
+        // Check if we need to show penalties on edit
+        if (isEdit && matchResult.homeScore === matchResult.awayScore) {
+            checkKnockoutScoreTie();
+        }
     }, 100);
 }
 
@@ -8083,6 +8119,47 @@ function closeKnockoutScoreModal() {
     const modal = document.getElementById('knockout-score-modal');
     if (modal) {
         modal.remove();
+    }
+}
+
+// Check if scores are tied and show/hide penalty shootout
+function checkKnockoutScoreTie() {
+    const homeScore = document.getElementById('knockout-home-score').value;
+    const awayScore = document.getElementById('knockout-away-score').value;
+    const penaltyContainer = document.getElementById('penalty-shootout-container');
+    const saveBtn = document.getElementById('knockout-save-btn');
+    
+    if (homeScore !== '' && awayScore !== '' && homeScore === awayScore) {
+        // Scores are tied - show penalty shootout
+        penaltyContainer.style.display = 'block';
+        // Disable save button until penalties are entered
+        validatePenaltyInputs();
+    } else {
+        // Scores are not tied - hide penalty shootout
+        penaltyContainer.style.display = 'none';
+        // Enable save button
+        if (saveBtn) {
+            saveBtn.disabled = false;
+        }
+    }
+}
+
+// Validate penalty inputs and enable/disable save button
+function validatePenaltyInputs() {
+    const homePenalties = document.getElementById('knockout-home-penalties').value;
+    const awayPenalties = document.getElementById('knockout-away-penalties').value;
+    const saveBtn = document.getElementById('knockout-save-btn');
+    
+    if (!saveBtn) return;
+    
+    // Check if both penalty inputs have valid values and are not equal
+    if (homePenalties !== '' && awayPenalties !== '' && 
+        !isNaN(parseInt(homePenalties)) && !isNaN(parseInt(awayPenalties)) &&
+        parseInt(homePenalties) >= 0 && parseInt(awayPenalties) >= 0 &&
+        homePenalties !== awayPenalties) {
+        saveBtn.disabled = false;
+    } else {
+        saveBtn.disabled = true;
     }
 }
 
@@ -8101,18 +8178,46 @@ function saveKnockoutScoreModal(matchId, isEdit) {
     matchResult.played = true;
     matchResult.playedDate = new Date().toISOString();
     
-    // Determine winner and loser
-    if (homeScore > awayScore) {
-        matchResult.winner = matchResult.homeTeam;
-        matchResult.loser = matchResult.awayTeam;
-    } else if (awayScore > homeScore) {
-        matchResult.winner = matchResult.awayTeam;
-        matchResult.loser = matchResult.homeTeam;
+    // Check if match is tied and handle penalties
+    if (homeScore === awayScore) {
+        const homePenalties = parseInt(document.getElementById('knockout-home-penalties').value);
+        const awayPenalties = parseInt(document.getElementById('knockout-away-penalties').value);
+        
+        if (isNaN(homePenalties) || isNaN(awayPenalties) || homePenalties < 0 || awayPenalties < 0) {
+            showToast('Please enter valid penalty scores', 'error');
+            return;
+        }
+        
+        if (homePenalties === awayPenalties) {
+            showToast('Penalty scores cannot be tied', 'error');
+            return;
+        }
+        
+        // Store penalty results
+        matchResult.homePenalties = homePenalties;
+        matchResult.awayPenalties = awayPenalties;
+        
+        // Determine winner based on penalties
+        if (homePenalties > awayPenalties) {
+            matchResult.winner = matchResult.homeTeam;
+            matchResult.loser = matchResult.awayTeam;
+        } else {
+            matchResult.winner = matchResult.awayTeam;
+            matchResult.loser = matchResult.homeTeam;
+        }
     } else {
-        // For ties, we'll need penalty shootout logic - for now, home team wins
-        matchResult.winner = matchResult.homeTeam;
-        matchResult.loser = matchResult.awayTeam;
-        showToast('Tie game - home team advances on penalties', 'info');
+        // Normal result - clear any penalty data
+        delete matchResult.homePenalties;
+        delete matchResult.awayPenalties;
+        
+        // Determine winner and loser
+        if (homeScore > awayScore) {
+            matchResult.winner = matchResult.homeTeam;
+            matchResult.loser = matchResult.awayTeam;
+        } else {
+            matchResult.winner = matchResult.awayTeam;
+            matchResult.loser = matchResult.homeTeam;
+        }
     }
     
     // Close modal

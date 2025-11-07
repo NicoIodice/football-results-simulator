@@ -5712,6 +5712,124 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     transform: translateY(-1px);
 }
 
+.modal-actions .save-btn:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.modal-actions .save-btn:disabled:hover {
+    background: #95a5a6;
+    transform: none;
+}
+
+/* Penalty Shootout Styles */
+.penalty-shootout-container {
+    margin-top: 25px;
+    margin-bottom: 15px;
+    padding: 20px;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.penalty-shootout-header h4 {
+    margin: 0 0 8px 0;
+    color: #e67e22;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.penalty-shootout-header p {
+    margin: 0 0 15px 0;
+    color: #856404;
+    font-size: 0.95rem;
+}
+
+.penalty-scores {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.penalty-section {
+    flex: 1;
+    text-align: center;
+}
+
+.penalty-section label {
+    display: block;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.penalty-input {
+    width: 80px;
+    height: 50px;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    border: 3px solid #ffc107;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.3s ease;
+}
+
+.penalty-input:focus {
+    outline: none;
+    border-color: #e67e22;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, 0.1);
+}
+
+.penalty-vs {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e67e22;
+    text-align: center;
+    min-width: 50px;
+}
+
+.penalty-vs span {
+    display: block;
+    background: #ffc107;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+/* Penalty score display in bracket */
+.penalty-score {
+    display: block;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    font-style: italic;
+    margin-top: 4px;
+}
+
+body.dark-mode .penalty-score {
+    color: #95a5a6;
+}
+
 @media (max-width: 768px) {
     .teams-display {
         display: block;
@@ -5730,6 +5848,21 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     .modal-actions .cancel-btn,
     .modal-actions .save-btn {
         width: 100%;
+    }
+    
+    .penalty-scores {
+        gap: 10px;
+    }
+    
+    .penalty-input {
+        width: 70px;
+        height: 45px;
+        font-size: 20px;
+    }
+    
+    .penalty-vs span {
+        padding: 6px 10px;
+        font-size: 0.75rem;
     }
 }
 
