@@ -45,13 +45,31 @@
   "knockout": {
     "date": "November 7th, 2025",
     "startTime": "4:00 PM",
-    "dateTimeFormatted": "📅 November 7th, 2025 - Starting at 4:00 PM",
+    "dateTimeFormatted": "📅 November 7th, 2025 - Starting at 16:00 PM",
     "title": "🏆 Semi-Finals & Finals",
     "venue": {
       "name": "Campo Vigor da Mocidade",
       "googleMapsUrl": "https://www.google.com/maps/place/Grupo+Recreativo+O+Vigor+da+Mocidade/@40.202941,-8.4729408,17z/data=!3m1!4b1!4m6!3m5!1s0xd22f888067921ef:0xa886e54df9c6c856!8m2!3d40.202941!4d-8.4729408!16s%2Fg%2F11cr_t0kk5"
     },
-    "description": "Championship knockout stage featuring semi-finals, 3rd place playoff, and final"
+    "description": "Championship knockout stage featuring semi-finals, 3rd place playoff, and final",
+    "matches": {
+      "semi1": {
+        "time": "🕓 16:00 PM",
+        "homeGroup": "group-b",
+        "awayGroup": "group-d"
+      },
+      "semi2": {
+        "time": "🕠 17:00 PM",
+        "homeGroup": "group-a",
+        "awayGroup": "group-c"
+      },
+      "third": {
+        "time": "🕠 18:15 PM"
+      },
+      "final": {
+        "time": "⏰ 19:15 PM"
+      }
+    }
   },
   "simulation": {
     "useOpenAI": false,

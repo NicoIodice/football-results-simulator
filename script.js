@@ -7261,6 +7261,9 @@ function updateKnockoutStage() {
     // Update knockout venue information
     updateKnockoutVenues();
     
+    // Update match times and group labels
+    updateKnockoutMatchTimesAndLabels();
+    
     // Update disclaimer
     updateKnockoutDisclaimer();
     
@@ -7277,13 +7280,13 @@ function updateKnockoutStage() {
         'Group D': groupDWinner?.name
     });
     
-    // Update Semi-Final 1 (Group A vs Group D)
-    const groupABox = document.getElementById('group-a-winner');
+    // Update Semi-Final 1 (Group B vs Group D)
+    const groupBBox = document.getElementById('group-b-winner');
     const groupDBox = document.getElementById('group-d-winner');
     
-    if (groupABox && groupAWinner) {
-        groupABox.querySelector('.team-name').textContent = groupAWinner.name;
-        groupABox.title = `${groupAWinner.fullName || groupAWinner.name} - ${groupAWinner.points} points`;
+    if (groupBBox && groupBWinner) {
+        groupBBox.querySelector('.team-name').textContent = groupBWinner.name;
+        groupBBox.title = `${groupBWinner.fullName || groupBWinner.name} - ${groupBWinner.points} points`;
     }
     
     if (groupDBox && groupDWinner) {
@@ -7291,13 +7294,13 @@ function updateKnockoutStage() {
         groupDBox.title = `${groupDWinner.fullName || groupDWinner.name} - ${groupDWinner.points} points`;
     }
     
-    // Update Semi-Final 2 (Group B vs Group C)
-    const groupBBox = document.getElementById('group-b-winner');
+    // Update Semi-Final 2 (Group A vs Group C)
+    const groupABox = document.getElementById('group-a-winner');
     const groupCBox = document.getElementById('group-c-winner');
     
-    if (groupBBox && groupBWinner) {
-        groupBBox.querySelector('.team-name').textContent = groupBWinner.name;
-        groupBBox.title = `${groupBWinner.fullName || groupBWinner.name} - ${groupBWinner.points} points`;
+    if (groupABox && groupAWinner) {
+        groupABox.querySelector('.team-name').textContent = groupAWinner.name;
+        groupABox.title = `${groupAWinner.fullName || groupAWinner.name} - ${groupAWinner.points} points`;
     }
     
     if (groupCBox && groupCWinner) {
@@ -7306,8 +7309,8 @@ function updateKnockoutStage() {
     }
     
     // Update knockout match displays and controls
-    updateKnockoutMatch('semi1', groupAWinner, groupDWinner);
-    updateKnockoutMatch('semi2', groupBWinner, groupCWinner);
+    updateKnockoutMatch('semi1', groupBWinner, groupDWinner);
+    updateKnockoutMatch('semi2', groupAWinner, groupCWinner);
     
     // Always update semi-final result displays (winners/losers in final and 3rd place)
     updateSemiFinalResultDisplays();
@@ -7916,6 +7919,85 @@ function updateKnockoutVenues() {
             element.innerHTML = venueHTML;
         }
     });
+}
+
+// Update knockout match times and group labels
+function updateKnockoutMatchTimesAndLabels() {
+    if (!config?.knockout?.matches) return;
+    
+    const matches = config.knockout.matches;
+    
+    // Update Semi-Final 1
+    if (matches.semi1) {
+        const semi1Time = document.getElementById('semi1-time');
+        if (semi1Time && matches.semi1.time) {
+            semi1Time.textContent = matches.semi1.time;
+        }
+        
+        // Update group labels if specified
+        if (matches.semi1.homeGroup) {
+            const homeLabel = document.getElementById('semi1-home-label');
+            const groupName = getGroupNameById(matches.semi1.homeGroup);
+            if (homeLabel && groupName) {
+                homeLabel.textContent = `Winner of ${groupName}`;
+            }
+        }
+        
+        if (matches.semi1.awayGroup) {
+            const awayLabel = document.getElementById('semi1-away-label');
+            const groupName = getGroupNameById(matches.semi1.awayGroup);
+            if (awayLabel && groupName) {
+                awayLabel.textContent = `Winner of ${groupName}`;
+            }
+        }
+    }
+    
+    // Update Semi-Final 2
+    if (matches.semi2) {
+        const semi2Time = document.getElementById('semi2-time');
+        if (semi2Time && matches.semi2.time) {
+            semi2Time.textContent = matches.semi2.time;
+        }
+        
+        // Update group labels if specified
+        if (matches.semi2.homeGroup) {
+            const homeLabel = document.getElementById('semi2-home-label');
+            const groupName = getGroupNameById(matches.semi2.homeGroup);
+            if (homeLabel && groupName) {
+                homeLabel.textContent = `Winner of ${groupName}`;
+            }
+        }
+        
+        if (matches.semi2.awayGroup) {
+            const awayLabel = document.getElementById('semi2-away-label');
+            const groupName = getGroupNameById(matches.semi2.awayGroup);
+            if (awayLabel && groupName) {
+                awayLabel.textContent = `Winner of ${groupName}`;
+            }
+        }
+    }
+    
+    // Update 3rd Place Match
+    if (matches.third) {
+        const thirdTime = document.getElementById('third-time');
+        if (thirdTime && matches.third.time) {
+            thirdTime.textContent = matches.third.time;
+        }
+    }
+    
+    // Update Final
+    if (matches.final) {
+        const finalTime = document.getElementById('final-time');
+        if (finalTime && matches.final.time) {
+            finalTime.textContent = matches.final.time;
+        }
+    }
+}
+
+// Helper function to get group name by ID
+function getGroupNameById(groupId) {
+    const group = groups.find(g => g.id === groupId);
+    return group ? group.name : null;
 }
 
 // Determine team company (CSW / CTW) from teams list using league field
