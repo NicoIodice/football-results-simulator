@@ -5151,6 +5151,22 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     margin-bottom: 20px;
     border-bottom: 2px solid #ecf0f1;
     gap: 0;
+    position: relative;
+    --indicator-left: 0px;
+    --indicator-width: 0px;
+}
+
+/* Animated indicator bar for sub-tabs */
+.sub-tabs::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: var(--indicator-left);
+    width: var(--indicator-width);
+    height: 3px;
+    background: var(--primary-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 3px 3px 0 0;
 }
 
 .sub-tab-button {
@@ -5161,9 +5177,9 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     font-size: 1rem;
     font-weight: 500;
     color: #7f8c8d;
-    border-bottom: 3px solid transparent;
     transition: all 0.3s ease;
     position: relative;
+    white-space: nowrap;
 }
 
 .sub-tab-button:hover {
@@ -5173,8 +5189,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 
 .sub-tab-button.active {
     color: #2c3e50;
-    border-bottom-color: var(--primary-color);
-    background: rgba(52, 152, 219, 0.05);
+    font-weight: 600;
 }
 
 .sub-tab-content {
@@ -5925,19 +5940,31 @@ body.dark-mode .penalty-score {
         padding: 10px 16px;
     }
     
+    /* Modern mobile sub-tabs with sliding indicator */
     .sub-tabs {
-        flex-direction: column;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+        -ms-overflow-style: none; /* IE and Edge */
+        border-bottom: 1px solid #ecf0f1;
+        margin-bottom: 15px;
+    }
+    
+    .sub-tabs::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
     }
     
     .sub-tab-button {
-        border-bottom: none;
-        border-right: 3px solid transparent;
-        text-align: left;
+        padding: 14px 20px;
+        font-size: 0.95rem;
+        flex-shrink: 0;
+        background: transparent;
     }
     
     .sub-tab-button.active {
-        border-right-color: var(--primary-color);
-        border-bottom-color: transparent;
+        color: var(--primary-color);
+        font-weight: 600;
     }
 }
 
@@ -6831,21 +6858,24 @@ body.dark-mode .points {
 }
 
 body.dark-mode .sub-tabs {
-    background-color: #2d2d2d;
+    border-bottom-color: #3a3a3a;
+}
+
+body.dark-mode .sub-tabs::after {
+    background: var(--primary-color);
 }
 
 body.dark-mode .sub-tab-button {
-    background-color: #2d2d2d;
     color: #b0b0b0;
 }
 
 body.dark-mode .sub-tab-button:hover {
-    background-color: #3a3a3a;
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #e0e0e0;
 }
 
 body.dark-mode .sub-tab-button.active {
-    background-color: #2c5282;
-    color: white;
+    color: var(--primary-color);
 }
 
 body.dark-mode .dark-mode-toggle {

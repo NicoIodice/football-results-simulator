@@ -459,6 +459,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadPendingResults();
 
     showTab('overview');
+    
+    // Initialize sub-tab indicators after a brief delay to ensure layout is ready
+    setTimeout(() => initializeSubTabIndicators(), 200);
 
     // Initialize OpenRouter only if enabled
     if (config?.simulation?.useOpenAI) {
@@ -7204,6 +7207,50 @@ function hideScorerWarningPopup() {
 }
 
 // Sub-tab functionality for Standings
+// Update sliding indicator position for sub-tabs
+function updateSubTabIndicator(button) {
+    if (!button) return;
+    
+    const subTabsContainer = button.parentElement;
+    if (!subTabsContainer || !subTabsContainer.classList.contains('sub-tabs')) return;
+    
+    const buttonRect = button.getBoundingClientRect();
+    const containerRect = subTabsContainer.getBoundingClientRect();
+    
+    // Calculate position relative to container
+    const left = buttonRect.left - containerRect.left + subTabsContainer.scrollLeft;
+    const width = buttonRect.width;
+    
+    // Update the ::after pseudo-element via CSS custom properties
+    subTabsContainer.style.setProperty('--indicator-left', `${left}px`);
+    subTabsContainer.style.setProperty('--indicator-width', `${width}px`);
+}
+
+// Initialize all sub-tab indicators on page load
+function initializeSubTabIndicators() {
+    // Find all sub-tabs containers
+    const subTabsContainers = document.querySelectorAll('.sub-tabs');
+    
+    subTabsContainers.forEach(container => {
+        // Find the active button in this container
+        const activeButton = container.querySelector('.sub-tab-button.active');
+        if (activeButton) {
+            // Use setTimeout to ensure layout is ready
+            setTimeout(() => updateSubTabIndicator(activeButton), 100);
+        }
+    });
+    
+    // Also update on window resize to handle orientation changes
+    window.addEventListener('resize', () => {
+        subTabsContainers.forEach(container => {
+            const activeButton = container.querySelector('.sub-tab-button.active');
+            if (activeButton) {
+                updateSubTabIndicator(activeButton);
+            }
+        });
+    });
+}
+
 function showStandingsSubTab(tabId) {
     // Hide all sub-tab contents
     const subTabContents = document.querySelectorAll('.sub-tab-content');
@@ -7226,6 +7273,9 @@ function showStandingsSubTab(tabId) {
     // Add active class to clicked button
     const clickedButton = event.target;
     clickedButton.classList.add('active');
+    
+    // Update sliding indicator position
+    updateSubTabIndicator(clickedButton);
     
     // Update content based on sub-tab
     if (tabId === 'knockout-stage') {
@@ -7259,6 +7309,9 @@ function showSimulatorSubTab(tabId) {
     // Add active class to clicked button
     const clickedButton = event.target;
     clickedButton.classList.add('active');
+    
+    // Update sliding indicator position
+    updateSubTabIndicator(clickedButton);
     
     // Update content based on sub-tab
     if (tabId === 'knockout-stage-sim') {
