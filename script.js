@@ -1381,7 +1381,31 @@ function showTab(tabName) {
             updateForecast();
             break;
         case 'simulator':
-            updateSimulation();
+            // Ensure default simulator sub-tab (group-stage-sim) is visible
+            const defaultSimTab = document.getElementById('group-stage-sim');
+            if (defaultSimTab && !defaultSimTab.classList.contains('active')) {
+                defaultSimTab.classList.add('active');
+            }
+
+            const simSelect = document.getElementById('selected-team');
+            // If teams or select not ready yet (user clicked before data finished loading), defer initialization
+            if (!Array.isArray(teams) || teams.length === 0 || !simSelect || simSelect.options.length === 0) {
+                const simResults = document.getElementById('simulation-results');
+                if (simResults) {
+                    simResults.innerHTML = '<div class="loading">⏳ Loading teams...</div>';
+                }
+                // Try again shortly after data load completes
+                setTimeout(() => {
+                    try {
+                        updateTeamSelectorForGroup();
+                        updateSimulation();
+                    } catch (e) {
+                        logger.warn('Deferred simulator init failed:', e.message);
+                    }
+                }, 250);
+            } else {
+                updateSimulation();
+            }
             break;
     }
 }
@@ -8014,7 +8038,7 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                 <div class="score-modal-body">
                     <div class="teams-display">
                         <div class="team-section">
-                            <div class="team-name">${homeTeam.name}</div>
+                            <div class="team-name team-name-modal">${homeTeam.name}</div>
                             <input type="number" id="knockout-home-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.homeScore : ''}" 
                                    class="score-input">
@@ -8023,7 +8047,7 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                             <span class="vs-text">VS</span>
                         </div>
                         <div class="team-section">
-                            <div class="team-name">${awayTeam.name}</div>
+                            <div class="team-name team-name-modal">${awayTeam.name}</div>
                             <input type="number" id="knockout-away-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.awayScore : ''}" 
                                    class="score-input">

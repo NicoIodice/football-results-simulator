@@ -2190,7 +2190,7 @@ tr.first-place .goal-diff-negative {
     
     .tab-button {
         flex-direction: column;
-        padding: 8px 4px;
+        padding: 8px 4px 20px;
         border-bottom: none;
         border-top: 3px solid transparent;
         gap: 4px;
@@ -3827,14 +3827,25 @@ tr.first-place .goal-diff-negative {
         width: 95%;
     }
     
-    .score-inputs {
-        gap: 15px;
+    .modal .score-inputs {
+        display: flex;              /* Ensure horizontal layout on mobile */
+        flex-direction: row;        /* Explicit row direction */
+        flex-wrap: nowrap;          /* Prevent wrapping to new line */
+        align-items: center;        /* Vertically center all items */
+        justify-content: center;    /* Center the group horizontally */
+        gap: 10px;                  /* Tighter spacing for mobile */
     }
     
     .team-score input {
         width: 70px;
         height: 45px;
         font-size: 20px;
+    }
+    
+    .modal .vs-separator {
+        font-size: 16px;            /* Slightly smaller on mobile */
+        height: 45px;               /* Match mobile input height */
+        flex-shrink: 0;             /* Prevent shrinking */
     }
     
     .modal-actions {
@@ -4174,8 +4185,12 @@ tr.first-place .goal-diff-negative {
     }
     
     .match-label {
-        font-size: 0.8rem !important;
+        font-size: 1.0rem !important;
         margin-bottom: 12px !important;
+    }
+
+    .match-time {
+        font-size: 0.8em !important;
     }
     
     .confidence-badge {
@@ -5363,6 +5378,10 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     word-wrap: break-word;
 }
 
+.team-name-modal {
+    text-align: center;
+}
+
 .team-label {
     color: #7f8c8d;
     font-size: 0.9rem;
@@ -5695,10 +5714,11 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 
 @media (max-width: 768px) {
     .teams-display {
+        display: block;
         flex-direction: column;
         gap: 15px;
     }
-    
+
     .teams-display .vs-section {
         order: 2;
     }
