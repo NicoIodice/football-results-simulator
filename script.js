@@ -1376,6 +1376,16 @@ function showTab(tabName) {
     switch(tabName) {
         case 'overview':
             updateOverview();
+            // Update sub-tab indicators when switching to overview tab
+            setTimeout(() => {
+                const overviewSubTabs = document.querySelector('#overview .sub-tabs');
+                if (overviewSubTabs) {
+                    const activeOverviewButton = overviewSubTabs.querySelector('.sub-tab-button.active');
+                    if (activeOverviewButton) {
+                        updateSubTabIndicator(activeOverviewButton);
+                    }
+                }
+            }, 50);
             break;
         case 'fixtures':
             updateFixtures();
@@ -1389,6 +1399,17 @@ function showTab(tabName) {
             if (defaultSimTab && !defaultSimTab.classList.contains('active')) {
                 defaultSimTab.classList.add('active');
             }
+
+            // Update sub-tab indicators when switching to simulator tab
+            setTimeout(() => {
+                const simulatorSubTabs = document.querySelector('#simulator .sub-tabs');
+                if (simulatorSubTabs) {
+                    const activeSimButton = simulatorSubTabs.querySelector('.sub-tab-button.active');
+                    if (activeSimButton) {
+                        updateSubTabIndicator(activeSimButton);
+                    }
+                }
+            }, 50);
 
             const simSelect = document.getElementById('selected-team');
             // If teams or select not ready yet (user clicked before data finished loading), defer initialization
