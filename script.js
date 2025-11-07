@@ -1040,6 +1040,9 @@ async function loadData() {
         // Load team player data for Teams tab
         await loadPlayersData();
         
+        // Initialize theme based on config
+        initializeTheme();
+        
         // Initialize dark mode after config is loaded
         initializeDarkMode();
     } catch (error) {
@@ -8309,6 +8312,32 @@ function toggleDarkMode() {
     } else {
         icon.textContent = '🌙';
         localStorage.setItem('darkMode', 'disabled');
+    }
+}
+
+// Initialize theme from config
+function initializeTheme() {
+    // Check if theme is defined in config
+    const theme = config?.theme;
+    
+    // Default to CTW (blue) if no theme is specified
+    if (!theme || theme === '') {
+        document.body.classList.remove('theme-csw');
+        logger.warn('⚠️ No theme defined in config.json, using default (CTW - blueish colors)');
+        return;
+    }
+    
+    // Apply theme class to body
+    if (theme === 'csw') {
+        document.body.classList.add('theme-csw');
+        logger.log('🎨 CSW theme applied (reddish colors)');
+    } else if (theme === 'ctw') {
+        document.body.classList.remove('theme-csw');
+        logger.log('🎨 CTW theme applied (blueish colors)');
+    } else {
+        // Unknown theme - default to CTW (blue)
+        document.body.classList.remove('theme-csw');
+        logger.warn(`⚠️ Unknown theme "${theme}" in config.json, using default (CTW - blueish colors)`);
     }
 }
 

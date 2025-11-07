@@ -1,3 +1,32 @@
+/* ===================================
+   THEME VARIABLES
+   =================================== */
+:root {
+    /* CTW Theme - Blue colors (default) */
+    --primary-color: #3498db;
+    --primary-dark: #2980b9;
+    --primary-darker: #2c5282;
+    --primary-gradient-start: #3498db;
+    --primary-gradient-end: #2980b9;
+    --primary-gradient-dark-start: #2c3e50;
+    --primary-gradient-dark-end: #3498db;
+}
+
+body.theme-csw {
+    /* CSW Theme - Red colors */
+    --primary-color: #c01722;
+    --primary-dark: #a01419;
+    --primary-darker: #8b1116;
+    --primary-gradient-start: #c01722;
+    --primary-gradient-end: #a01419;
+    --primary-gradient-dark-start: #2c3e50;
+    --primary-gradient-dark-end: #c01722;
+}
+
+/* ===================================
+   WARNING & NOTIFICATION ICONS
+   =================================== */
+
 /* Warning icon for scorer/goal mismatch */
 .scorer-warning-icon {
     color: #e67e22;
@@ -129,7 +158,7 @@
 .simulation-header h3 {
     font-size: 1.8rem;
     margin-bottom: 10px;
-    color: #2c5282;
+    color: var(--primary-darker);
 }
 
 .simulation-disclaimer {
@@ -154,7 +183,7 @@
 
 .knockout-round h4 {
     text-align: center;
-    color: #2c5282;
+    color: var(--primary-darker);
     margin-bottom: 20px;
     font-size: 1.4rem;
     text-transform: uppercase;
@@ -226,7 +255,7 @@
 .team-sim .team-score {
     font-size: 1.4rem;
     font-weight: 700;
-    color: #2c5282;
+    color: var(--primary-darker);
     min-width: 35px;
     text-align: center;
 }
@@ -251,7 +280,7 @@
     display: inline-block;
     padding: 6px 14px;
     background: #e7f3ff;
-    color: #2c5282;
+    color: var(--primary-darker);
     border-radius: 20px;
     font-size: 0.9rem;
     font-weight: 600;
@@ -387,7 +416,7 @@ body.dark-mode .simulation-header h3 {
 }
 .analysis-arrow {
     font-size: 1em;
-    color: #3498db;
+    color: var(--primary-color);
     font-weight: bold;
     margin-left: 10px;
     transition: transform 0.2s;
@@ -484,12 +513,12 @@ body.dark-mode .simulation-header h3 {
 
 /* Only color and background for scorer-goals inside modal */
 .scorers-table .scorer-goals {
-    color: #3498db;
+    color: var(--primary-color);
     background: #f0f8ff;
 }
 .scorers-table tr.own-goal td.scorer-goals {
     color: black;
-    background: #3498db;
+    background: var(--primary-color);
 }
 .scorers-table tr:last-child td {
     border-bottom: none;
@@ -599,7 +628,7 @@ body.dark-mode .simulation-header h3 {
 .scorers-title {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #3498db;
+    color: var(--primary-color);
     letter-spacing: 0.5px;
 }
 .scorers-close {
@@ -724,7 +753,7 @@ body.config-modal-open {
 }
 .config-category-item.active {
     background: #eaf6ff;
-    color: #3498db;
+    color: var(--primary-color);
     font-weight: 600;
 }
 .config-fields-panel {
@@ -769,13 +798,13 @@ body.config-modal-open {
 .config-fields-panel select:focus,
 .config-fields-panel input:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 .config-fields-panel input[type="checkbox"] {
     width: 22px;
     height: 22px;
-    accent-color: #3498db;
+    accent-color: var(--primary-color);
 }
 .config-fields-panel .config-field-description {
     color: #888;
@@ -990,7 +1019,7 @@ body.blurred .config-modal {
     font-weight: 600;
     border-radius: 8px;
     padding: 10px 24px;
-    background: #3498db;
+    background: var(--primary-color);
     color: #fff;
     border: none;
     cursor: pointer;
@@ -999,7 +1028,7 @@ body.blurred .config-modal {
 }
 #config-save-btn:enabled {
     opacity: 1;
-    background: #2980b9;
+    background: var(--primary-dark);
 }
 #config-save-btn:disabled {
     cursor: not-allowed;
@@ -1051,7 +1080,7 @@ body {
 header {
     text-align: center;
     margin-bottom: 30px;
-    background: linear-gradient(135deg, #2c3e50, #3498db);
+    background: linear-gradient(135deg, var(--primary-gradient-dark-start), var(--primary-gradient-dark-end));
     color: white;
     padding: 30px 20px;
     border-radius: 10px;
@@ -1132,9 +1161,9 @@ header p {
 }
 
 .tab-button.active {
-    background-color: #3498db;
+    background-color: var(--primary-color);
     color: white;
-    border-bottom-color: #2980b9;
+    border-bottom-color: var(--primary-dark);
 }
 
 /* Tab content */
@@ -1155,7 +1184,7 @@ header p {
     margin-bottom: 25px;
     color: #2c3e50;
     font-size: 1.8rem;
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid var(--primary-color);
     padding-bottom: 10px;
 }
 
@@ -1485,7 +1514,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .gameweek-header {
-    background-color: #3498db;
+    background-color: var(--primary-color);
     color: white;
     padding: 15px 20px;
     font-weight: 600;
@@ -1504,7 +1533,7 @@ tr.first-place .goal-diff-negative {
     margin-bottom: 12px;
     background-color: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     gap: 16px;
     position: relative;
     font-weight: 600;
@@ -1664,7 +1693,7 @@ tr.first-place .goal-diff-negative {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     display: flex;
     align-items: center;
     gap: 6px; /* tighter label-dropdown spacing */
@@ -1758,7 +1787,7 @@ tr.first-place .goal-diff-negative {
 
 .group-selector select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -1768,7 +1797,7 @@ tr.first-place .goal-diff-negative {
     padding: 18px 20px; /* slightly reduced vertical padding for better centering */
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     display: flex;
     align-items: center;
 }
@@ -1802,7 +1831,7 @@ tr.first-place .goal-diff-negative {
 
 .team-selector select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -1811,7 +1840,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .simulation-header {
-    background: linear-gradient(135deg, #2c3e50, #3498db);
+    background: linear-gradient(135deg, var(--primary-gradient-dark-start), var(--primary-gradient-dark-end));
     color: white;
     padding: 15px 20px;
     border-radius: 8px 8px 0 0;
@@ -1864,7 +1893,7 @@ tr.first-place .goal-diff-negative {
 .stat-value {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #3498db;
+    color: var(--primary-color);
 }
 
 .stat-label {
@@ -2088,7 +2117,7 @@ tr.first-place .goal-diff-negative {
     }
     
     .tab-button.active {
-        border-bottom-color: #3498db;
+        border-bottom-color: var(--primary-color);
     }
     
     .tab-content {
@@ -2382,7 +2411,7 @@ tr.first-place .goal-diff-negative {
 /* AI-Powered Simulator Styles */
 .api-key-prompt {
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-    border: 2px dashed #3498db;
+    border: 2px dashed var(--primary-color);
     border-radius: 12px;
     margin-bottom: 20px;
     text-align: center;
@@ -2392,7 +2421,7 @@ tr.first-place .goal-diff-negative {
     text-align: center;
     padding: 40px 20px;
     font-size: 1.2rem;
-    color: #3498db;
+    color: var(--primary-color);
     background: linear-gradient(45deg, #f8f9fa, #ffffff);
     border-radius: 8px;
     margin: 20px 0;
@@ -2400,7 +2429,7 @@ tr.first-place .goal-diff-negative {
 
 .ai-scenario {
     background-color: #f8f9fa;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     padding: 20px;
     margin-bottom: 15px;
     border-radius: 0 8px 8px 0;
@@ -2447,7 +2476,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .ai-powered-badge small {
-    color: #3498db;
+    color: var(--primary-color);
     font-weight: 600;
     letter-spacing: 0.5px;
 }
@@ -2478,7 +2507,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .team-item.current-team {
-    border-left-color: #3498db;
+    border-left-color: var(--primary-color);
     background: linear-gradient(135deg, #f0f8ff, #ffffff);
     font-weight: 600;
 }
@@ -2533,9 +2562,9 @@ tr.first-place .goal-diff-negative {
     padding: 20px;
     background-color: #f8f9fa;
     border-radius: 8px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     border: 1px solid #e0e0e0;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .forecast-controls .control-row {
@@ -2575,12 +2604,12 @@ tr.first-place .goal-diff-negative {
 }
 
 .forecast-controls select:hover {
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .forecast-controls select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -2599,7 +2628,7 @@ tr.first-place .goal-diff-negative {
     color: #2c3e50;
     margin-bottom: 15px;
     padding-bottom: 10px;
-    border-bottom: 2px solid #3498db;
+    border-bottom: 2px solid var(--primary-color);
 }
 
 /* Status Messages for Forecast */
@@ -2663,7 +2692,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .team-position {
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     border-radius: 50%;
     width: 30px;
@@ -2783,7 +2812,7 @@ tr.first-place .goal-diff-negative {
 .win-probability {
     font-size: 1.2em;
     font-weight: bold;
-    color: #3498db;
+    color: var(--primary-color);
 }
 
 .match-center {
@@ -2805,7 +2834,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .prediction-confidence {
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     padding: 4px 8px;
     border-radius: 12px;
@@ -2871,7 +2900,7 @@ tr.first-place .goal-diff-negative {
 
 .scorer-toggle {
     font-size: 0.8em;
-    color: #3498db;
+    color: var(--primary-color);
     font-weight: bold;
     transition: transform 0.2s ease;
 }
@@ -2923,7 +2952,7 @@ tr.first-place .goal-diff-negative {
 
 .scorer-prediction:hover {
     background: #f8f9fa;
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .scorer-name {
@@ -2993,7 +3022,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .upcoming-match {
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .match-header {
@@ -3011,7 +3040,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .upcoming-badge {
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     padding: 4px 12px;
     border-radius: 12px;
@@ -3123,7 +3152,7 @@ tr.first-place .goal-diff-negative {
 
 .projected-position.podium {
     background: linear-gradient(90deg, #f8f9fa, #e8f4f8);
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 /* Championship forecast probability border colors */
@@ -3502,7 +3531,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .modal-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
     color: white;
     padding: 20px;
     border-radius: 12px 12px 0 0;
@@ -3537,7 +3566,7 @@ tr.first-place .goal-diff-negative {
     padding: 15px;
     border-radius: 8px;
     margin-bottom: 20px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .match-info p {
@@ -3578,7 +3607,7 @@ tr.first-place .goal-diff-negative {
 
 .team-score input:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     background: white;
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
@@ -3607,7 +3636,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .btn-primary {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
     color: white;
 }
 
@@ -3739,7 +3768,7 @@ tr.first-place .goal-diff-negative {
     width: 60px;
     height: 60px;
     border: 6px solid #f3f3f3;
-    border-top: 6px solid #3498db;
+    border-top: 6px solid var(--primary-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
     margin: 0 auto 20px;
@@ -3777,7 +3806,7 @@ tr.first-place .goal-diff-negative {
 
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #3498db, #2ecc71);
+    background: linear-gradient(90deg, var(--primary-color), #2ecc71);
     border-radius: 4px;
     width: 0%;
     transition: width 0.3s ease;
@@ -4066,7 +4095,7 @@ tr.first-place .goal-diff-negative {
 
 .team-selector select {
     padding: 8px 12px;
-    border: 2px solid #3498db;
+    border: 2px solid var(--primary-color);
     border-radius: 6px;
     background-color: white;
     font-size: 14px;
@@ -4078,12 +4107,12 @@ tr.first-place .goal-diff-negative {
 }
 
 .team-selector select:hover {
-    border-color: #2980b9;
+    border-color: var(--primary-dark);
 }
 
 .team-selector select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -4094,7 +4123,7 @@ tr.first-place .goal-diff-negative {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
     display: flex;
     gap: 30px;
     align-items: center;
@@ -4133,7 +4162,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .tactics-selector select:hover {
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .tactics-selector select:focus {
@@ -4144,7 +4173,7 @@ tr.first-place .goal-diff-negative {
 
 .team-selector select:focus {
     outline: none;
-    border-color: #2980b9;
+    border-color: var(--primary-dark);
     box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
 }
 
@@ -4561,7 +4590,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .player-icon.defender {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
 }
 
 .player-icon.midfielder {
@@ -4680,7 +4709,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .bench-player-icon.defender {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
 }
 
 .bench-player-icon.midfielder {
@@ -4857,7 +4886,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .control-row {
@@ -4883,7 +4912,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .checkbox-control input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #3498db;
+    accent-color: var(--primary-color);
 }
 
 .fixtures-controls .group-selector {
@@ -4921,7 +4950,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .fixture-group-indicator {
     display: inline-block;
     padding: 2px 8px;
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     border-radius: 12px;
     font-size: 0.8rem;
@@ -4997,13 +5026,13 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .sub-tab-button:hover {
-    color: #3498db;
+    color: var(--primary-color);
     background: rgba(52, 152, 219, 0.1);
 }
 
 .sub-tab-button.active {
     color: #2c3e50;
-    border-bottom-color: #3498db;
+    border-bottom-color: var(--primary-color);
     background: rgba(52, 152, 219, 0.05);
 }
 
@@ -5080,7 +5109,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     padding: 10px;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
     border-radius: 8px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .matches-container {
@@ -5107,11 +5136,11 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .knockout-match:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .match-header {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
     color: white;
     margin: -20px -20px 15px -20px;
     padding: 12px 20px;
@@ -5183,7 +5212,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .team-box {
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
     color: white;
     padding: 15px 10px;
     border-radius: 8px;
@@ -5278,7 +5307,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     background: white;
     padding: 12px 20px;
     border-radius: 8px;
-    border: 2px solid #3498db;
+    border: 2px solid var(--primary-color);
     font-weight: bold;
     font-size: 1.3rem;
     color: #2c3e50;
@@ -5331,7 +5360,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .edit-result-btn {
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 6px;
@@ -5343,17 +5372,17 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .edit-result-btn:hover {
-    background: #2980b9;
+    background: var(--primary-dark);
     transform: translateY(-1px);
 }
 
 .edit-knockout-btn {
-    background: #3498db;
+    background: var(--primary-color);
     color: white;
 }
 
 .edit-knockout-btn:hover {
-    background: #2980b9;
+    background: var(--primary-dark);
 }
 
 .save-knockout-btn {
@@ -5415,7 +5444,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #eee;
-    background: linear-gradient(135deg, #3498db, #2980b9);
+    background: linear-gradient(135deg, var(--primary-gradient-start), var(--primary-gradient-end));
     color: white;
     border-radius: 12px 12px 0 0;
 }
@@ -5481,7 +5510,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 
 .score-input:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
 }
 
@@ -5617,7 +5646,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     }
     
     .sub-tab-button.active {
-        border-right-color: #3498db;
+        border-right-color: var(--primary-color);
         border-bottom-color: transparent;
     }
 }
@@ -5628,7 +5657,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 30px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid var(--primary-color);
 }
 
 .statistics-controls .control-row {
@@ -5655,7 +5684,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .statistics-controls .checkbox-control input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #3498db;
+    accent-color: var(--primary-color);
 }
 
 .statistics-controls .group-selector,
@@ -5698,12 +5727,12 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .statistics-controls select:hover:not(:disabled) {
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .statistics-controls select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
@@ -5721,7 +5750,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
     padding: 20px;
     font-size: 1.2rem;
     font-weight: 600;
-    border-bottom: 3px solid #3498db;
+    border-bottom: 3px solid var(--primary-color);
 }
 
 .statistics-content {
@@ -5759,7 +5788,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 .topscorers-controls .checkbox-control input[type="checkbox"] {
     width: 18px;
     height: 18px;
-    accent-color: #3498db;
+    accent-color: var(--primary-color);
 }
 
 .topscorers-controls .filter-selector,
@@ -5807,12 +5836,12 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .topscorers-controls select:hover:not(:disabled) {
-    border-color: #3498db;
+    border-color: var(--primary-color);
 }
 
 .topscorers-controls select:focus {
     outline: none;
-    border-color: #3498db;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
@@ -6461,7 +6490,7 @@ body.dark-mode .modal-content {
 }
 
 body.dark-mode .modal-header {
-    background-color: #2c5282;
+    background-color: var(--primary-darker);
 }
 
 body.dark-mode .modal-body input {
@@ -6471,7 +6500,7 @@ body.dark-mode .modal-body input {
 }
 
 body.dark-mode .btn-primary {
-    background: linear-gradient(135deg, #2c5282, #1e3a52);
+    background: linear-gradient(135deg, var(--primary-darker), #1e3a52);
 }
 
 body.dark-mode .btn-secondary {
@@ -6566,3 +6595,4 @@ body.dark-mode .knockout-warning-content .original-team {
         font-size: 1rem;
     }
 }
+

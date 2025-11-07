@@ -1,4 +1,5 @@
 {
+  "theme": "csw",
   "featureToggles": {
     "tabs": {
       "overview": true,
@@ -14,11 +15,6 @@
         "knockoutStage": true,
         "statistics": true
       }
-    },
-    "ui": {
-      "showLoadingMask": true,
-      "enableDebugMode": false,
-      "enableDarkMode": true
     }
   },
   "defaultGroup": "group-c",
@@ -79,7 +75,7 @@
   },
   "ui": {
     "showLoadingMask": true,
-    "enableDebugMode": false,
+    "enableDebugMode": true,
     "enableDarkMode": true
   },
    "admin": {
