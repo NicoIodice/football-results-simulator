@@ -267,10 +267,12 @@
     box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
 }
 
+/*
 .champion {
     max-width: 500px;
     margin: 0 auto;
 }
+*/
 
 .trophy-icon {
     font-size: 5rem;
@@ -3967,12 +3969,63 @@ tr.first-place .goal-diff-negative {
         border-left: 3px solid #ff9800 !important;
     }
     
+    /* Simulated Match Mobile Styles */
+    .simulated-match {
+        padding: 15px 10px !important;
+    }
+    
     .match-teams-sim {
         display: flex !important;
-        align-items: center !important;
+        align-items: stretch !important;
         justify-content: space-between !important;
+        gap: 8px !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    .team-sim {
+        flex: 1 !important;
+        min-width: 0 !important;
+        padding: 10px 8px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
         gap: 6px !important;
+    }
+    
+    .team-sim .team-name {
         font-size: 0.85rem !important;
+        text-align: center !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+        hyphens: auto !important;
+        line-height: 1.2 !important;
+        max-width: 100% !important;
+        order: 1 !important;
+    }
+    
+    .team-sim .team-score {
+        font-size: 1.4rem !important;
+        min-width: auto !important;
+        order: 2 !important;
+    }
+    
+    .vs-separator {
+        font-size: 0.7rem !important;
+        color: #7f8c8d !important;
+        flex-shrink: 0 !important;
+        align-self: center !important;
+        padding: 0 2px !important;
+    }
+    
+    .match-label {
+        font-size: 0.8rem !important;
+        margin-bottom: 12px !important;
+    }
+    
+    .confidence-badge {
+        font-size: 0.75rem !important;
+        padding: 4px 10px !important;
     }
     
     .team-home {
@@ -3985,13 +4038,6 @@ tr.first-place .goal-diff-negative {
         flex: 1 !important;
         text-align: right !important;
         font-size: 0.85rem !important;
-    }
-    
-    .vs-separator {
-        font-size: 0.75rem !important;
-        color: #7f8c8d !important;
-        flex-shrink: 0 !important;
-        text-align: center !important;
     }
     
     .match-date-sim {
