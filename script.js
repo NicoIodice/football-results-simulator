@@ -24,12 +24,14 @@ function hideScorerWarningPopup() {
 }
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
-    // Find the match to check if it's cancelled
+    // Find the match to check if it's cancelled and get its group
     const match = results.find(r => r.matchId === matchId);
     const isCancelled = match && match.matchStatus === 'cancelled';
+    const matchGroupId = match ? match.groupId : null;
     
     // Find goals for this match using scorers from group-phase-results.json
-    const matchGoals = getGoalsForGroup().filter(g => g.matchId === matchId);
+    // Pass the match's groupId to ensure we search in the correct group
+    const matchGoals = getGoalsForGroup(matchGroupId).filter(g => g.matchId === matchId);
     // Own goals for each team (should be shown for opponent)
     const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
     const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
