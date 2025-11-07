@@ -850,7 +850,7 @@ body.config-modal-open {
         justify-content: flex-end !important;
         align-items: center !important;
         gap: 10px !important;
-        padding: 0 12px;
+        padding: 5px 12px;
         z-index: 9999 !important;
         pointer-events: auto;
         box-sizing: border-box !important;
@@ -875,6 +875,14 @@ body.config-modal-open {
         flex-shrink: 0 !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
+    }
+
+    /* Override absolute positioning of desktop toggles on mobile */
+    .fab-vertical-stack .dark-mode-toggle,
+    .fab-vertical-stack .settings-toggle {
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
     }
 
     .settings-icon, .dark-mode-icon {
