@@ -8131,29 +8131,29 @@ function isWithinEditWindow(playedDate) {
 }
 
 function downloadKnockoutResults() {
+    // Check if it's a mobile device
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    if (!teamId) {
-        // If no team selected, return empty array
-        return [];
+    
+    if (isMobile) {
+        // On mobile, just store in session and show different message
+        sessionStorage.setItem('pendingKnockoutResults', JSON.stringify(knockoutResults));
+        logger.log('Knockout results stored in session (mobile device)');
+        return;
     }
-    const teamGoals = getGoalsForGroup().filter(goal => goal.teamId === teamId);
-    const playersMap = new Map();
-    teamGoals.forEach(goal => {
-        const goalCount = goal.goals || goal.totalGoals || 1;
-        const playerId = goal.playerId;
-        if (playersMap.has(playerId)) {
-            playersMap.get(playerId).totalGoals += goalCount;
-        } else {
-            playersMap.set(playerId, {
-                playerId: goal.playerId,
-                playerName: goal.playerName,
-                teamId: goal.teamId,
-                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
-                totalGoals: goalCount
-            });
-        }
-    });
-    return Array.from(playersMap.values()).sort((a, b) => b.totalGoals - a.totalGoals);
+    
+    // On desktop, proceed with download
+    const dataStr = JSON.stringify(knockoutResults, null, 2);
+    const dataBlob = new Blob([dataStr], {type: 'application/json'});
+    
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(dataBlob);
+    link.download = 'knockout-results.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function triggerChampionshipCelebration(finalResult) {
     const championTeam = teams.find(t => t.id === finalResult.winner);
     if (!championTeam) {
         logger.log('ERROR: Championship team not found');
