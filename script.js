@@ -7209,6 +7209,290 @@ function showStandingsSubTab(tabId) {
     }
 }
 
+// Show simulator sub-tab
+function showSimulatorSubTab(tabId) {
+    // Hide all sub-tab contents in simulator
+    const subTabContents = document.querySelectorAll('#simulator .sub-tab-content');
+    subTabContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all sub-tab buttons in simulator
+    const subTabButtons = document.querySelectorAll('#simulator .sub-tab-button');
+    subTabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected sub-tab content
+    const selectedContent = document.getElementById(tabId);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    const clickedButton = event.target;
+    clickedButton.classList.add('active');
+    
+    // Update content based on sub-tab
+    if (tabId === 'knockout-stage-sim') {
+        updateKnockoutSimulation();
+    }
+}
+
+// Update knockout simulation
+function updateKnockoutSimulation() {
+    const contentDiv = document.getElementById('knockout-simulation-content');
+    if (!contentDiv) return;
+    
+    // Check if all group matches are complete
+    const globalStatus = checkQualificationStatus(); // null = check all groups
+    const allGroupsComplete = globalStatus.allCompleted;
+    
+    if (!allGroupsComplete) {
+        // Show warning message
+        contentDiv.innerHTML = `
+            <div class="knockout-sim-warning">
+                <div class="warning-icon">⚠️</div>
+                <h3>Group Stage In Progress</h3>
+                <p>Knockout stage simulation is not yet available. Complete all group stage matches to unlock knockout predictions.</p>
+                <div class="progress-indicator">
+                    <p>Check the <strong>Overview → Knockout</strong> tab to track group winners and qualification status.</p>
+                </div>
+            </div>
+        `;
+    } else {
+        // Generate knockout simulation
+        generateKnockoutSimulation(contentDiv);
+    }
+}
+
+// Generate knockout simulation based on team statistics
+function generateKnockoutSimulation(contentDiv) {
+    logger.log('DEBUG: Generating knockout simulation');
+    
+    // Get knockout teams (accounting for cancellations)
+    const groupATeam = getKnockoutTeam('group-a');
+    const groupBTeam = getKnockoutTeam('group-b');
+    const groupCTeam = getKnockoutTeam('group-c');
+    const groupDTeam = getKnockoutTeam('group-d');
+    
+    if (!groupATeam || !groupBTeam || !groupCTeam || !groupDTeam) {
+        contentDiv.innerHTML = `
+            <div class="knockout-sim-warning">
+                <div class="warning-icon">⚠️</div>
+                <h3>Incomplete Data</h3>
+                <p>Unable to generate knockout simulation. Not all group winners have been determined.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    // Calculate team statistics for simulation
+    const semi1Home = calculateTeamPerformance(groupBTeam.id);
+    const semi1Away = calculateTeamPerformance(groupDTeam.id);
+    const semi2Home = calculateTeamPerformance(groupATeam.id);
+    const semi2Away = calculateTeamPerformance(groupCTeam.id);
+    
+    // Simulate Semi-Final 1: Group B vs Group D
+    const semi1Result = simulateMatch(semi1Home, semi1Away, groupBTeam, groupDTeam);
+    
+    // Simulate Semi-Final 2: Group A vs Group C
+    const semi2Result = simulateMatch(semi2Home, semi2Away, groupATeam, groupCTeam);
+    
+    // Simulate 3rd Place Match
+    const thirdPlaceResult = simulateMatch(semi1Result.loser.stats, semi2Result.loser.stats, semi1Result.loser.team, semi2Result.loser.team);
+    
+    // Simulate Final
+    const finalResult = simulateMatch(semi1Result.winner.stats, semi2Result.winner.stats, semi1Result.winner.team, semi2Result.winner.team);
+    
+    // Render simulation results
+    contentDiv.innerHTML = `
+        <div class="knockout-simulation">
+            <div class="simulation-header">
+                <h3>🏆 Knockout Stage Simulation</h3>
+                <p class="simulation-disclaimer">Predictions based on group stage performance, goals scored, defensive record, and overall team statistics.</p>
+            </div>
+            
+            <div class="knockout-matches">
+                <div class="knockout-round">
+                    <h4>Semi-Finals</h4>
+                    <div class="simulated-matches">
+                        ${renderSimulatedMatch('Semi-Final 1', groupBTeam, groupDTeam, semi1Result)}
+                        ${renderSimulatedMatch('Semi-Final 2', groupATeam, groupCTeam, semi2Result)}
+                    </div>
+                </div>
+                
+                <div class="knockout-round">
+                    <h4>3rd Place Match</h4>
+                    <div class="simulated-matches">
+                        ${renderSimulatedMatch('3rd Place', semi1Result.loser.team, semi2Result.loser.team, thirdPlaceResult)}
+                    </div>
+                </div>
+                
+                <div class="knockout-round final-round">
+                    <h4>Championship Final</h4>
+                    <div class="simulated-matches">
+                        ${renderSimulatedMatch('Final', semi1Result.winner.team, semi2Result.winner.team, finalResult)}
+                    </div>
+                </div>
+                
+                <div class="simulation-summary">
+                    <div class="champion">
+                        <div class="trophy-icon">🏆</div>
+                        <h3>Predicted Champion</h3>
+                        <div class="champion-name">${finalResult.winner.team.name}</div>
+                        <p class="champion-stats">
+                            Confidence: ${finalResult.confidence}% | 
+                            Avg Goals: ${finalResult.winner.stats.avgGoalsFor.toFixed(1)}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Calculate team performance metrics from group stage
+function calculateTeamPerformance(teamId) {
+    const originalGroupId = selectedGroupId;
+    
+    // Find team's group
+    const team = teams.find(t => t.id === teamId);
+    if (!team) return null;
+    
+    selectedGroupId = team.groupId;
+    
+    // Get all results for this group
+    const groupResults = getResultsForGroup(team.groupId);
+    
+    // Calculate stats
+    let matchesPlayed = 0;
+    let wins = 0;
+    let losses = 0;
+    let draws = 0;
+    let goalsFor = 0;
+    let goalsAgainst = 0;
+    
+    groupResults.forEach(result => {
+        if (result.homeTeam === teamId) {
+            matchesPlayed++;
+            goalsFor += result.homeScore;
+            goalsAgainst += result.awayScore;
+            if (result.homeScore > result.awayScore) wins++;
+            else if (result.homeScore < result.awayScore) losses++;
+            else draws++;
+        } else if (result.awayTeam === teamId) {
+            matchesPlayed++;
+            goalsFor += result.awayScore;
+            goalsAgainst += result.homeScore;
+            if (result.awayScore > result.homeScore) wins++;
+            else if (result.awayScore < result.homeScore) losses++;
+            else draws++;
+        }
+    });
+    
+    selectedGroupId = originalGroupId;
+    
+    return {
+        teamId,
+        team,
+        matchesPlayed,
+        wins,
+        losses,
+        draws,
+        goalsFor,
+        goalsAgainst,
+        goalDiff: goalsFor - goalsAgainst,
+        avgGoalsFor: matchesPlayed > 0 ? goalsFor / matchesPlayed : 0,
+        avgGoalsAgainst: matchesPlayed > 0 ? goalsAgainst / matchesPlayed : 0,
+        winRate: matchesPlayed > 0 ? wins / matchesPlayed : 0,
+        points: (wins * 3) + draws
+    };
+}
+
+// Simulate a match between two teams
+function simulateMatch(homeStats, awayStats, homeTeam, awayTeam) {
+    // Calculate match strength based on various factors
+    const homeStrength = (homeStats.winRate * 0.3) + 
+                        (homeStats.avgGoalsFor * 0.25) + 
+                        ((homeStats.points / 15) * 0.25) + 
+                        (Math.max(0, homeStats.goalDiff) * 0.02) +
+                        0.1; // Home advantage
+    
+    const awayStrength = (awayStats.winRate * 0.3) + 
+                        (awayStats.avgGoalsFor * 0.25) + 
+                        ((awayStats.points / 15) * 0.25) + 
+                        (Math.max(0, awayStats.goalDiff) * 0.02);
+    
+    const totalStrength = homeStrength + awayStrength;
+    const homeWinProb = homeStrength / totalStrength;
+    
+    // Simulate scores based on average goals
+    const homeExpectedGoals = (homeStats.avgGoalsFor + awayStats.avgGoalsAgainst) / 2;
+    const awayExpectedGoals = (awayStats.avgGoalsFor + homeStats.avgGoalsAgainst) / 2;
+    
+    // Add some randomness (±1 goal)
+    const randomFactor = () => Math.random() * 2 - 1;
+    
+    let homeScore = Math.max(0, Math.round(homeExpectedGoals + randomFactor()));
+    let awayScore = Math.max(0, Math.round(awayExpectedGoals + randomFactor()));
+    
+    // Adjust scores based on win probability
+    if (homeWinProb > 0.6 && homeScore <= awayScore) {
+        homeScore = awayScore + 1;
+    } else if (homeWinProb < 0.4 && awayScore <= homeScore) {
+        awayScore = homeScore + 1;
+    }
+    
+    // Determine winner
+    const winner = homeScore > awayScore ? 
+        { team: homeTeam, stats: homeStats, score: homeScore } : 
+        { team: awayTeam, stats: awayStats, score: awayScore };
+    
+    const loser = homeScore > awayScore ? 
+        { team: awayTeam, stats: awayStats, score: awayScore } : 
+        { team: homeTeam, stats: homeStats, score: homeScore };
+    
+    const confidence = Math.round(Math.max(homeWinProb, 1 - homeWinProb) * 100);
+    
+    return {
+        homeTeam,
+        awayTeam,
+        homeScore,
+        awayScore,
+        winner,
+        loser,
+        confidence,
+        homeWinProb: Math.round(homeWinProb * 100)
+    };
+}
+
+// Render a simulated match
+function renderSimulatedMatch(matchLabel, homeTeam, awayTeam, result) {
+    const isHomeWinner = result.homeScore > result.awayScore;
+    const isAwayWinner = result.awayScore > result.homeScore;
+    
+    return `
+        <div class="simulated-match">
+            <div class="match-label">${matchLabel}</div>
+            <div class="match-teams-sim">
+                <div class="team-sim ${isHomeWinner ? 'winner' : ''}">
+                    <span class="team-name">${homeTeam.name}</span>
+                    <span class="team-score">${result.homeScore}</span>
+                </div>
+                <div class="vs-separator">vs</div>
+                <div class="team-sim ${isAwayWinner ? 'winner' : ''}">
+                    <span class="team-score">${result.awayScore}</span>
+                    <span class="team-name">${awayTeam.name}</span>
+                </div>
+            </div>
+            <div class="match-prediction">
+                <span class="confidence-badge">Confidence: ${result.confidence}%</span>
+            </div>
+        </div>
+    `;
+}
+
 // Function to get the winner of each group
 function getGroupWinner(groupId) {
     // Save current group selection

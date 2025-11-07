@@ -82,6 +82,282 @@
     text-decoration: line-through;
 }
 
+/* Knockout Simulation Styles */
+.knockout-sim-warning {
+    text-align: center;
+    padding: 60px 30px;
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    border-radius: 12px;
+    margin: 30px auto;
+    max-width: 600px;
+}
+
+.knockout-sim-warning .warning-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+}
+
+.knockout-sim-warning h3 {
+    color: #856404;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+}
+
+.knockout-sim-warning p {
+    color: #856404;
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.knockout-sim-warning .progress-indicator {
+    margin-top: 25px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+}
+
+.knockout-simulation {
+    padding: 20px 0;
+}
+
+.simulation-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.simulation-header h3 {
+    font-size: 1.8rem;
+    margin-bottom: 10px;
+    color: #2c5282;
+}
+
+.simulation-disclaimer {
+    color: #666;
+    font-style: italic;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.knockout-matches {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.knockout-round {
+    margin-bottom: 40px;
+    background: #f8f9fa;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.knockout-round h4 {
+    text-align: center;
+    color: #2c5282;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.knockout-round.final-round {
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border: 3px solid #d4af37;
+}
+
+.knockout-round.final-round h4 {
+    color: #8b6914;
+}
+
+.simulated-matches {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.simulated-match {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+.match-label {
+    text-align: center;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.match-teams-sim {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 12px;
+}
+
+.team-sim {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 18px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.team-sim.winner {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 2px solid #28a745;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);
+}
+
+.team-sim .team-name {
+    font-size: 1.05rem;
+}
+
+.team-sim .team-score {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #2c5282;
+    min-width: 35px;
+    text-align: center;
+}
+
+.team-sim.winner .team-score {
+    color: #155724;
+}
+
+.vs-separator {
+    font-weight: 600;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.match-prediction {
+    text-align: center;
+    padding-top: 10px;
+    border-top: 1px solid #e9ecef;
+}
+
+.confidence-badge {
+    display: inline-block;
+    padding: 6px 14px;
+    background: #e7f3ff;
+    color: #2c5282;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.simulation-summary {
+    margin-top: 50px;
+    padding: 40px;
+    text-align: center;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    border: 3px solid #d4af37;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(212, 175, 55, 0.3);
+}
+
+.champion {
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.trophy-icon {
+    font-size: 5rem;
+    margin-bottom: 15px;
+    animation: trophy-bounce 2s ease-in-out infinite;
+}
+
+@keyframes trophy-bounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    50% {
+        transform: translateY(-10px) scale(1.05);
+    }
+}
+
+.champion h3 {
+    color: #8b6914;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.champion-name {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: #8b6914;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.champion-stats {
+    color: #8b6914;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+/* Dark mode styles for knockout simulation */
+body.dark-mode .knockout-sim-warning {
+    background: #3a3a1a;
+    border-color: #e67e22;
+}
+
+body.dark-mode .knockout-sim-warning h3,
+body.dark-mode .knockout-sim-warning p {
+    color: #ffc107;
+}
+
+body.dark-mode .knockout-round {
+    background: #2d2d2d;
+}
+
+body.dark-mode .knockout-round h4 {
+    color: #5dade2;
+}
+
+body.dark-mode .simulated-match {
+    background: #3a3a3a;
+}
+
+body.dark-mode .team-sim {
+    background: #2d2d2d;
+}
+
+body.dark-mode .team-sim.winner {
+    background: linear-gradient(135deg, #1e4620 0%, #2d5a2d 100%);
+    border-color: #28a745;
+}
+
+body.dark-mode .team-sim .team-score {
+    color: #5dade2;
+}
+
+body.dark-mode .team-sim.winner .team-score {
+    color: #66bb6a;
+}
+
+body.dark-mode .confidence-badge {
+    background: #2c5282;
+    color: #e0e0e0;
+}
+
+body.dark-mode .simulation-header h3 {
+    color: #5dade2;
+}
+
 /* Analysis Panel Styles for Predictions */
 .analysis-panel {
     margin-top: 15px;
