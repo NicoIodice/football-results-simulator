@@ -22,6 +22,66 @@
     z-index: 9999;
     display: none;
 }
+
+/* Knockout stage team replacement warning */
+.knockout-warning-icon {
+    color: #e67e22;
+    cursor: pointer;
+    font-size: 0.9em;
+    vertical-align: middle;
+    margin-left: 4px;
+    display: inline-block;
+    transition: transform 0.2s;
+}
+
+.knockout-warning-icon:hover {
+    transform: scale(1.2);
+}
+
+.knockout-warning-popup {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    font-size: 0.95em;
+    max-width: 350px;
+    min-width: 250px;
+    pointer-events: none;
+    position: absolute;
+    z-index: 10000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.knockout-warning-popup[style*="display: block"] {
+    opacity: 1;
+}
+
+.knockout-warning-content {
+    line-height: 1.6;
+}
+
+.knockout-warning-content strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #e67e22;
+    font-size: 1.05em;
+}
+
+.knockout-warning-content .replacement-team {
+    font-weight: 600;
+    color: #28a745;
+}
+
+.knockout-warning-content .original-team {
+    font-weight: 600;
+    color: #dc3545;
+    text-decoration: line-through;
+}
+
 /* Analysis Panel Styles for Predictions */
 .analysis-panel {
     margin-top: 15px;
@@ -6131,6 +6191,24 @@ body.dark-mode .dark-mode-toggle {
 
 body.dark-mode .dark-mode-toggle:hover {
     background: rgba(255, 255, 255, 0.25);
+}
+
+body.dark-mode .knockout-warning-popup {
+    background: #3a3a1a;
+    color: #ffc107;
+    border-color: #e67e22;
+}
+
+body.dark-mode .knockout-warning-content strong {
+    color: #ffa726;
+}
+
+body.dark-mode .knockout-warning-content .replacement-team {
+    color: #66bb6a;
+}
+
+body.dark-mode .knockout-warning-content .original-team {
+    color: #ef5350;
 }
 
 /* Mobile Responsive for Celebration */

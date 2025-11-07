@@ -69,7 +69,8 @@
       "final": {
         "time": "⏰ 19:15 PM"
       }
-    }
+    },
+    "cancellations": ["group-c"]
   },
   "simulation": {
     "useOpenAI": false,

@@ -7229,6 +7229,137 @@ function getGroupWinner(groupId) {
     return winner;
 }
 
+// Get team for knockout stage (winner or replacement if cancelled)
+function getKnockoutTeam(groupId) {
+    // Check if this group's winner has cancelled
+    const cancellations = config?.knockout?.cancellations || [];
+    const isCancelled = cancellations.includes(groupId);
+    
+    // Save current group selection
+    const originalGroupId = selectedGroupId;
+    
+    // Temporarily change to the target group
+    selectedGroupId = groupId;
+    
+    // Calculate standings for this group
+    const standings = calculateStandings();
+    
+    let team = null;
+    let replacementInfo = null;
+    
+    if (isCancelled && standings.length >= 2) {
+        // Winner cancelled, use second place team
+        team = standings[1];
+        const originalWinner = standings[0];
+        replacementInfo = {
+            isReplacement: true,
+            originalTeam: originalWinner
+        };
+    } else {
+        // Use winner (first place team)
+        team = standings.length > 0 ? standings[0] : null;
+    }
+    
+    // Restore original group selection
+    selectedGroupId = originalGroupId;
+    
+    // Attach replacement info to team object
+    if (team && replacementInfo) {
+        team.replacementInfo = replacementInfo;
+    }
+    
+    return team;
+}
+
+// Update team box with replacement warning icon if applicable
+function updateTeamBoxWithReplacement(teamBox, team) {
+    // Remove any existing warning icon
+    const existingWarning = teamBox.querySelector('.knockout-warning-icon');
+    if (existingWarning) {
+        existingWarning.remove();
+    }
+    
+    // If team is a replacement, add warning icon
+    if (team && team.replacementInfo && team.replacementInfo.isReplacement) {
+        const teamNameElement = teamBox.querySelector('.team-name');
+        const warningIcon = document.createElement('span');
+        warningIcon.className = 'knockout-warning-icon';
+        warningIcon.textContent = ' ⚠️';
+        warningIcon.title = 'Replacement team';
+        
+        logger.log('DEBUG: Adding replacement warning for', team.name, 'replacing', team.replacementInfo.originalTeam.name);
+        
+        // Add hover events for popup
+        warningIcon.addEventListener('mouseenter', (event) => {
+            logger.log('DEBUG: Warning icon mouseenter triggered');
+            showKnockoutWarningPopup(event, team.name, team.replacementInfo.originalTeam.name);
+        });
+        
+        warningIcon.addEventListener('mouseleave', () => {
+            logger.log('DEBUG: Warning icon mouseleave triggered');
+            hideKnockoutWarningPopup();
+        });
+        
+        // Add click support for mobile
+        warningIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            logger.log('DEBUG: Warning icon clicked');
+            showKnockoutWarningPopup(event, team.name, team.replacementInfo.originalTeam.name);
+        });
+        
+        // Insert warning icon after team name
+        teamNameElement.appendChild(warningIcon);
+    }
+}
+
+// Show knockout warning popup
+function showKnockoutWarningPopup(event, replacementTeamName, originalTeamName) {
+    const popup = document.getElementById('knockout-warning-popup');
+    if (!popup) {
+        logger.error('DEBUG: Popup element not found!');
+        return;
+    }
+    
+    logger.log('DEBUG: Showing popup for', replacementTeamName, 'replacing', originalTeamName);
+    
+    // Set popup content
+    popup.innerHTML = `
+        <div class="knockout-warning-content">
+            <strong>⚠️ Team Replacement</strong>
+            <span class="replacement-team">${replacementTeamName}</span> replaced 
+            <span class="original-team">${originalTeamName}</span> due to cancellation
+        </div>
+    `;
+    
+    // Position popup near the warning icon
+    const iconRect = event.target.getBoundingClientRect();
+    const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    popup.style.left = `${iconRect.left + scrollLeft}px`;
+    popup.style.top = `${iconRect.bottom + scrollTop + 5}px`;
+    
+    logger.log('DEBUG: Popup positioned at', popup.style.left, popup.style.top);
+    
+    // Show popup
+    popup.style.display = 'block';
+    popup.style.visibility = 'visible';
+    popup.style.opacity = '1';
+    
+    logger.log('DEBUG: Popup display:', popup.style.display, 'visibility:', popup.style.visibility);
+}
+
+// Hide knockout warning popup
+function hideKnockoutWarningPopup() {
+    const popup = document.getElementById('knockout-warning-popup');
+    if (popup) {
+        logger.log('DEBUG: Hiding popup');
+        popup.style.display = 'none';
+        popup.style.visibility = 'hidden';
+        popup.style.opacity = '0';
+    }
+}
+
 // Initialize knockout dates from configuration
 function initializeKnockoutDates() {
     const knockoutDateElement = document.getElementById('knockout-date');
@@ -7267,50 +7398,66 @@ function updateKnockoutStage() {
     // Update disclaimer
     updateKnockoutDisclaimer();
     
-    // Get winners for each group
-    const groupAWinner = getGroupWinner('group-a');
-    const groupBWinner = getGroupWinner('group-b');
-    const groupCWinner = getGroupWinner('group-c');
-    const groupDWinner = getGroupWinner('group-d');
+    // Get teams for each group (winner or replacement if cancelled)
+    const groupATeam = getKnockoutTeam('group-a');
+    const groupBTeam = getKnockoutTeam('group-b');
+    const groupCTeam = getKnockoutTeam('group-c');
+    const groupDTeam = getKnockoutTeam('group-d');
     
-    logger.log('DEBUG: Group winners:', {
-        'Group A': groupAWinner?.name,
-        'Group B': groupBWinner?.name,
-        'Group C': groupCWinner?.name,
-        'Group D': groupDWinner?.name
+    logger.log('DEBUG: Group knockout teams:', {
+        'Group A': groupATeam?.name,
+        'Group B': groupBTeam?.name,
+        'Group C': groupCTeam?.name,
+        'Group D': groupDTeam?.name
     });
     
     // Update Semi-Final 1 (Group B vs Group D)
     const groupBBox = document.getElementById('group-b-winner');
     const groupDBox = document.getElementById('group-d-winner');
     
-    if (groupBBox && groupBWinner) {
-        groupBBox.querySelector('.team-name').textContent = groupBWinner.name;
-        groupBBox.title = `${groupBWinner.fullName || groupBWinner.name} - ${groupBWinner.points} points`;
+    if (groupBBox && groupBTeam) {
+        const teamNameElement = groupBBox.querySelector('.team-name');
+        teamNameElement.textContent = groupBTeam.name;
+        groupBBox.title = `${groupBTeam.fullName || groupBTeam.name} - ${groupBTeam.points} points`;
+        
+        // Add warning icon if replacement
+        updateTeamBoxWithReplacement(groupBBox, groupBTeam);
     }
     
-    if (groupDBox && groupDWinner) {
-        groupDBox.querySelector('.team-name').textContent = groupDWinner.name;
-        groupDBox.title = `${groupDWinner.fullName || groupDWinner.name} - ${groupDWinner.points} points`;
+    if (groupDBox && groupDTeam) {
+        const teamNameElement = groupDBox.querySelector('.team-name');
+        teamNameElement.textContent = groupDTeam.name;
+        groupDBox.title = `${groupDTeam.fullName || groupDTeam.name} - ${groupDTeam.points} points`;
+        
+        // Add warning icon if replacement
+        updateTeamBoxWithReplacement(groupDBox, groupDTeam);
     }
     
     // Update Semi-Final 2 (Group A vs Group C)
     const groupABox = document.getElementById('group-a-winner');
     const groupCBox = document.getElementById('group-c-winner');
     
-    if (groupABox && groupAWinner) {
-        groupABox.querySelector('.team-name').textContent = groupAWinner.name;
-        groupABox.title = `${groupAWinner.fullName || groupAWinner.name} - ${groupAWinner.points} points`;
+    if (groupABox && groupATeam) {
+        const teamNameElement = groupABox.querySelector('.team-name');
+        teamNameElement.textContent = groupATeam.name;
+        groupABox.title = `${groupATeam.fullName || groupATeam.name} - ${groupATeam.points} points`;
+        
+        // Add warning icon if replacement
+        updateTeamBoxWithReplacement(groupABox, groupATeam);
     }
     
-    if (groupCBox && groupCWinner) {
-        groupCBox.querySelector('.team-name').textContent = groupCWinner.name;
-        groupCBox.title = `${groupCWinner.fullName || groupCWinner.name} - ${groupCWinner.points} points`;
+    if (groupCBox && groupCTeam) {
+        const teamNameElement = groupCBox.querySelector('.team-name');
+        teamNameElement.textContent = groupCTeam.name;
+        groupCBox.title = `${groupCTeam.fullName || groupCTeam.name} - ${groupCTeam.points} points`;
+        
+        // Add warning icon if replacement
+        updateTeamBoxWithReplacement(groupCBox, groupCTeam);
     }
     
     // Update knockout match displays and controls
-    updateKnockoutMatch('semi1', groupBWinner, groupDWinner);
-    updateKnockoutMatch('semi2', groupAWinner, groupCWinner);
+    updateKnockoutMatch('semi1', groupBTeam, groupDTeam);
+    updateKnockoutMatch('semi2', groupATeam, groupCTeam);
     
     // Always update semi-final result displays (winners/losers in final and 3rd place)
     updateSemiFinalResultDisplays();
