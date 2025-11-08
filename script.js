@@ -1400,6 +1400,18 @@ function showTab(tabName) {
                 defaultSimTab.classList.add('active');
             }
 
+            // Ensure the first sub-tab button has active class
+            const simulatorSubTabs = document.querySelector('#simulator .sub-tabs');
+            if (simulatorSubTabs) {
+                const firstSimButton = simulatorSubTabs.querySelector('.sub-tab-button');
+                const activeSimButton = simulatorSubTabs.querySelector('.sub-tab-button.active');
+                
+                // If no button is active, activate the first one
+                if (!activeSimButton && firstSimButton) {
+                    firstSimButton.classList.add('active');
+                }
+            }
+
             // Update sub-tab indicators when switching to simulator tab
             setTimeout(() => {
                 const simulatorSubTabs = document.querySelector('#simulator .sub-tabs');
@@ -1409,7 +1421,7 @@ function showTab(tabName) {
                         updateSubTabIndicator(activeSimButton);
                     }
                 }
-            }, 50);
+            }, 100);
 
             const simSelect = document.getElementById('selected-team');
             // If teams or select not ready yet (user clicked before data finished loading), defer initialization
