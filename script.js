@@ -1007,22 +1007,30 @@ function saveConfig() {
 // Load JSON data
 async function loadData() {
     try {
-        const [configResponse, groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, knockoutResponse] = await Promise.all([
-            fetch('data/config.json'),
-            fetch('data/groups.json'),
-            fetch('data/teams.json'),
-            fetch('data/fixtures.json'),
-            fetch('data/group-phase-results.json'),
-            fetch('data/knockout-results.json')
-        ]);
-        
+        // First, load config to get year and sportType
+        const configResponse = await fetch('data/config.json');
         defaults = await configResponse.json();
         config = defaults; // Store config for feature toggles
+        
+        // Extract year and sportType from config
+        const year = defaults.year || '2025';
+        const sportType = defaults.sportType || 'futsal';
+        const basePath = `data/${year}/${sportType}`;
+        
+        // Load all other data files from the dynamic path
+        const [groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, knockoutResponse] = await Promise.all([
+            fetch(`${basePath}/groups.json`),
+            fetch(`${basePath}/teams.json`),
+            fetch(`${basePath}/fixtures.json`),
+            fetch(`${basePath}/group-phase-results.json`),
+            fetch(`${basePath}/knockout-results.json`)
+        ]);
+        
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await groupPhaseResultsResponse.json();
-    // goals.json is deprecated; all goal data comes from group-phase-results.json
+        // goals.json is deprecated; all goal data comes from group-phase-results.json
         knockoutResults = await knockoutResponse.json();
         
         // Set default group based on config.json
@@ -1485,7 +1493,7 @@ function applyTabVisibilitySettings() {
     // Apply sub-tab configurations if they exist in defaults
     if (defaults.subTabs && defaults.subTabs.overview) {
         const subTabConfig = defaults.subTabs.overview;
-        const subTabsContainer = document.querySelector('.sub-tabs');
+        const subTabsContainer = document.querySelector('#overview .sub-tabs');
         
         // Hide/show sub-tabs container based on configuration
         if (subTabsContainer) {
@@ -1504,6 +1512,39 @@ function applyTabVisibilitySettings() {
             const leagueButton = document.querySelector('button[onclick="showStandingsSubTab(\'league-standings\')"]');
             if (leagueButton) {
                 leagueButton.style.display = subTabConfig.leagueStandings !== false ? '' : 'none';
+            }
+        }
+        
+        if (subTabConfig.statistics !== undefined) {
+            const statisticsButton = document.querySelector('button[onclick="showStandingsSubTab(\'statistics\')"]');
+            if (statisticsButton) {
+                statisticsButton.style.display = subTabConfig.statistics !== false ? '' : 'none';
+            }
+        }
+    }
+    
+    // Apply simulator sub-tab configurations if they exist in defaults
+    if (defaults.subTabs && defaults.subTabs.simulator) {
+        const simSubTabConfig = defaults.subTabs.simulator;
+        const simSubTabsContainer = document.querySelector('#simulator .sub-tabs');
+        
+        // Hide/show sub-tabs container based on configuration
+        if (simSubTabsContainer) {
+            simSubTabsContainer.style.display = simSubTabConfig.enabled !== false ? '' : 'none';
+        }
+        
+        // Configure individual simulator sub-tab buttons
+        if (simSubTabConfig.groupStageSim !== undefined) {
+            const groupStageSimButton = document.querySelector('button[onclick="showSimulatorSubTab(\'group-stage-sim\')"]');
+            if (groupStageSimButton) {
+                groupStageSimButton.style.display = simSubTabConfig.groupStageSim !== false ? '' : 'none';
+            }
+        }
+        
+        if (simSubTabConfig.knockoutStageSim !== undefined) {
+            const knockoutStageSimButton = document.querySelector('button[onclick="showSimulatorSubTab(\'knockout-stage-sim\')"]');
+            if (knockoutStageSimButton) {
+                knockoutStageSimButton.style.display = simSubTabConfig.knockoutStageSim !== false ? '' : 'none';
             }
         }
     }
