@@ -2,69 +2,73 @@
   "semi1": {
     "id": "semi1",
     "name": "Semi-Final 1",
-    "homeTeam": null,
-    "awayTeam": null,
-    "homeScore": null,
-    "awayScore": null,
+    "homeTeam": "borussia-doutromundo",
+    "awayTeam": "fish-kicks-united",
+    "homeScore": 16,
+    "awayScore": 2,
     "compensationTime": null,
     "penaltyTies": {
         "occurred": false,
         "homeScore": null,
         "awayScore": null
     },
-    "winner": null,
-    "loser": null,
-    "played": false
+    "winner": "borussia-doutromundo",
+    "loser": "fish-kicks-united",
+    "played": true,
+    "playedDate": "2025-11-07T16:00:00Z"
   },
   "semi2": {
     "id": "semi2",
     "name": "Semi-Final 2",
-    "homeTeam": null,
-    "awayTeam": null,
-    "homeScore": null,
-    "awayScore": null,
+    "homeTeam": "desesperados-fc",
+    "awayTeam": "sporting-esgaios",
+    "homeScore": 5,
+    "awayScore": 0,
     "compensationTime": null,
     "penaltyTies": {
         "occurred": false,
         "homeScore": null,
         "awayScore": null
     },
-    "winner": null,
-    "loser": null,
-    "played": false
+    "winner": "desesperados-fc",
+    "loser": "sporting-esgaios",
+    "played": true,
+    "playedDate": "2025-11-07T17:00:00Z"
   },
   "third": {
     "id": "third",
     "name": "3rd Place Match",
-    "homeTeam": null,
-    "awayTeam": null,
-    "homeScore": null,
-    "awayScore": null,
+    "homeTeam": "fish-kicks-united",
+    "awayTeam": "sporting-esgaios",
+    "homeScore": 2,
+    "awayScore": 13,
     "compensationTime": null,
     "penaltyTies": {
         "occurred": false,
         "homeScore": null,
         "awayScore": null
     },
-    "winner": null,
-    "loser": null,
-    "played": false
+    "winner": "sporting-esgaios",
+    "loser": "fish-kicks-united",
+    "played": true,
+    "playedDate": "2025-11-07T18:15:00Z"
   },
   "final": {
     "id": "final",
     "name": "Championship Final",
-    "homeTeam": null,
-    "awayTeam": null,
-    "homeScore": null,
-    "awayScore": null,
+    "homeTeam": "borussia-doutromundo",
+    "awayTeam": "desesperados-fc",
+    "homeScore": 5,
+    "awayScore": 1,
     "compensationTime": null,
     "penaltyTies": {
         "occurred": false,
         "homeScore": null,
         "awayScore": null
     },
-    "winner": null,
-    "loser": null,
-    "played": false
+    "winner": "borussia-doutromundo",
+    "loser": "desesperados-fc",
+    "played": true,
+    "playedDate": "2025-11-07T19:15:00Z"
   }
 }
