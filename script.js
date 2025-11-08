@@ -7977,6 +7977,120 @@ function updateKnockoutStage() {
         updateKnockoutMatch('final', semi1Winner, semi2Winner);
         updateKnockoutMatch('third', semi1Loser, semi2Loser);
     }
+    
+    // Update tournament top scorers (group phase + knockout)
+    updateTournamentTopScorers();
+}
+
+// Calculate and display tournament top scorers (group phase + knockout combined)
+function updateTournamentTopScorers() {
+    const content = document.getElementById('knockout-topscorers-content');
+    if (!content) return;
+    
+    // Get all group phase goals
+    let allGoals = [];
+    groups.forEach(group => {
+        const groupGoals = getGoalsForGroup(group.id);
+        allGoals = allGoals.concat(groupGoals);
+    });
+    
+    // Exclude own goals from statistics
+    allGoals = allGoals.filter(goal => !goal.ownGoal && goal.goalType !== 'own-goal');
+    
+    // Create map to aggregate goals by player
+    const playersMap = new Map();
+    
+    // Add group phase goals
+    allGoals.forEach(goal => {
+        const goalCount = goal.totalGoals || 1;
+        const playerId = goal.playerId;
+        if (playersMap.has(playerId)) {
+            playersMap.get(playerId).totalGoals += goalCount;
+        } else {
+            playersMap.set(playerId, {
+                playerId: goal.playerId,
+                playerName: goal.playerName,
+                teamId: goal.teamId,
+                teamName: teams.find(t => t.id === goal.teamId)?.name || 'Unknown Team',
+                totalGoals: goalCount
+            });
+        }
+    });
+    
+    // Add knockout stage goals
+    Object.values(knockoutResults).forEach(match => {
+        if (match.played && match.scorers) {
+            // Process scorers for both teams
+            Object.keys(match.scorers).forEach(teamId => {
+                match.scorers[teamId].forEach(scorer => {
+                    const playerId = scorer.playerId;
+                    const goals = scorer.goals || 0;
+                    
+                    if (playersMap.has(playerId)) {
+                        playersMap.get(playerId).totalGoals += goals;
+                    } else {
+                        playersMap.set(playerId, {
+                            playerId: playerId,
+                            playerName: scorer.playerName,
+                            teamId: teamId,
+                            teamName: teams.find(t => t.id === teamId)?.name || 'Unknown Team',
+                            totalGoals: goals
+                        });
+                    }
+                });
+            });
+        }
+    });
+    
+    // Convert to array and sort by goals (top 20)
+    const topScorers = Array.from(playersMap.values())
+        .sort((a, b) => b.totalGoals - a.totalGoals)
+        .slice(0, 3);
+    
+    // Generate HTML
+    content.innerHTML = generateTournamentTopScorersHTML(topScorers);
+}
+
+// Generate HTML for tournament top scorers
+function generateTournamentTopScorersHTML(topScorers) {
+    if (!topScorers || topScorers.length === 0) {
+        return '<p class="no-data">No goal scorers found.</p>';
+    }
+    
+    // Function to get medal emoji based on position
+    function getMedalEmoji(position) {
+        switch (position) {
+            case 1: return '🥇';
+            case 2: return '🥈';
+            case 3: return '🥉';
+            default: return '';
+        }
+    }
+    
+    return `
+        <div class="topscorers-list">
+            ${topScorers.map((scorer, index) => {
+                const position = index + 1;
+                const medalEmoji = getMedalEmoji(position);
+                return `
+                <div class="topscorer-card ${index < 3 ? 'top-3' : ''}">
+                    <div class="scorer-position">
+                        ${medalEmoji}
+                        <span class="position-number">${position}</span>
+                    </div>
+                    <div class="scorer-info">
+                        <div class="scorer-name">${scorer.playerName}</div>
+                        <div class="scorer-team">${scorer.teamName} ${renderTeamBadge(scorer.teamId)}</div>
+                    </div>
+                    <div class="scorer-goals scorer-goals-statistics">
+                        <span class="goals-count">${scorer.totalGoals}</span>
+                        <span class="goals-label">goal${scorer.totalGoals !== 1 ? 's' : ''}</span>
+                    </div>
+                </div>
+                `;
+            }).join('')}
+        </div>
+    `;
 }
 
 function updateKnockoutDisclaimer() {
