@@ -20,15 +20,15 @@ footballAdmin.enableAdmin()
 ### How It Works:
 
 1. **Add Result** - Result is added to memory (visible immediately) and downloads updated JSON file
-2. **Download** - Updated `group-phase-results.json` file is automatically downloaded to your Downloads folder
-3. **Replace File** - Replace `data/group-phase-results.json` with the downloaded file
+2. **Download** - Updated `group-stage-results.json` file is automatically downloaded to your Downloads folder
+3. **Replace File** - Replace `data/group-stage-results.json` with the downloaded file
 4. **Refresh Page** - Page will load from the updated file (no localStorage caching)
 
 ### Workflow:
 
 1. **Add results** using the admin interface
-2. **Check Downloads folder** - updated `group-phase-results.json` will be there
-3. **Replace** `data/group-phase-results.json` with the downloaded file  
+2. **Check Downloads folder** - updated `group-stage-results.json` will be there
+3. **Replace** `data/group-stage-results.json` with the downloaded file  
 4. **Refresh page** - results will be loaded from the updated file
 
 ## 🛠 Console Commands
@@ -42,7 +42,7 @@ footballAdmin.showConfig()           // Show current configuration
 
 // Data management
 footballAdmin.exportResults()        // Export all results to console and download
-footballAdmin.downloadResults()      // Download current group-phase-results.json
+footballAdmin.downloadResults()      // Download current group-stage-results.json
 footballAdmin.reloadPage()           // Reload page after updating file
 
 // OpenAI controls
@@ -119,7 +119,7 @@ The green **+** button appears to the left of the date/time with proper spacing 
 ## 🔄 Data Flow
 
 1. **Add Result** → Added to memory + Downloaded as file
-2. **Replace File** → Copy downloaded file to `data/group-phase-results.json`
+2. **Replace File** → Copy downloaded file to `data/group-stage-results.json`
 3. **Refresh Page** → Loads fresh data from updated file
 4. **Clean State** → No cached data, always reads from actual file
 

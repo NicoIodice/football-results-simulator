@@ -12,6 +12,11 @@
         "homeScore": null,
         "awayScore": null
     },
+    "scorers": {
+      "fish-kicks-united": [
+        { "playerId": "joao-afonso-almeida", "playerName": "João Afonso Almeida", "goals": 2 }
+      ]
+    },
     "winner": "borussia-doutromundo",
     "loser": "fish-kicks-united",
     "played": true,
@@ -30,6 +35,13 @@
         "homeScore": null,
         "awayScore": null
     },
+    "scorers": {
+      "desesperados-fc": [
+        { "playerId": "andre-farinha-carvalho", "playerName": "André Farinha Carvalho", "goals": 2 },
+        { "playerId": "goncalo-lopes", "playerName": "Gonçalo Lopes", "goals": 2 },
+        { "playerId": "miguel-lopo-ferreira", "playerName": "Miguel Lopo Ferreira", "goals": 1 }
+      ]
+    },
     "winner": "desesperados-fc",
     "loser": "sporting-esgaios",
     "played": true,
@@ -47,6 +59,18 @@
         "occurred": false,
         "homeScore": null,
         "awayScore": null
+    },
+    "scorers": {
+      "fish-kicks-united": [
+        { "playerId": "joao-afonso-almeida", "playerName": "João Afonso Almeida", "goals": 2 }
+      ],
+      "sporting-esgaios": [
+        { "playerId": "marcio-veiga", "playerName": "Márcio Veiga", "goals": 7 },
+        { "playerId": "angelo-iodice", "playerName": "Ângelo Iodice", "goals": 1 },
+        { "playerId": "francisco-ferreira", "playerName": "Francisco Ferreira", "goals": 2 },
+        { "playerId": "joao-manuel-amorim", "playerName": "João Manuel Amorim", "goals": 1 },
+        { "playerId": "sandro-carvalho", "playerName": "Sandro Carvalho", "goals": 2 }
+      ]
     },
     "winner": "sporting-esgaios",
     "loser": "fish-kicks-united",

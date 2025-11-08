@@ -24,41 +24,100 @@ function hideScorerWarningPopup() {
 }
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
-    // Find the match to check if it's cancelled and get its group
-    const match = results.find(r => r.matchId === matchId);
-    const isCancelled = match && match.matchStatus === 'cancelled';
-    const matchGroupId = match ? match.groupId : null;
+    // Find the match - check both group phase and knockout results
+    let match = results.find(r => r.matchId === matchId);
+    let isKnockout = false;
+    let isCancelled = false;
+    let matchGroupId = null;
+    let homeScorersData = [];
+    let awayScorersData = [];
     
-    // Find goals for this match using scorers from group-phase-results.json
-    // Pass the match's groupId to ensure we search in the correct group
-    const matchGoals = getGoalsForGroup(matchGroupId).filter(g => g.matchId === matchId);
-    // Own goals for each team (should be shown for opponent)
-    const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
-    const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
-    let homeScorers = matchGoals.filter(g => g.teamId === homeTeamId && g.goalType !== 'own-goal');
-    let awayScorers = matchGoals.filter(g => g.teamId === awayTeamId && g.goalType !== 'own-goal');
-    // Sort by number of goals descending
-    homeScorers = [...homeScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
-    awayScorers = [...awayScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
+    if (!match) {
+        // Check knockout results
+        match = knockoutResults[matchId];
+        isKnockout = true;
+    }
+    
+    if (!match) {
+        logger.warn('Match not found:', matchId);
+        return;
+    }
+    
+    // Handle group phase matches
+    if (!isKnockout) {
+        isCancelled = match && match.matchStatus === 'cancelled';
+        matchGroupId = match ? match.groupId : null;
+        
+        // Find goals for this match using scorers from group-stage-results.json
+        const matchGoals = getGoalsForGroup(matchGroupId).filter(g => g.matchId === matchId);
+        // Own goals for each team (should be shown for opponent)
+        const homeOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== homeTeamId);
+        const awayOwnGoals = matchGoals.filter(g => g.goalType === 'own-goal' && g.teamId !== awayTeamId);
+        let homeScorers = matchGoals.filter(g => g.teamId === homeTeamId && g.goalType !== 'own-goal');
+        let awayScorers = matchGoals.filter(g => g.teamId === awayTeamId && g.goalType !== 'own-goal');
+        // Sort by number of goals descending
+        homeScorers = [...homeScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
+        awayScorers = [...awayScorers].sort((a, b) => (b.totalGoals || 1) - (a.totalGoals || 1));
+        
+        homeScorersData = homeScorers.map(g => ({ name: getPlayerNameById(g.playerId), goals: g.totalGoals || 1, isOwnGoal: false }));
+        awayScorersData = awayScorers.map(g => ({ name: getPlayerNameById(g.playerId), goals: g.totalGoals || 1, isOwnGoal: false }));
+        
+        // Add own goals
+        homeScorersData.push(...homeOwnGoals.map(g => ({ name: getPlayerNameById(g.playerId), goals: g.totalGoals || 1, isOwnGoal: true })));
+        awayScorersData.push(...awayOwnGoals.map(g => ({ name: getPlayerNameById(g.playerId), goals: g.totalGoals || 1, isOwnGoal: true })));
+    } else {
+        // Handle knockout matches
+        if (match.scorers) {
+            // Get home team scorers
+            if (match.scorers[homeTeamId]) {
+                homeScorersData = match.scorers[homeTeamId].map(scorer => ({
+                    name: scorer.playerName,
+                    goals: scorer.goals,
+                    isOwnGoal: false
+                }));
+            }
+            
+            // Get away team scorers
+            if (match.scorers[awayTeamId]) {
+                awayScorersData = match.scorers[awayTeamId].map(scorer => ({
+                    name: scorer.playerName,
+                    goals: scorer.goals,
+                    isOwnGoal: false
+                }));
+            }
+        }
+    }
+    
+    // Generate HTML content
     let homeContent = '';
     let awayContent = '';
-    if (homeScorers.length > 0 || homeOwnGoals.length > 0) {
+    
+    if (homeScorersData.length > 0) {
         homeContent = `<table class='scorers-table'><tbody>` +
-            homeScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
-            homeOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            homeScorersData.map(s => {
+                const rowClass = s.isOwnGoal ? " class='own-goal'" : '';
+                const namePrefix = s.isOwnGoal ? 'OG ' : '';
+                return `<tr${rowClass}><td class='scorer-name'>${namePrefix}${s.name}</td><td class='scorer-goals'>${s.goals}</td></tr>`;
+            }).join('') + `</tbody></table>`;
     } else {
         homeContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }
-    if (awayScorers.length > 0 || awayOwnGoals.length > 0) {
+    
+    if (awayScorersData.length > 0) {
         awayContent = `<table class='scorers-table'><tbody>` +
-            awayScorers.map(g => `<tr><td class='scorer-name'>${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') +
-            awayOwnGoals.map(g => `<tr class='own-goal'><td class='scorer-name'>OG ${getPlayerNameById(g.playerId)}</td><td class='scorer-goals'>${g.totalGoals || 1}</td></tr>`).join('') + `</tbody></table>`;
+            awayScorersData.map(s => {
+                const rowClass = s.isOwnGoal ? " class='own-goal'" : '';
+                const namePrefix = s.isOwnGoal ? 'OG ' : '';
+                return `<tr${rowClass}><td class='scorer-name'>${namePrefix}${s.name}</td><td class='scorer-goals'>${s.goals}</td></tr>`;
+            }).join('') + `</tbody></table>`;
     } else {
         awayContent = `<div class=\"no-scorers\">No scorers available</div>`;
     }
+    
     // Remove any existing popup first
     const oldPopup = document.querySelector('.scorers-popup');
     if (oldPopup) document.body.removeChild(oldPopup);
+    
     const popup = document.createElement('div');
     popup.className = 'scorers-popup';
     popup.innerHTML = `
@@ -78,17 +137,20 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
             </div>
         </div>
     `;
+    
     document.body.appendChild(popup);
     popup.style.position = 'fixed';
     popup.style.left = '50%';
     popup.style.top = '50%';
     popup.style.transform = 'translate(-50%, -50%)';
     popup.style.zIndex = 9999;
+    
     // Dismiss on close button or outside click
     popup.querySelector('.scorers-close').onclick = function(e) {
         document.body.removeChild(popup);
         e.stopPropagation();
     }
+    
     setTimeout(() => {
         document.addEventListener('mousedown', function handler(e) {
             if (!popup.contains(e.target)) {
@@ -119,7 +181,7 @@ let teams = [];
 let fixtures = [];
 let results = [];
 let knockoutResults = {};
-// let goals = []; // REMOVED: All goal data now comes from group-phase-results.json
+// let goals = []; // REMOVED: All goal data now comes from group-stage-results.json
 let defaults = {}; // Add defaults configuration
 let selectedGroupId = null;
 
@@ -1022,15 +1084,15 @@ async function loadData() {
             fetch(`${basePath}/groups.json`),
             fetch(`${basePath}/teams.json`),
             fetch(`${basePath}/fixtures.json`),
-            fetch(`${basePath}/group-phase-results.json`),
-            fetch(`${basePath}/knockout-results.json`)
+            fetch(`${basePath}/group-stage-results.json`),
+            fetch(`${basePath}/knockout-stage-results.json`)
         ]);
         
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
         results = await groupPhaseResultsResponse.json();
-        // goals.json is deprecated; all goal data comes from group-phase-results.json
+        // goals.json is deprecated; all goal data comes from group-stage-results.json
         knockoutResults = await knockoutResponse.json();
         
         // Set default group based on config.json
@@ -1154,7 +1216,7 @@ function getResultsForGroup(groupId = selectedGroupId) {
     return results.filter(result => result.groupId === groupId);
 }
 
-// getGoalsForGroup is now deprecated. Use scorers from results in group-phase-results.json
+// getGoalsForGroup is now deprecated. Use scorers from results in group-stage-results.json
 // All goal/statistics logic should use the scorers property in results.
 function getGoalsForGroup(groupId = selectedGroupId) {
     // Aggregate all scorers from results for the group
@@ -1180,7 +1242,7 @@ function getGoalsForGroup(groupId = selectedGroupId) {
 
 // Calculate goal statistics by team and player for current group
 function calculateGoalStatistics() {
-    // Use scorers from results (group-phase-results.json)
+    // Use scorers from results (group-stage-results.json)
     const groupId = selectedGroupId;
     const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
     const stats = {};
@@ -1206,7 +1268,7 @@ function calculateGoalStatistics() {
     return stats;
 }
 function calculateGoalStatistics() {
-    // Use group-phase-results.json scorers property
+    // Use group-stage-results.json scorers property
     const groupId = selectedGroupId;
     const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
     const stats = {};
@@ -4749,7 +4811,7 @@ function generateMatchPredictionsHTML(predictions, gameweek) {
 
 // Get goal scorer statistics for a team
 function getTeamGoalScorers(teamId) {
-    // Use group-phase-results.json scorers property
+    // Use group-stage-results.json scorers property
     let scorerStats = {};
     results.forEach(match => {
         if (match.scorers && match.scorers[teamId]) {
@@ -4777,7 +4839,7 @@ function getTeamGoalScorers(teamId) {
 
 // Check if team has goal scorer data
 function hasGoalScorerData(teamId) {
-    // Use scorers from results (group-phase-results.json)
+    // Use scorers from results (group-stage-results.json)
     return results.some(match => match.scorers && match.scorers[teamId] && match.scorers[teamId].length > 0);
 }
 
@@ -5284,7 +5346,7 @@ function submitResult(event) {
             results[existingResultIndex].awayScore = awayScore;
         }
         
-        // Trigger download of updated group-phase-results.json
+        // Trigger download of updated group-stage-results.json
         downloadUpdatedResults();
         
         // Hide modal and reset title
@@ -5296,7 +5358,7 @@ function submitResult(event) {
         if (isMobileDevice()) {
             showToast('Result updated! Data stored in session (will be lost on refresh)', 'success');
         } else {
-            showToast('Result updated! Check Downloads → Replace data/group-phase-results.json → Refresh page', 'success');
+            showToast('Result updated! Check Downloads → Replace data/group-stage-results.json → Refresh page', 'success');
         }
     } else {
         // Create new result
@@ -5314,7 +5376,7 @@ function submitResult(event) {
         // Add to results array (only in memory for current session)
         results.push(newResult);
         
-        // Trigger download of updated group-phase-results.json
+        // Trigger download of updated group-stage-results.json
         downloadUpdatedResults();
         
         // Hide modal
@@ -5324,7 +5386,7 @@ function submitResult(event) {
         if (isMobileDevice()) {
             showToast('Result added! Data stored in session (will be lost on refresh)', 'success');
         } else {
-            showToast('Result added! Check Downloads → Replace data/group-phase-results.json → Refresh page', 'success');
+            showToast('Result added! Check Downloads → Replace data/group-stage-results.json → Refresh page', 'success');
         }
     }
     
@@ -5405,7 +5467,7 @@ function isMobileDevice() {
            window.innerWidth <= 768;
 }
 
-// Function to download updated group-phase-results.json
+// Function to download updated group-stage-results.json
 function downloadUpdatedResults() {
     // Check if it's a mobile device
     if (isMobileDevice()) {
@@ -5421,7 +5483,7 @@ function downloadUpdatedResults() {
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
-    link.download = 'group-phase-results.json';
+    link.download = 'group-stage-results.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -5429,7 +5491,7 @@ function downloadUpdatedResults() {
 
 // Function to export all current results for manual copying
 function exportAllResults() {
-    logger.log('All Current Results (copy this to group-phase-results.json):');
+    logger.log('All Current Results (copy this to group-stage-results.json):');
     logger.log(JSON.stringify(results, null, 2));
     
     if (!isMobileDevice()) {
@@ -5708,7 +5770,12 @@ let teamsData = [];
 // Load team data with player information
 async function loadPlayersData() {
     try {
-        const response = await fetch('./data/teams.json');
+        // Use year and sportType from config to construct the path
+        const year = defaults.year || '2025';
+        const sportType = defaults.sportType || 'futsal';
+        const basePath = `data/${year}/${sportType}`;
+        
+        const response = await fetch(`./${basePath}/teams.json`);
         teamsData = await response.json();
         logger.log('Teams data loaded:', teamsData);
         // Apply persisted formations/starters if available
@@ -8025,6 +8092,13 @@ function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
             }
             
             scoreDisplay.innerHTML = scoreText;
+            
+            // Make score clickable to show scorers popup
+            scoreDisplay.style.cursor = 'pointer';
+            scoreDisplay.title = 'Click to view scorers';
+            scoreDisplay.onclick = () => {
+                showScorersPopup(matchId, matchResult.homeTeam, matchResult.awayTeam);
+            };
         }
         
         // Add winner indicator to team boxes
@@ -8406,7 +8480,7 @@ function saveKnockoutScoreModal(matchId, isEdit) {
     if (isMobileDevice()) {
         showToast(`${matchResult.name} result saved! (${teamNames}: ${homeScore}-${awayScore})`, 'success');
     } else {
-        showToast(`${matchResult.name} result saved! Check Downloads → Replace data/knockout-results.json → Refresh page`, 'success');
+        showToast(`${matchResult.name} result saved! Check Downloads → Replace data/knockout-stage-results.json → Refresh page`, 'success');
     }
 }
 
@@ -8440,7 +8514,7 @@ function downloadKnockoutResults() {
     
     const link = document.createElement('a');
     link.href = URL.createObjectURL(dataBlob);
-    link.download = 'knockout-results.json';
+    link.download = 'knockout-stage-results.json';
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
