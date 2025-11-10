@@ -1,0 +1,10 @@
+- Finalize settings page
+- Separate code
+- Clean code
+- Add pages folder for different urls and url links (/teams, /forecast, etc)
+- Add admin dashboard (settings and dark/light-mode toggle)
+- Add login page with encrypted credentials (index.html)
+- Divide Teams tab into sub-tabs (team, formation, etc)
+- Merge Forecast and Simulator tab
+- Add loading mask on app start while loading data (validate if needed)
+- Add on config the name of the tournament and read it to print on header (Critical...)
