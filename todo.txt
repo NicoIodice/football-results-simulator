@@ -6,5 +6,6 @@
 - Add login page with encrypted credentials (index.html)
 - Divide Teams tab into sub-tabs (team, formation, etc)
 - Merge Forecast and Simulator tab
+- Add gameweek date on fixtures (consistency across all fixtures and group fixtures)
 - Add loading mask on app start while loading data (validate if needed)
 - Add on config the name of the tournament and read it to print on header (Critical...)
