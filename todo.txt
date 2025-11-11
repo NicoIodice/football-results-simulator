@@ -13,4 +13,8 @@
 - Add gameweek date on fixtures (consistency across all fixtures and group fixtures)
 - Add loading mask on app start while loading data (validate if needed)
 - Add on config the name of the tournament and read it to print on header (Critical...)
-- Change repo name, etc
+- Load files from dropbox files
+ - Add api token environment variable
+- Change repo name, etc (Critical Cup app?)
+- Add playwright tests
+- Add testId
