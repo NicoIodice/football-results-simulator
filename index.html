@@ -378,24 +378,66 @@
             <!-- Teams Tab -->
             <div id="teams" class="tab-content" data-testid="tab-teams-content">
                 <h2>Team Lineup & Squad</h2>
-                <div class="teams-controls">
-                    <div class="team-selector" data-testid="team-selector-lineup">
-                        <label for="selected-team-lineup">Team:</label>
-                        <select id="selected-team-lineup" data-testid="selected-team-lineup" onchange="updateTeamLineup()">
-                            <!-- Teams will be populated by JavaScript -->
-                        </select>
+                
+                <!-- Sub-tabs for Teams -->
+                <div class="sub-tabs">
+                    <button class="sub-tab-button active" data-testid="sub-tab-team-lineup" onclick="showTeamsSubTab('team-lineup')">Team Lineup</button>
+                    <button class="sub-tab-button" data-testid="sub-tab-team-formations" onclick="showTeamsSubTab('team-formations')">Formations</button>
+                </div>
+                
+                <!-- Team Lineup Sub-tab -->
+                <div id="team-lineup" class="sub-tab-content active" data-testid="team-lineup-content">
+                    <!-- Statistics Cards -->
+                    <div class="team-statistics-cards" data-testid="team-statistics-cards">
+                        <div class="stat-card" data-testid="stat-card-teams">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="total-teams">0</div>
+                                <div class="stat-label">Teams</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" data-testid="stat-card-athletes">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="total-athletes">0</div>
+                                <div class="stat-label">Athletes</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" data-testid="stat-card-associations">
+                            <div class="stat-icon">🤝</div>
+                            <div class="stat-content">
+                                <div class="stat-value" id="total-associations">0</div>
+                                <div class="stat-label">Associations</div>
+                            </div>
+                        </div>
                     </div>
                     
-                    <div class="tactics-selector" data-testid="tactics-selector-lineup">
-                        <label for="selected-tactics">Formation:</label>
-                        <select id="selected-tactics" data-testid="selected-tactics" onchange="updateFormation()">
-                            <!-- Tactics will be populated by JavaScript -->
-                        </select>
+                    <!-- Teams grouped by region -->
+                    <div id="teams-by-region" data-testid="teams-by-region">
+                        <!-- Will be populated by JavaScript -->
                     </div>
                 </div>
                 
-                <div id="team-lineup-content">
-                    <div class="football-field">
+                <!-- Team Formations Sub-tab -->
+                <div id="team-formations" class="sub-tab-content" data-testid="team-formations-content">
+                    <div class="teams-controls">
+                        <div class="team-selector" data-testid="team-selector-formations">
+                            <label for="selected-team-lineup">Team:</label>
+                            <select id="selected-team-lineup" data-testid="selected-team-lineup" onchange="updateTeamLineup()">
+                                <!-- Teams will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        
+                        <div class="formations-selector" data-testid="formations-selector-formations">
+                            <label for="selected-formations">Formation:</label>
+                            <select id="selected-formations" data-testid="selected-formations" onchange="updateFormation()">
+                                <!-- Formations will be populated by JavaScript -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="team-lineup-content">
+                        <div class="football-field">
                         <!-- Goalkeeper Area -->
                         <div class="goalkeeper-area">
                             <div class="goal">

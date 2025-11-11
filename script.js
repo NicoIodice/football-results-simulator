@@ -1466,6 +1466,39 @@ function showTab(tabName) {
                 }
             }, 50);
             break;
+        case 'teams':
+            // Ensure default teams sub-tab (team-lineup) is visible
+            const defaultTeamsTab = document.getElementById('team-lineup');
+            if (defaultTeamsTab && !defaultTeamsTab.classList.contains('active')) {
+                defaultTeamsTab.classList.add('active');
+            }
+
+            // Ensure the first sub-tab button has active class
+            const teamsSubTabs = document.querySelector('#teams .sub-tabs');
+            if (teamsSubTabs) {
+                const firstTeamsButton = teamsSubTabs.querySelector('.sub-tab-button');
+                const activeTeamsButton = teamsSubTabs.querySelector('.sub-tab-button.active');
+                
+                // If no button is active, activate the first one
+                if (!activeTeamsButton && firstTeamsButton) {
+                    firstTeamsButton.classList.add('active');
+                }
+            }
+
+            // Update team lineup view
+            updateTeamLineupView();
+
+            // Update sub-tab indicators
+            setTimeout(() => {
+                const teamsSubTabs = document.querySelector('#teams .sub-tabs');
+                if (teamsSubTabs) {
+                    const activeTeamsButton = teamsSubTabs.querySelector('.sub-tab-button.active');
+                    if (activeTeamsButton) {
+                        updateSubTabIndicator(activeTeamsButton);
+                    }
+                }
+            }, 100);
+            break;
         case 'fixtures':
             updateFixtures();
             break;
@@ -5846,8 +5879,8 @@ function updateTeamLineup() {
     
     logger.log('Updating lineup for team:', team.name);
     
-    // Populate tactics selector for this team
-    populateTacticsSelector(selectedTeamId);
+    // Populate formations selector for this team
+    populateFormationsSelector(selectedTeamId);
     
     // Update field players
     updateFieldPlayers(team);
@@ -5896,7 +5929,7 @@ function updateFieldPlayers(team) {
     const oldMap = {def: defendersList.map(p=>p.id), mid: midfieldersList.map(p=>p.id), fwd: forwardsList.map(p=>p.id)};
     const newMap = {def: newDef.map(p=>p.id), mid: newMid.map(p=>p.id), fwd: newFwd.map(p=>p.id)};
     if (JSON.stringify(oldMap) !== JSON.stringify(newMap)) {
-        showToast('You changed tactics but should review player positions', 'warning', 4000);
+        showToast('You changed formations but should review player positions', 'warning', 4000);
     }
 
     // Reset all field slots
@@ -6704,8 +6737,8 @@ function createBenchPlayerElement(player) {
     return playerDiv;
 }
 
-// TACTICS SYSTEM FOR TEAMS TAB
-const ALL_TACTICS = [
+// FORMATIONS SYSTEM FOR TEAMS TAB
+const ALL_FORMATIONS = [
     '0-0-4', '0-1-3', '0-2-2', '0-3-1', '0-4-0',
     '1-0-3', '1-1-2', '1-2-1', '1-3-0',
     '2-0-2', '2-1-1', '2-2-0',
@@ -6713,9 +6746,9 @@ const ALL_TACTICS = [
     '4-0-0'
 ];
 
-// Populate tactics selector based on current team
-function populateTacticsSelector(selectedTeamId) {
-    const selector = document.getElementById('selected-tactics');
+// Populate formations selector based on current team
+function populateFormationsSelector(selectedTeamId) {
+    const selector = document.getElementById('selected-formations');
     if (!selector) return;
     
     selector.innerHTML = '';
@@ -6724,8 +6757,8 @@ function populateTacticsSelector(selectedTeamId) {
     const team = teamsData.find(t => t.id === selectedTeamId);
     const currentFormation = team ? team.formation : '2-1-1';
     
-    // Add all tactics options
-    ALL_TACTICS.forEach(tactic => {
+    // Add all formations options
+    ALL_FORMATIONS.forEach(tactic => {
         const option = document.createElement('option');
         option.value = tactic;
         option.textContent = formatTacticDisplay(tactic);
@@ -6745,7 +6778,7 @@ function formatTacticDisplay(tactic) {
 // Handle formation change
 function updateFormation() {
     const selectedTeamId = document.getElementById('selected-team-lineup').value;
-    const selectedTactic = document.getElementById('selected-tactics').value;
+    const selectedTactic = document.getElementById('selected-formations').value;
     
     if (!selectedTeamId || !selectedTactic) return;
     
@@ -6766,7 +6799,7 @@ function updateFormation() {
     // Compare after allocation
     const afterMap = getCurrentLinePlayerMap(team);
     if (formationPlayerMovementOccurred(beforeMap, afterMap)) {
-        showToast('You changed tactics but should review player positions', 'warning', 4000);
+        showToast('You changed formations but should review player positions', 'warning', 4000);
     }
 
     // Persist new formation
@@ -6791,10 +6824,10 @@ function formationPlayerMovementOccurred(beforeMap, afterMap) {
     return ['defense','midfield','attack'].some(line => (beforeMap[line]||[]).join(',') !== (afterMap[line]||[]).join(','));
 }
 
-// Override the validateFutsalFormation to accept all tactics
+// Override the validateFutsalFormation to accept all formations
 function validateFutsalFormation(formation) {
-    // Accept any formation from our tactics list
-    if (ALL_TACTICS.includes(formation)) {
+    // Accept any formation from our formations list
+    if (ALL_FORMATIONS.includes(formation)) {
         return formation;
     }
     
@@ -7468,6 +7501,252 @@ function showSimulatorSubTab(tabId) {
         updateKnockoutSimulation();
     }
 }
+
+// Show Teams sub-tab
+function showTeamsSubTab(tabId) {
+    // Hide all sub-tab contents in teams
+    const subTabContents = document.querySelectorAll('#teams .sub-tab-content');
+    subTabContents.forEach(content => {
+        content.classList.remove('active');
+    });
+    
+    // Remove active class from all sub-tab buttons in teams
+    const subTabButtons = document.querySelectorAll('#teams .sub-tab-button');
+    subTabButtons.forEach(button => {
+        button.classList.remove('active');
+    });
+    
+    // Show selected sub-tab content
+    const selectedContent = document.getElementById(tabId);
+    if (selectedContent) {
+        selectedContent.classList.add('active');
+    }
+    
+    // Add active class to clicked button
+    const clickedButton = event.target;
+    clickedButton.classList.add('active');
+    
+    // Update sliding indicator position
+    updateSubTabIndicator(clickedButton);
+    
+    // Update content based on sub-tab
+    if (tabId === 'team-lineup') {
+        updateTeamLineupView();
+    }
+}
+
+// Association data mapping
+const TEAM_ASSOCIATIONS = {
+    'francesinha-united': {
+        name: 'Stiftung Ambulantes Kinderhospiz München',
+        url: 'https://www.kinderhospiz-muenchen.de/'
+    },
+    'sporting-esgaios': {
+        name: 'Bayerische Staatsforsten',
+        url: 'https://www.baysf.de/'
+    },
+    'logan-fc': {
+        name: 'APPACMD Porto',
+        url: 'https://www.appacdmporto.com/'
+    },
+    'critical-techballers': {
+        name: 'ZERO',
+        url: 'https://zero.ong/'
+    },
+    'ctrl-shift-golo': {
+        name: 'GAS Porto',
+        url: 'https://gasporto.org/'
+    },
+    'dataki': {
+        name: 'Opus Diversidades',
+        url: 'https://rainbowportal.opusdiversidades.org/'
+    },
+    'critigals': {
+        name: 'Quercus',
+        url: 'https://quercus.pt/'
+    },
+    'borg-coimbra': {
+        name: 'Clube de Tempos Livres Santa Clara',
+        url: 'https://www.ctl.pt/#!/#!%2F'
+    },
+    'borussia-doutromundo': {
+        name: 'Maggie\'s Southampton',
+        url: 'https://www.maggies.org/'
+    },
+    'underdogs-fc': {
+        name: 'Serve the City',
+        url: 'https://www.servethecity.pt/'
+    },
+    'fc-zerolhos': {
+        name: 'Instituto de Apoio à Criança',
+        url: 'https://iacrianca.pt/'
+    },
+    'desesperados-fc': {
+        name: 'APDPróstata',
+        url: 'https://www.apdprostata.com/'
+    },
+    'bestsellers': {
+        name: 'SOS Animal',
+        url: 'https://sosanimal.com/'
+    },
+    'red-star-lx': {
+        name: 'Casa Santo António',
+        url: 'https://www.casasantoantonio.org.pt/'
+    },
+    'critical-underdogs': {
+        name: 'Associação para a Defesa dos Animais e Ambiente de Vila Verde',
+        url: 'https://adaavv.com/'
+    },
+    'shadow-x': {
+        name: 'AJUDARIS',
+        url: 'https://ajudaris.org/'
+    },
+    'fish-kicks-united': {
+        name: 'APPACDM Condeixa',
+        url: 'https://www.appacdmcondeixa.pt/'
+    }
+};
+
+// Update team lineup view with statistics and team cards
+function updateTeamLineupView() {
+    if (!teams || teams.length === 0 || !groups || groups.length === 0) {
+        logger.warn('Teams or groups not loaded yet');
+        return;
+    }
+    
+    // Calculate statistics
+    const totalTeams = teams.length;
+    const totalAthletes = teams.reduce((sum, team) => sum + (team.players?.length || 0), 0);
+    const uniqueAssociations = new Set(
+        teams.map(team => TEAM_ASSOCIATIONS[team.id]?.name).filter(Boolean)
+    ).size;
+    
+    // Update statistics cards
+    document.getElementById('total-teams').textContent = totalTeams;
+    document.getElementById('total-athletes').textContent = totalAthletes;
+    document.getElementById('total-associations').textContent = uniqueAssociations;
+    
+    // Generate teams by region
+    const teamsContainer = document.getElementById('teams-by-region');
+    if (!teamsContainer) return;
+    
+    let html = '';
+    
+    // Group teams by region (group description)
+    groups.forEach(group => {
+        const groupTeams = teams
+            .filter(team => team.groupId === group.id)
+            .sort((a, b) => a.name.localeCompare(b.name));
+        
+        if (groupTeams.length === 0) return;
+        
+        html += `
+            <div class="region-group" data-region-id="${group.id}">
+                <h3 class="region-header" onclick="toggleRegionGroup('${group.id}')">
+                    <span class="region-name">${group.description.toUpperCase()}</span>
+                    <span class="region-toggle">▼</span>
+                </h3>
+                <div class="region-teams-container">
+        `;
+        
+        groupTeams.forEach(team => {
+            const captain = team.players?.find(p => p.isCaptain);
+            const association = TEAM_ASSOCIATIONS[team.id];
+            const playerCount = team.players?.length || 0;
+            
+            html += `
+                <div class="team-card" data-team-id="${team.id}">
+                    <div class="team-card-header" onclick="toggleTeamCard('${team.id}')">
+                        <div class="team-card-title">
+                            <span class="team-card-name">${team.name}</span>
+                            <span class="team-card-toggle">▼</span>
+                        </div>
+                        <div class="team-card-meta">
+                            <div class="team-meta-item">
+                                <span class="meta-label">League:</span>
+                                <span class="team-company-badge company-${team.league.toLowerCase()}">${team.league}</span>
+                            </div>
+                            ${captain ? `
+                            <div class="team-meta-item">
+                                <span class="meta-icon">⚽</span>
+                                <span class="meta-label">Captain:</span>
+                                <span class="meta-value">${captain.name}</span>
+                            </div>
+                            ` : ''}
+                            <div class="team-meta-item">
+                                <span class="meta-icon">👥</span>
+                                <span class="meta-value">${playerCount} ${playerCount === 1 ? 'player' : 'players'}</span>
+                            </div>
+                            ${association ? `
+                            <div class="team-meta-item">
+                                <span class="meta-icon">🤝</span>
+                                <a href="${association.url}" 
+                                   target="_blank" 
+                                   rel="noopener noreferrer" 
+                                   class="team-association-link"
+                                   onclick="event.stopPropagation()">
+                                    ${association.name}
+                                </a>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div class="team-card-body">
+                        <div class="team-members-list">
+            `;
+            
+            // Add team members
+            if (team.players && team.players.length > 0) {
+                team.players
+                    .sort((a, b) => a.number - b.number)
+                    .forEach(player => {
+                        html += `
+                            <div class="team-member-item">
+                                <div class="member-number">#${player.number}</div>
+                                <div class="member-info">
+                                    <div class="member-name">${player.name}</div>
+                                    <div class="member-position">${player.position}</div>
+                                </div>
+                                ${player.isCaptain ? '<span class="member-captain" title="Captain">Ⓒ</span>' : ''}
+                            </div>
+                        `;
+                    });
+            } else {
+                html += '<div class="no-players">No players registered</div>';
+            }
+            
+            html += `
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `
+                </div>
+            </div>
+        `;
+    });
+    
+    teamsContainer.innerHTML = html;
+}
+
+// Toggle team card expansion
+function toggleTeamCard(teamId) {
+    const card = document.querySelector(`.team-card[data-team-id="${teamId}"]`);
+    if (!card) return;
+    
+    card.classList.toggle('expanded');
+}
+
+// Toggle region group expansion
+function toggleRegionGroup(regionId) {
+    const region = document.querySelector(`.region-group[data-region-id="${regionId}"]`);
+    if (!region) return;
+    
+    region.classList.toggle('collapsed');
+}
+
 
 // Update knockout simulation
 function updateKnockoutSimulation() {
