@@ -8287,7 +8287,7 @@ function updateSemiFinalResultDisplays() {
             // Update team-label to show actual team
             const semi1WinnerLabel = semi1WinnerBox.parentElement.querySelector('.team-label');
             if (semi1WinnerLabel) {
-                semi1WinnerLabel.textContent = `${winner.name} (Semi-Final 1 Winner)`;
+                semi1WinnerLabel.textContent = 'Semi-Final 1 Winner';
             }
         }
         
@@ -8298,7 +8298,7 @@ function updateSemiFinalResultDisplays() {
             // Update team-label to show actual team
             const semi1LoserLabel = semi1LoserBox.parentElement.querySelector('.team-label');
             if (semi1LoserLabel) {
-                semi1LoserLabel.textContent = `${loser.name} (Semi-Final 1 Loser)`;
+                semi1LoserLabel.textContent = 'Semi-Final 1 Loser';
             }
         }
     } else {
@@ -8333,7 +8333,7 @@ function updateSemiFinalResultDisplays() {
             // Update team-label to show actual team
             const semi2WinnerLabel = semi2WinnerBox.parentElement.querySelector('.team-label');
             if (semi2WinnerLabel) {
-                semi2WinnerLabel.textContent = `${winner.name} (Semi-Final 2 Winner)`;
+                semi2WinnerLabel.textContent = 'Semi-Final 2 Winner';
             }
         }
         
@@ -8344,7 +8344,7 @@ function updateSemiFinalResultDisplays() {
             // Update team-label to show actual team
             const semi2LoserLabel = semi2LoserBox.parentElement.querySelector('.team-label');
             if (semi2LoserLabel) {
-                semi2LoserLabel.textContent = `${loser.name} (Semi-Final 2 Loser)`;
+                semi2LoserLabel.textContent = 'Semi-Final 2 Loser';
             }
         }
     } else {

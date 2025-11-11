@@ -16,7 +16,5 @@
 - Add loading mask on app start while loading data (validate if needed)
 - Load files from dropbox files
  - Add api token environment variable
-- Change repo name
-  - Add on tournament-settings.json the name of the tournament and read it to print on header (Critical...)
 - Add playwright tests
 - Add testId

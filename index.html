@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Multi Sport</h1>
-            <p>Tournament Manager</p>
+    <div class="container" data-testid="main-container">
+        <header data-testid="main-header">
+            <h1 data-testid="header-title">Multi Sport</h1>
+            <p data-testid="header-subtitle">Tournament Manager</p>
             <!-- Floating action buttons for settings and dark mode (mobile-friendly) -->
             <div class="fab-vertical-stack">
                 <button id="dark-mode-toggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
@@ -45,24 +45,24 @@
             </div>
         </div>
 
-        <nav class="tabs">
-            <button class="tab-button active" onclick="showTab('overview')">
+        <nav class="tabs" data-testid="main-tabs">
+            <button class="tab-button active" data-testid="tab-overview" onclick="showTab('overview')">
                 <span class="tab-icon">📊</span>
                 <span class="tab-label">Overview</span>
             </button>
-            <button class="tab-button" onclick="showTab('teams')">
+            <button class="tab-button" data-testid="tab-teams" onclick="showTab('teams')">
                 <span class="tab-icon">👥</span>
                 <span class="tab-label">Teams</span>
             </button>
-            <button class="tab-button" onclick="showTab('fixtures')">
+            <button class="tab-button" data-testid="tab-fixtures" onclick="showTab('fixtures')">
                 <span class="tab-icon">📅</span>
                 <span class="tab-label">Fixtures</span>
             </button>
-            <button class="tab-button" onclick="showTab('forecast')">
+            <button class="tab-button" data-testid="tab-forecast" onclick="showTab('forecast')">
                 <span class="tab-icon">🔮</span>
                 <span class="tab-label">Forecast</span>
             </button>
-            <button class="tab-button" onclick="showTab('simulator')">
+            <button class="tab-button" data-testid="tab-simulator" onclick="showTab('simulator')">
                 <span class="tab-icon">🎮</span>
                 <span class="tab-label">Simulator</span>
             </button>
@@ -70,19 +70,19 @@
 
         <main>
             <!-- Overview Tab (formerly Standings) -->
-            <div id="overview" class="tab-content active">
+            <div id="overview" class="tab-content active" data-testid="tab-overview-content">
                 <h2>Championship Overview</h2>
                 
                 <!-- Sub-tabs for Overview -->
                 <div class="sub-tabs">
-                    <button class="sub-tab-button active" onclick="showStandingsSubTab('league-standings')">League Standings</button>
-                    <button class="sub-tab-button" onclick="showStandingsSubTab('knockout-stage')">Knockout</button>
-                    <button class="sub-tab-button" onclick="showStandingsSubTab('statistics')">Statistics</button>
+                    <button class="sub-tab-button active" data-testid="sub-tab-league-standings" onclick="showStandingsSubTab('league-standings')">League Standings</button>
+                    <button class="sub-tab-button" data-testid="sub-tab-knockout-stage" onclick="showStandingsSubTab('knockout-stage')">Knockout</button>
+                    <button class="sub-tab-button" data-testid="sub-tab-statistics" onclick="showStandingsSubTab('statistics')">Statistics</button>
                 </div>
                 
                 <!-- League Standings Sub-tab -->
-                <div id="league-standings" class="sub-tab-content active">
-                    <div class="group-selector">
+                <div id="league-standings" class="sub-tab-content active" data-testid="league-standings-content">
+                    <div class="group-selector" data-testid="group-selector">
                         <label for="selected-group">Group:</label>
                         <div class="group-selector-container">
                             <select id="selected-group" onchange="updateStandingsForGroup()">
@@ -93,8 +93,8 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-container">
-                        <table id="standings-table">
+                    <div class="table-container" data-testid="standings-table-container">
+                        <table id="standings-table" data-testid="standings-table">
                             <thead>
                                 <tr>
                                     <th>Rank</th>
@@ -376,19 +376,19 @@
             </div>
 
             <!-- Teams Tab -->
-            <div id="teams" class="tab-content">
+            <div id="teams" class="tab-content" data-testid="tab-teams-content">
                 <h2>Team Lineup & Squad</h2>
                 <div class="teams-controls">
-                    <div class="team-selector">
+                    <div class="team-selector" data-testid="team-selector-lineup">
                         <label for="selected-team-lineup">Team:</label>
-                        <select id="selected-team-lineup" onchange="updateTeamLineup()">
+                        <select id="selected-team-lineup" data-testid="selected-team-lineup" onchange="updateTeamLineup()">
                             <!-- Teams will be populated by JavaScript -->
                         </select>
                     </div>
                     
-                    <div class="tactics-selector">
+                    <div class="tactics-selector" data-testid="tactics-selector-lineup">
                         <label for="selected-tactics">Formation:</label>
-                        <select id="selected-tactics" onchange="updateFormation()">
+                        <select id="selected-tactics" data-testid="selected-tactics" onchange="updateFormation()">
                             <!-- Tactics will be populated by JavaScript -->
                         </select>
                     </div>
@@ -460,7 +460,7 @@
             </div>
 
             <!-- Fixtures Tab -->
-            <div id="fixtures" class="tab-content">
+            <div id="fixtures" class="tab-content" data-testid="tab-fixtures-content">
                 <h2>Fixtures & Results</h2>
                 
                 <!-- Today's Games Header Card -->
@@ -472,42 +472,42 @@
                 <!-- Fixtures Controls -->
                 <div class="fixtures-controls">
                     <div class="control-row">
-                        <div class="group-selector">
+                        <div class="group-selector" data-testid="group-selector-fixtures">
                             <label for="fixtures-group-select">Group:</label>
-                            <select id="fixtures-group-select" onchange="updateFixturesForGroup()">
+                            <select id="fixtures-group-select" data-testid="selected-group-fixtures" onchange="updateFixturesForGroup()">
                                 <!-- Groups will be populated by JavaScript -->
                             </select>
                         </div>
                         <div class="checkbox-control">
-                            <label for="show-all-fixtures">
-                                <input type="checkbox" id="show-all-fixtures" onchange="toggleAllFixtures()">
+                            <label for="show-all-fixtures" data-testid="show-all-fixtures-label">
+                                <input type="checkbox" id="show-all-fixtures" data-testid="show-all-fixtures-checkbox" onchange="toggleAllFixtures()">
                                 Show All Fixtures
                             </label>
                         </div>
                     </div>
                 </div>
                 
-                <div id="fixtures-content">
+                <div id="fixtures-content" data-testid="fixtures-content">
                     <!-- Fixtures will be populated by JavaScript -->
                 </div>
             </div>
 
             <!-- Simulator Tab -->
-            <div id="simulator" class="tab-content">
+            <div id="simulator" class="tab-content" data-testid="tab-simulator-content">
                 <h2>Championship Simulator</h2>
                 
                 <!-- Sub-tabs for Simulator -->
                 <div class="sub-tabs">
-                    <button class="sub-tab-button active" onclick="showSimulatorSubTab('group-stage-sim')">Group Stage</button>
-                    <button class="sub-tab-button" onclick="showSimulatorSubTab('knockout-stage-sim')">Knockout Stage</button>
+                    <button class="sub-tab-button active" data-testid="sub-tab-group-stage-sim" onclick="showSimulatorSubTab('group-stage-sim')">Group Stage</button>
+                    <button class="sub-tab-button" data-testid="sub-tab-knockout-stage-sim" onclick="showSimulatorSubTab('knockout-stage-sim')">Knockout Stage</button>
                 </div>
                 
                 <!-- Group Stage Simulation Sub-tab -->
                 <div id="group-stage-sim" class="sub-tab-content active">
                     <div class="simulator-controls">
-                        <div class="team-selector">
+                        <div class="team-selector" data-testid="team-selector-simulator">
                             <label for="selected-team">Team to Analyze:</label>
-                            <select id="selected-team" onchange="updateSimulation()">
+                            <select id="selected-team" data-testid="selected-team-simulator" onchange="updateSimulation()">
                                 <!-- Teams will be populated by JavaScript -->
                             </select>
                         </div>
@@ -527,17 +527,17 @@
             </div>
 
             <!-- Forecast Tab -->
-            <div id="forecast" class="tab-content">
+            <div id="forecast" class="tab-content" data-testid="tab-forecast-content">
                 <h2>🔮 Championship Forecast & Predictions</h2>
                 <div class="forecast-description">
                     <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
                 </div>
                 
                 <!-- Forecast Controls -->
-                <div class="forecast-controls">
-                    <div class="group-selector">
-                        <label for="forecast-group-select">Group:</label>
-                        <select id="forecast-group-select" onchange="updateForecastForGroup()">
+                <div class="forecast-controls" data-testid="forecast-controls">
+                    <div class="group-selector" data-testid="group-selector-forecast">
+                        <label for="forecast-group-select" data-testid="forecast-group-select-label">Group:</label>
+                        <select id="forecast-group-select" data-testid="selected-group-forecast" onchange="updateForecastForGroup()">
                             <!-- Groups will be populated by JavaScript -->
                         </select>
                     </div>
@@ -552,7 +552,7 @@
     </div>
 
     <!-- Add Result Modal -->
-    <div id="addResultModal" class="modal">
+    <div id="addResultModal" class="modal" data-testid="add-result-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Add Match Result</h3>
@@ -563,21 +563,21 @@
                     <p><strong>Match:</strong> <span id="modal-teams"></span></p>
                     <p><strong>Date & Time:</strong> <span id="modal-datetime"></span></p>
                 </div>
-                <form id="addResultForm" onsubmit="submitResult(event)">
+                <form id="addResultForm" data-testid="add-result-form" onsubmit="submitResult(event)">
                     <div class="score-inputs">
                         <div class="team-score">
                             <label for="homeScore" id="homeTeamLabel"></label>
-                            <input type="number" id="homeScore" min="0" max="99" required>
+                            <input type="number" id="homeScore" min="0" max="99" required data-testid="home-score-input">
                         </div>
                         <div class="vs-separator">VS</div>
                         <div class="team-score">
                             <label for="awayScore" id="awayTeamLabel"></label>
-                            <input type="number" id="awayScore" min="0" max="99" required>
+                            <input type="number" id="awayScore" min="0" max="99" required data-testid="away-score-input">
                         </div>
                     </div>
-                    <div class="modal-actions">
-                        <button type="button" class="btn-secondary" onclick="hideAddResultModal()">Cancel</button>
-                        <button type="submit" class="btn-primary">Add Result</button>
+                    <div class="modal-actions" data-testid="modal-actions">
+                        <button type="button" class="btn-secondary" data-testid="add-result-cancel-btn" onclick="hideAddResultModal()">Cancel</button>
+                        <button type="submit" class="btn-primary" data-testid="add-result-submit-btn">Add Result</button>
                     </div>
                 </form>
             </div>
@@ -585,10 +585,10 @@
     </div>
 
     <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
+    <div id="toast" class="toast" data-testid="toast"></div>
 
     <!-- Loading Mask for OpenAI SDK -->
-    <div id="openai-loading-mask" class="loading-mask hide">
+    <div id="openai-loading-mask" class="loading-mask hide" data-testid="openai-loading-mask">
         <div class="loading-spinner">
             <div class="spinner"></div>
             <div class="loading-text">
@@ -605,7 +605,7 @@
     </div>
 
     <!-- Knockout warning popup for team replacements -->
-    <div id="knockout-warning-popup" class="knockout-warning-popup" style="display: none;"></div>
+    <div id="knockout-warning-popup" class="knockout-warning-popup" style="display: none;" data-testid="knockout-warning-popup"></div>
 
     <!-- OpenAI SDK -->
     <!--<script src="https://cdn.jsdelivr.net/npm/openai@4.0.0/dist/openai.min.js"></script>-->
