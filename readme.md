@@ -1,4 +1,4 @@
-# ⚽ Football Results Simulator
+# ⚽ Sports Tournment App
 
 A comprehensive football league analysis and prediction system featuring real-time standings, match simulation, championship scenarios, and AI-powered forecasts.
 
