@@ -1,3 +1,4 @@
+- Fazer o fix do green field para as formations
 - Finalize settings page
 - Separate code
 - Clean code
