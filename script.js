@@ -24,7 +24,7 @@ function hideScorerWarningPopup() {
 }
 // Show scorers popup for fixtures
 function showScorersPopup(matchId, homeTeamId, awayTeamId) {
-    // Find the match - check both group phase and knockout results
+    // Find the match - check both group stage and knockout results
     let match = results.find(r => r.matchId === matchId);
     let isKnockout = false;
     let isCancelled = false;
@@ -43,7 +43,7 @@ function showScorersPopup(matchId, homeTeamId, awayTeamId) {
         return;
     }
     
-    // Handle group phase matches
+    // Handle group stage matches
     if (!isKnockout) {
         isCancelled = match && match.matchStatus === 'cancelled';
         matchGroupId = match ? match.groupId : null;
@@ -188,8 +188,9 @@ let selectedGroupId = null;
 // Forecast-specific variables
 let selectedForecastGroupId = null;
 
-// Configuration loaded from config.json
-let config = null;
+// Configuration loaded from settings.json
+let appSettings = null;
+let tournamentSettings = null;
 
 // Local storage keys
 const STORAGE_KEYS = {
@@ -237,29 +238,27 @@ function persistTeamState() {
 // Centralized logging system that respects debug mode setting
 const logger = {
     log: (...args) => {
-        if (config?.ui?.enableDebugMode) {
+        if (appSettings?.ui?.enableDebugMode) {
             console.log(...args);
         }
     },
     warn: (...args) => {
-        if (config?.ui?.enableDebugMode) {
+        if (appSettings?.ui?.enableDebugMode) {
             console.warn(...args);
         }
     },
     error: (...args) => {
         // Always show errors regardless of debug mode
         console.error(...args);
-        
-        // Show toast notification for errors
         handleError(args[0]);
     },
     info: (...args) => {
-        if (config?.ui?.enableDebugMode) {
+        if (appSettings?.ui?.enableDebugMode) {
             console.info(...args);
         }
     },
     debug: (...args) => {
-        if (config?.ui?.enableDebugMode) {
+        if (appSettings?.ui?.enableDebugMode) {
             console.debug(...args);
         }
     }
@@ -306,46 +305,64 @@ function withErrorHandling(fn) {
     };
 }
 
-// OpenRouter API configuration (formerly OpenAI)
-const OPENAI_CONFIG = {
-    apiKey: null, // API key will be loaded from .env file
-    baseURL: 'https://openrouter.ai/api/v1',
-    model: 'openai/gpt-4o', //'openai/gpt-4o'
-    maxTokens: 500, // Limit response length to optimize costs
-    temperature: 0.7,
-    retryAttempts: 3,
-    retryDelay: 1000, // Base delay in ms (will use exponential backoff)
-    timeoutMs: 30000 // 30 second timeout
-};
+// Load app settings (ui/admin) from app-settings.json
+async function loadAppSettings() {
+    try {
+        const response = await fetch('data/app-settings.json');
+        if (!response.ok) throw new Error('Failed to load app-settings.json');
+        appSettings = await response.json();
+    } catch (e) {
+        logger.error('Error loading app-settings.json:', e);
+        appSettings = {};
+    }
+}
 
-let openaiInitialized = false; // Track initialization status
+// Load tournament settings from tournament-settings.json
+async function loadTournamentSettings() {
+    try {
+        const response = await fetch('data/2025/futsal/tournament-settings.json');
+        if (!response.ok) throw new Error('Failed to load tournament-settings.json');
+        tournamentSettings = await response.json();
+        // Set document title and header dynamically
+        if (tournamentSettings.tournamentTitle && tournamentSettings.tournamentSubTitle && tournamentSettings.year) {
+            const fullTitle = `${tournamentSettings.tournamentTitle}: ${tournamentSettings.tournamentSubTitle} ${tournamentSettings.year}`;
+            document.title = fullTitle;
+            // Update header h1 and p
+            const h1 = document.querySelector('header h1');
+            if (h1) h1.textContent = `${tournamentSettings.tournamentTitle} ${tournamentSettings.year}`;
+            const p = document.querySelector('header p');
+            if (p) p.textContent = tournamentSettings.tournamentSubTitle;
+        }
+    } catch (e) {
+        logger.error('Error loading tournament-settings.json:', e);
+        tournamentSettings = {};
+    }
+}
 
-// Load API key from config.json file
+// Load OpenAI key from app-config.json (not app-settings.json)
 async function loadOpenAIKeyFromConfig() {
     try {
         const response = await fetch('app-config.json');
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-        
-        const config = await response.json();
-        const apiKey = config.OPENAI_API_KEY;
-        
+        const appConfig = await response.json();
+        const apiKey = appConfig.OPENAI_API_KEY;
         if (apiKey && apiKey !== 'your-api-key-here' && apiKey.trim()) {
             OPENAI_CONFIG.apiKey = apiKey.trim();
             initializeOpenAI(OPENAI_CONFIG.apiKey);
-            logger.log('✅ OpenRouter API key loaded from config.json');
+            logger.log('✅ OpenRouter API key loaded from app-config.json');
             return;
         } else {
-            logger.warn('⚠️ No valid OpenRouter API key found in config.json');
+            logger.warn('⚠️ No valid OpenRouter API key found in app-config.json');
         }
     } catch (error) {
-        logger.warn('⚠️ Could not load config.json:', error.message);
-        logger.info('💡 Create a config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
+        logger.warn('⚠️ Could not load app-config.json:', error.message);
+        logger.info('💡 Create an app-config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
     }
 }
 
-// Fallback: Load API key from .env file (if config.json fails)
+// Fallback: Load API key from .env file (if app-config.json fails)
 async function loadOpenAIKeyFromEnv() {
     try {
         const response = await fetch('.env');
@@ -373,6 +390,27 @@ async function loadOpenAIKeyFromEnv() {
         logger.debug('.env file not accessible via HTTP (this is normal)');
     }
 }
+
+// OpenRouter API configuration
+const OPENAI_CONFIG = {
+    // Only set by loadOpenAIKeyFromConfig, not from app-settings.json
+    apiKey: null,
+    // All other values will be loaded from app-settings.json openAI object
+};
+
+// Merge values from app-settings.json openAI object into OPENAI_CONFIG (except apiKey)
+function applyOpenAISettingsFromAppSettings(settings) {
+    if (!settings || typeof settings !== 'object') return;
+    if (settings.openAI && typeof settings.openAI === 'object') {
+        for (const [key, value] of Object.entries(settings.openAI)) {
+            if (key !== 'apiKey') {
+                OPENAI_CONFIG[key] = value;
+            }
+        }
+    }
+}
+
+let openaiInitialized = false; // Track initialization status
 
 // Initialize OpenAI client
 function initializeOpenAI(apiKey) {
@@ -482,7 +520,7 @@ async function initializeOpenRouterSystem() {
         logger.log('🔄 Initializing OpenRouter system...');
         
         // Try to load API key in order of preference
-        await loadOpenAIKeyFromConfig(); // Try config.json first
+        await loadOpenAIKeyFromConfig(); // Try app-config.json first
         if (!OPENAI_CONFIG.apiKey) {
             await loadOpenAIKeyFromEnv(); // Fallback to .env
         }
@@ -507,32 +545,20 @@ async function initializeOpenRouterSystem() {
 
 // Load data when page loads
 document.addEventListener('DOMContentLoaded', async function() {
-    logger.log('Using default OpenAI configuration:', {
-        useOpenAI: false, // Will be loaded from config.json
-        maxTokens: OPENAI_CONFIG.maxTokens,
-        retryAttempts: OPENAI_CONFIG.retryAttempts,
-        model: OPENAI_CONFIG.model
-    });
-    
-    // Load data first (non-blocking)
+    // Load app and tournament settings first
+    await loadAppSettings();
+    await loadTournamentSettings();
+    // ...existing code...
     await loadData();
-
-    // Load any pending results from session storage (mobile)
     loadPendingResults();
-
     showTab('overview');
-    
-    // Initialize sub-tab indicators after a brief delay to ensure layout is ready
     setTimeout(() => initializeSubTabIndicators(), 200);
-
     // Initialize OpenRouter only if enabled
-    if (config?.simulation?.useOpenAI) {
+    if (tournamentSettings?.simulation?.useOpenAI) {
         initializeOpenRouterSystem();
     } else {
         logger.log('ℹ️ OpenRouter feature disabled, skipping initialization');
     }
-
-    // Settings modal logic
     const settingsToggle = document.getElementById('settings-toggle');
     if (settingsToggle) {
         settingsToggle.addEventListener('click', showConfigModal);
@@ -566,28 +592,29 @@ let selectedConfigCategory = 'General';
 const configCategoryLabels = {
     General: 'General',
     featureToggles: 'Feature Toggles',
-    groupPhase: 'Group Phase',
+    groupStage: 'Group Stage',
     knockout: 'Knockout',
     simulation: 'Simulation',
     venues: 'Venues',
-    admin: 'Admin'
+    admin: 'Admin',
+    ui: 'UI'
 };
 
 const categories = [
     'General',
     'featureToggles',
-    'groupPhase',
+    'groupStage',
     'knockout',
     'simulation',
     'venues',
-    'admin'
+    'admin',
+    'ui'
 ];
 
 function renderConfigCategories() {
     const panel = document.getElementById('config-categories-panel');
-    if (!panel || !config) return;
+    if (!panel) return;
     panel.innerHTML = '';
-
     categories.forEach(cat => {
         const btn = document.createElement('button');
         btn.className = 'config-category-item' + (selectedConfigCategory === cat ? ' active' : '');
@@ -603,26 +630,30 @@ function renderConfigCategories() {
 
 function renderConfigFieldsPanel(category) {
     const panel = document.getElementById('config-fields-panel');
-    if (!panel || !config) return;
+    if (!panel) return;
     panel.innerHTML = '';
     let fields = {};
     let title = configCategoryLabels[category] || category;
+    let source = null;
+    if (category === 'ui' || category === 'admin') {
+        source = appSettings;
+    } else {
+        source = tournamentSettings;
+    }
     if (category === 'General') {
-        // Only show top-level primitives
-        for (const key in config) {
-            if (typeof config[key] !== 'object' || config[key] === null || Array.isArray(config[key])) {
-                fields[key] = config[key];
+        for (const key in tournamentSettings) {
+            if (typeof tournamentSettings[key] !== 'object' || tournamentSettings[key] === null || Array.isArray(tournamentSettings[key])) {
+                fields[key] = tournamentSettings[key];
             }
         }
     } else if (category === 'featureToggles') {
         renderFeatureTogglesPanel(panel);
         return;
     } else if (category === 'venues') {
-        // Venues editor (group and knockout)
         renderVenuesEditor(panel);
         return;
     } else {
-        fields = config[category] || {};
+        fields = (source && source[category]) || {};
     }
     const heading = document.createElement('h1');
     heading.textContent = title;
@@ -656,8 +687,8 @@ function renderFeatureTogglesPanel(panel) {
     tabsTitle.textContent = 'Tabs Visibility';
     tabsSection.appendChild(tabsTitle);
 
-    const tabs = config.featureToggles.tabs;
-    const subTabs = config.featureToggles.subTabs;
+    const tabs = tournamentSettings.featureToggles.tabs;
+    const subTabs = tournamentSettings.featureToggles.subTabs;
     for (const tab in tabs) {
         const tabRow = document.createElement('div');
         tabRow.className = 'feature-toggle-tab-row';
@@ -722,7 +753,7 @@ function renderFeatureTogglesPanel(panel) {
     const uiTitle = document.createElement('h2');
     uiTitle.textContent = 'UI';
     uiSection.appendChild(uiTitle);
-    const ui = config.featureToggles.ui;
+    const ui = tournamentSettings.featureToggles.ui;
     for (const key in ui) {
         const uiRow = document.createElement('div');
         uiRow.className = 'feature-toggle-ui-row';
@@ -883,11 +914,11 @@ function renderVenuesEditor(panel) {
     heading.style.marginBottom = '24px';
     panel.appendChild(heading);
 
-    // Group phase venues
-    const groupVenues = (config.groupPhase && config.groupPhase.venues) || {};
+    // Group stage venues
+    const groupVenues = (tournamentSettings.groupStage && tournamentSettings.groupStage.venues) || {};
     const groupVenueList = document.createElement('div');
     groupVenueList.className = 'venues-list';
-    groupVenueList.innerHTML = '<h3>Group Phase Venues</h3>';
+    groupVenueList.innerHTML = '<h3>Group Stage Venues</h3>';
     Object.entries(groupVenues).forEach(([groupId, venue]) => {
         const group = groups.find(g => g.id === groupId);
         const groupName = group ? group.name : groupId;
@@ -918,7 +949,7 @@ function renderVenuesEditor(panel) {
         nameInput.value = venue.name || '';
         nameInput.className = 'config-input venue-name-input';
         nameInput.id = `venue-name-${groupId}`;
-        nameInput.dataset.path = `groupPhase.venues.${groupId}.name`;
+        nameInput.dataset.path = `groupStage.venues.${groupId}.name`;
         nameInput.oninput = onConfigInputChange;
         nameRow.appendChild(nameLabel);
         nameRow.appendChild(nameInput);
@@ -943,7 +974,7 @@ function renderVenuesEditor(panel) {
         urlInput.value = venue.googleMapsUrl || '';
         urlInput.className = 'config-input venue-url-input';
         urlInput.id = `venue-url-${groupId}`;
-        urlInput.dataset.path = `groupPhase.venues.${groupId}.googleMapsUrl`;
+        urlInput.dataset.path = `groupStage.venues.${groupId}.googleMapsUrl`;
         urlInput.oninput = onConfigInputChange;
         // Google Maps link/button
         const mapBtn = document.createElement('a');
@@ -960,7 +991,7 @@ function renderVenuesEditor(panel) {
     panel.appendChild(groupVenueList);
 
     // Knockout venue
-    const knockoutVenue = (config.knockout && config.knockout.venue) || null;
+    const knockoutVenue = (tournamentSettings.knockout && tournamentSettings.knockout.venue) || null;
     if (knockoutVenue) {
         const knockoutDiv = document.createElement('div');
         knockoutDiv.className = 'venue-row';
@@ -1069,55 +1100,33 @@ function saveConfig() {
 // Load JSON data
 async function loadData() {
     try {
-        // First, load config to get year and sportType
-        const configResponse = await fetch('data/config.json');
-        defaults = await configResponse.json();
-        config = defaults; // Store config for feature toggles
-        
-        // Extract year and sportType from config
-        const year = defaults.year || '2025';
-        const sportType = defaults.sportType || 'futsal';
+        // Use tournamentSettings for tournament config
+        const year = tournamentSettings?.year || '2025';
+        const sportType = tournamentSettings?.sportType || 'futsal';
         const basePath = `data/${year}/${sportType}`;
-        
-        // Load all other data files from the dynamic path
-        const [groupsResponse, teamsResponse, fixturesResponse, groupPhaseResultsResponse, knockoutResponse] = await Promise.all([
+        const [groupsResponse, teamsResponse, fixturesResponse, groupStageResultsResponse, knockoutResponse] = await Promise.all([
             fetch(`${basePath}/groups.json`),
             fetch(`${basePath}/teams.json`),
             fetch(`${basePath}/fixtures.json`),
             fetch(`${basePath}/group-stage-results.json`),
             fetch(`${basePath}/knockout-stage-results.json`)
         ]);
-        
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
         fixtures = await fixturesResponse.json();
-        results = await groupPhaseResultsResponse.json();
-        // goals.json is deprecated; all goal data comes from group-stage-results.json
+        results = await groupStageResultsResponse.json();
         knockoutResults = await knockoutResponse.json();
-        
-        // Set default group based on config.json
-        selectedGroupId = defaults.defaultGroup || (groups.length > 0 ? groups[0].id : null);
-        
+        // Set default group based on tournamentSettings
+        selectedGroupId = tournamentSettings?.defaultGroup || (groups.length > 0 ? groups[0].id : null);
         logger.log('Data loaded successfully');
-        
-        // Apply tab visibility settings
         applyTabVisibilitySettings();
-        
         populateGroupSelector();
         updateTeamSelectorForGroup();
         updateAllTabs();
-        
-        // Initialize knockout dates
-        initializeKnockoutDates();
-        
-        // Load team player data for Teams tab
-        await loadPlayersData();
-        
-        // Initialize theme based on config
-        initializeTheme();
-        
-        // Initialize dark mode after config is loaded
-        initializeDarkMode();
+        initializeKnockoutDates?.();
+        await loadPlayersData?.();
+        initializeTheme?.();
+        initializeDarkMode?.();
     } catch (error) {
         logger.error('Error loading data:', error);
     }
@@ -2032,23 +2041,23 @@ function updateOverview() {
                     // Find the result of the match between these two teams
                     let headToHeadPoints = 0;
                     let foundHeadToHeadMatch = false;
-                    results.forEach(result => {
+                    results.forEach(async result => {
                         if (
                             ((result.homeTeam === team.id && result.awayTeam === otherTeam.id) ||
                             (result.homeTeam === otherTeam.id && result.awayTeam === team.id)) &&
                             result.played
                         ) {
-                            foundHeadToHeadMatch = true;
-                            if (result.homeTeam === team.id) {
-                                if (result.homeScore > result.awayScore) headToHeadPoints += 3;
-                                else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
-                                // If homeScore < awayScore, headToHeadPoints remains 0 (loss)
-                            } else if (result.awayTeam === team.id) {
-                                if (result.awayScore > result.homeScore) headToHeadPoints += 3;
-                                else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
-                                // If awayScore < homeScore, headToHeadPoints remains 0 (loss)
-                            }
-                        }
+                            const response = await fetch('data/app-settings.json');
+                            if (!response.ok) throw new Error('Failed to load app-settings.json');
+                            appSettings = await response.json();
+                            
+                            // Apply openAI settings to OPENAI_CONFIG (except apiKey)
+                            applyOpenAISettingsFromAppSettings(appSettings);
+                            
+                            if (result.awayScore > result.homeScore) headToHeadPoints += 3;
+                            else if (result.homeScore === result.awayScore) headToHeadPoints += 1;
+                            // If awayScore < homeScore, headToHeadPoints remains 0 (loss)
+                          }
                     });
                     // Only show TB3 value if a head-to-head match was found between the tied teams
                     if (foundHeadToHeadMatch) {
@@ -2389,15 +2398,15 @@ function createMatchElement(match, showGroupIndicator) {
         `<span class="fixture-group-indicator">${group.name}</span>` : '';
     
     // Admin add result button (only for today's matches without results)
-    const addResultButton = (!result && config?.admin?.role === 'admin') ? 
+    const addResultButton = (!result && appSettings?.admin?.role === 'admin') ? 
         `<button class="add-result-btn" onclick="showAddResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}')">+</button>` : '';
     
     // Edit result button (only for today's matches with results, until midnight)
-    const editResultButton = (result && isToday && config?.admin?.role === 'admin') ? 
+    const editResultButton = (result && isToday && appSettings?.admin?.role === 'admin') ? 
         `<button class="edit-result-btn" onclick="showEditResultModal('${match.id}', '${homeTeam.name}', '${awayTeam.name}', '${match.date}', '${match.time}', ${result.homeScore}, ${result.awayScore})">Edit</button>` : '';
     
-    // Get venue information from config
-    const venueInfo = config?.groupPhase?.venues?.[match.groupId];
+    // Get venue information from tournamentSettings
+    const venueInfo = tournamentSettings?.groupStage?.venues?.[match.groupId];
     const venueLink = venueInfo ? 
         `<a href="${venueInfo.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-link" title="${venueInfo.name}">
             <span class="venue-icon">📍</span>
@@ -2447,14 +2456,14 @@ async function updateSimulation() {
     try {
         // Debug logging for OpenAI configuration
         logger.log('🔍 OpenAI Debug Info:', {
-            useOpenAI: config?.simulation?.useOpenAI || false,
+            useOpenAI: tournamentSettings?.simulation?.useOpenAI || false,
             openaiClientExists: !!OPENAI_CONFIG.apiKey,
             apiKeyExists: !!OPENAI_CONFIG.apiKey,
             apiKeyPrefix: OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none'
         });
         
         // Check if OpenRouter is enabled and configured
-        if (config?.simulation?.useOpenAI && OPENAI_CONFIG.apiKey) {
+        if (tournamentSettings?.simulation?.useOpenAI && OPENAI_CONFIG.apiKey) {
             logger.log('✅ Using OpenRouter for simulation analysis');
             try {
                 const aiAnalysis = await generateAISimulation(selectedTeamId, selectedTeam);
@@ -2476,12 +2485,12 @@ async function updateSimulation() {
             }
         } else {
             // Use custom championship analysis
-            const reason = !config?.simulation?.useOpenAI ? 'OpenAI disabled' : 
+            const reason = !tournamentSettings?.simulation?.useOpenAI ? 'OpenAI disabled' : 
                           !OPENAI_CONFIG.apiKey ? 'OpenRouter client not initialized' : 
                           !OPENAI_CONFIG.apiKey ? 'No API key available' : 'Unknown';
                           
             logger.log('⚠️ Using fallback analysis because:', {
-                useOpenAI: config?.simulation?.useOpenAI,
+                useOpenAI: tournamentSettings?.simulation?.useOpenAI,
                 openaiClient: !!OPENAI_CONFIG.apiKey,
                 hasApiKey: !!OPENAI_CONFIG.apiKey,
                 reason: reason
@@ -2544,7 +2553,7 @@ function generateAPIKeyPrompt() {
         <div class="api-key-prompt">
             <div class="simulation-header">🔑 OpenAI Configuration</div>
             <div class="simulation-content">
-                <p><strong>Option 1:</strong> Create a <code>config.json</code> file:</p>
+                <p><strong>Option 1:</strong> Create a <code>app-config.json</code> file:</p>
                 <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace;">{"OPENAI_API_KEY": "your-api-key-here"}</pre>
                 
                 <p style="margin-top: 15px;"><strong>Option 2:</strong> Add to <code>.env</code> file (may not work in all servers):</p>
@@ -3030,7 +3039,7 @@ function generateCustomSimulation(teamId, team) {
     const remainingMatches = getRemainingMatches(teamId);
     
     // Get teams within points gap
-    const relevantTeams = getTeamsWithinGap(currentStandings, teamId, config?.simulation?.pointsGapLimit || 3);
+    const relevantTeams = getTeamsWithinGap(currentStandings, teamId, tournamentSettings?.simulation?.pointsGapLimit || 3);
     
     // Calculate all possible scenarios
     const scenarios = calculateAdvancedScenarios(teamId, currentStandings, relevantTeams);
@@ -3067,7 +3076,7 @@ function generateCustomSimulation(teamId, team) {
                 </div>
                 
                 <div class="relevant-teams">
-                    <h4>Teams Within ${config?.simulation?.pointsGapLimit || 3}-Point Gap (Next Gameweek Focus)</h4>
+                    <h4>Teams Within ${tournamentSettings?.simulation?.pointsGapLimit || 3}-Point Gap (Next Gameweek Focus)</h4>
                     <div class="teams-list">
                         ${relevantTeams.map(team => {
                             const nextGameweek = findNextGameweek();
@@ -3117,7 +3126,7 @@ function generateCustomSimulation(teamId, team) {
             <div class="simulation-content">
                 <div class="strategic-summary">
                     <p><strong>Next Gameweek Focus:</strong> Immediate impact scenarios only</p>
-                    <p><strong>Teams in Analysis:</strong> ${relevantTeams.length - 1} competitors within ${config?.simulation?.pointsGapLimit || 3}-point gap</p>
+                    <p><strong>Teams in Analysis:</strong> ${relevantTeams.length - 1} competitors within ${tournamentSettings?.simulation?.pointsGapLimit || 3}-point gap</p>
                     <p><strong>Scenarios for Next Round:</strong> ${scenarios.length} possible outcomes</p>
                     <p><strong>Analysis Type:</strong> Win/Draw/Loss impact on position</p>
                 </div>
@@ -5303,7 +5312,7 @@ function findMatchById(matchId) {
 }
 
 function validateMatchTime(matchDate, matchTime) {
-    if (!config?.admin?.validateTime) {
+    if (!appSettings?.admin?.validateTime) {
         return true; // Skip validation if disabled
     }
     
@@ -5417,22 +5426,22 @@ window.onclick = function(event) {
 
 // Function to enable admin mode (for testing)
 function enableAdminMode() {
-    config.admin.role = 'admin';
+    appSettings.admin.role = 'admin';
     updateAllTabs(); // Refresh to show admin buttons
     showToast('Admin mode enabled', 'success');
 }
 
 // Function to disable admin mode
 function disableAdminMode() {
-    config.admin.role = 'user';
+    appSettings.admin.role = 'user';
     updateAllTabs(); // Refresh to hide admin buttons
     showToast('Admin mode disabled', 'info');
 }
 
 // Function to toggle time validation
 function toggleTimeValidation() {
-    config.admin.validateTime = !config.admin.validateTime;
-    const status = config.admin.validateTime ? 'enabled' : 'disabled';
+    appSettings.admin.validateTime = !appSettings.admin.validateTime;
+    const status = appSettings.admin.validateTime ? 'enabled' : 'disabled';
     showToast(`Time validation ${status}`, 'info');
 }
 
@@ -5542,7 +5551,7 @@ window.footballAdmin = {
         logger.log('OpenAI Configuration:', {
             clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
-            useOpenAI: config?.simulation?.useOpenAI || false,
+            useOpenAI: tournamentSettings?.simulation?.useOpenAI || false,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts,
@@ -5554,7 +5563,7 @@ window.footballAdmin = {
             OPENAI_CONFIG: {
                 client: !!OPENAI_CONFIG.apiKey, 
                 apiKey: !!OPENAI_CONFIG.apiKey, 
-                enabled: config?.simulation?.useOpenAI || false,
+                enabled: tournamentSettings?.simulation?.useOpenAI || false,
                 model: OPENAI_CONFIG.model,
                 maxTokens: OPENAI_CONFIG.maxTokens
             },
@@ -5571,9 +5580,9 @@ window.footballAdmin = {
     },
     // OpenAI controls
     enableOpenAI: () => {
-        const wasEnabled = config?.simulation?.useOpenAI;
-        if (config?.simulation) {
-            config.simulation.useOpenAI = true;
+        const wasEnabled = tournamentSettings?.simulation?.useOpenAI;
+        if (tournamentSettings?.simulation) {
+            tournamentSettings.simulation.useOpenAI = true;
         }
         
         if (!wasEnabled) {
@@ -5585,21 +5594,21 @@ window.footballAdmin = {
         logger.log('OpenAI enabled for this session');
     },
     disableOpenAI: () => {
-        if (config?.simulation) {
-            config.simulation.useOpenAI = false;
+        if (tournamentSettings?.simulation) {
+            tournamentSettings.simulation.useOpenAI = false;
         }
         showToast('OpenAI analysis disabled - Using standard analysis', 'info', 3000);
         logger.log('OpenAI disabled for this session');
     },
     checkOpenAI: () => {
         const status = {
-            enabled: config?.simulation?.useOpenAI || false,
+            enabled: tournamentSettings?.simulation?.useOpenAI || false,
             clientInitialized: !!OPENAI_CONFIG.apiKey,
             apiKeyLoaded: !!OPENAI_CONFIG.apiKey,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts,
-            readyForUse: (config?.simulation?.useOpenAI || false) && !!OPENAI_CONFIG.apiKey
+            readyForUse: (tournamentSettings?.simulation?.useOpenAI || false) && !!OPENAI_CONFIG.apiKey
         };
         logger.log('🤖 OpenAI Status:', status);
         
@@ -5657,8 +5666,8 @@ window.footballAdmin = {
         localStorage.removeItem('openai_config');
         sessionStorage.removeItem('openai_session_key');
         // Reset to config defaults
-        if (config?.simulation) {
-            config.simulation.useOpenAI = false; // Back to default from config.json
+        if (tournamentSettings?.simulation) {
+            tournamentSettings.simulation.useOpenAI = false; // Back to default from config.json
         }
         OPENAI_CONFIG.maxTokens = 500;
         OPENAI_CONFIG.retryAttempts = 3;
@@ -5693,7 +5702,7 @@ window.footballAdmin = {
     debugOpenAI: () => {
         logger.log('🔍 Complete OpenAI Debug Report:');
         logger.log('window.fetch available:', !!window.fetch);
-        logger.log('config.simulation.useOpenAI:', config?.simulation?.useOpenAI, '(from config.json)');
+        logger.log('config.simulation.useOpenAI:', tournamentSettings?.simulation?.useOpenAI, '(from config.json)');
         logger.log('openai client exists:', !!openai);
         logger.log('OPENAI_CONFIG.apiKey exists:', !!OPENAI_CONFIG.apiKey);
         logger.log('API Key prefix:', OPENAI_CONFIG.apiKey ? OPENAI_CONFIG.apiKey.substring(0, 12) + '...' : 'none');
@@ -5707,19 +5716,19 @@ window.footballAdmin = {
         }
         
         logger.log('Current Configuration (from config.json):', {
-            useOpenAI: config?.simulation?.useOpenAI || false,
+            useOpenAI: tournamentSettings?.simulation?.useOpenAI || false,
             model: OPENAI_CONFIG.model,
             maxTokens: OPENAI_CONFIG.maxTokens,
             retryAttempts: OPENAI_CONFIG.retryAttempts
         });
         
-        const isReady = (config?.simulation?.useOpenAI || false) && !!openai && !!OPENAI_CONFIG.apiKey;
+        const isReady = (tournamentSettings?.simulation?.useOpenAI || false) && !!openai && !!OPENAI_CONFIG.apiKey;
         logger.log('🎯 OpenAI Ready:', isReady);
         
         if (!isReady) {
             logger.log('❌ Issues preventing OpenAI from working:');
             if (!window.fetch) logger.log('  - Fetch API not available');
-            if (!(config?.simulation?.useOpenAI)) logger.log('  - OpenAI disabled in config');
+            if (!(tournamentSettings?.simulation?.useOpenAI)) logger.log('  - OpenAI disabled in config');
             if (!openai) logger.log('  - OpenAI client not initialized');
             if (!OPENAI_CONFIG.apiKey) logger.log('  - No API key available');
         }
@@ -5729,7 +5738,7 @@ window.footballAdmin = {
             sdkLoaded: !!window.fetch,
             clientInitialized: !!openai,
             hasApiKey: !!OPENAI_CONFIG.apiKey,
-            enabled: config?.simulation?.useOpenAI || false
+            enabled: tournamentSettings?.simulation?.useOpenAI || false
         };
     },
     clearConfig: () => {
@@ -7737,7 +7746,7 @@ function getGroupWinner(groupId) {
 // Get team for knockout stage (winner or replacement if cancelled)
 function getKnockoutTeam(groupId) {
     // Check if this group's winner has cancelled
-    const cancellations = config?.knockout?.cancellations || [];
+    const cancellations = tournamentSettings?.knockout?.cancellations || [];
     const isCancelled = cancellations.includes(groupId);
     
     // Save current group selection
@@ -7978,16 +7987,16 @@ function updateKnockoutStage() {
         updateKnockoutMatch('third', semi1Loser, semi2Loser);
     }
     
-    // Update tournament top scorers (group phase + knockout)
+    // Update tournament top scorers (group stage + knockout)
     updateTournamentTopScorers();
 }
 
-// Calculate and display tournament top scorers (group phase + knockout combined)
+// Calculate and display tournament top scorers (group stage + knockout combined)
 function updateTournamentTopScorers() {
     const content = document.getElementById('knockout-topscorers-content');
     if (!content) return;
     
-    // Get all group phase goals
+    // Get all group stage goals
     let allGoals = [];
     groups.forEach(group => {
         const groupGoals = getGoalsForGroup(group.id);
@@ -8000,7 +8009,7 @@ function updateTournamentTopScorers() {
     // Create map to aggregate goals by player
     const playersMap = new Map();
     
-    // Add group phase goals
+    // Add group stage goals
     allGoals.forEach(goal => {
         const goalCount = goal.totalGoals || 1;
         const playerId = goal.playerId;
@@ -8123,7 +8132,7 @@ function updateKnockoutDisclaimer() {
         disclaimerElement.className = 'knockout-disclaimer success';
         disclaimerElement.innerHTML = `
             <strong>✅ Group Stage Complete!</strong><br>
-            All group matches have been completed and qualification period has ended. Ready for knockout phase!
+            All group matches have been completed and qualification period has ended. Ready for knockout stage!
         `;
         disclaimerElement.style.display = 'block';
         
@@ -8153,7 +8162,7 @@ function updateKnockoutDisclaimer() {
         disclaimerElement.className = 'knockout-disclaimer warning';
         disclaimerElement.innerHTML = `
             <strong>⚠️ Group Stage In Progress...</strong><br>
-            Group stage matches are still ongoing. Knockout phase will begin once all groups are completed.
+            Group stage matches are still ongoing. Knockout stage will begin once all groups are completed.
         `;
         disclaimerElement.style.display = 'block';
         
@@ -8163,7 +8172,7 @@ function updateKnockoutDisclaimer() {
 
 function updateKnockoutMatch(matchId, homeTeam, awayTeam) {
     const matchResult = knockoutResults[matchId];
-    const isAdmin = config?.admin?.role === 'admin';
+    const isAdmin = appSettings?.admin?.role === 'admin';
     
     // Update match teams if they're not set in the result
     if (homeTeam && awayTeam && (!matchResult.homeTeam || !matchResult.awayTeam)) {
@@ -8799,7 +8808,7 @@ function toggleDarkMode() {
 // Initialize theme from config
 function initializeTheme() {
     // Check if theme is defined in config
-    const theme = config?.theme;
+    const theme = tournamentSettings?.theme;
     
     // Default to CTW (blue) if no theme is specified
     if (!theme || theme === '') {
@@ -8827,7 +8836,7 @@ function initializeDarkMode() {
     const darkModeToggle = document.getElementById('dark-mode-toggle');
     
     // Check if dark mode is enabled in config
-    if (!config?.ui?.enableDarkMode) {
+    if (!appSettings?.ui?.enableDarkMode) {
         if (darkModeToggle) {
             darkModeToggle.style.display = 'none';
         }
@@ -8846,9 +8855,9 @@ function initializeDarkMode() {
 
 // Update knockout stage venue information
 function updateKnockoutVenues() {
-    if (!config?.knockout?.venue) return;
+    if (!tournamentSettings?.knockout?.venue) return;
     
-    const venueInfo = config.knockout.venue;
+    const venueInfo = tournamentSettings.knockout.venue;
     const venueHTML = `<a href="${venueInfo.googleMapsUrl}" target="_blank" rel="noopener noreferrer" class="venue-link" title="${venueInfo.name}"><span class="venue-icon">📍</span>${venueInfo.name}</a>`;
     
     // Update all knockout match venues (they all share the same venue)
@@ -8864,9 +8873,9 @@ function updateKnockoutVenues() {
 
 // Update knockout match times and group labels
 function updateKnockoutMatchTimesAndLabels() {
-    if (!config?.knockout?.matches) return;
+    if (!tournamentSettings?.knockout?.matches) return;
     
-    const matches = config.knockout.matches;
+    const matches = tournamentSettings.knockout.matches;
     
     // Update Semi-Final 1
     if (matches.semi1) {

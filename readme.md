@@ -159,3 +159,6 @@ The simulator provides detailed analysis including:
 ---
 
 *This simulator combines mathematical precision with intuitive design to provide the most comprehensive football league analysis tool available.*
+
+## AI Features
+* View more models here: https://openrouter.ai/

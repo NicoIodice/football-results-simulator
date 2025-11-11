@@ -1,10 +1,11 @@
-- Fazer o fix do green field para as formations
+- Fix formations green field and players move action
 - Finalize settings page
 - Separate code
 - Clean code
 - Add pages folder for different urls and url links (/teams, /forecast, etc)
 - Add admin dashboard (settings and dark/light-mode toggle)
-  - setup tournaments configurations, etc
+  - Setup tournaments configurations, etc
+  - On dashboard, when selecting one tournament, all the configs should read from the correct data folder
 - Add login page with encrypted credentials (index.html)
  - redirect to landing page > dashboard with current tournaments the player is subscripted
 - Divide Teams tab into sub-tabs (team, formation, etc)
@@ -13,9 +14,9 @@
 - Merge Forecast and Simulator tab
 - Add gameweek date on fixtures (consistency across all fixtures and group fixtures)
 - Add loading mask on app start while loading data (validate if needed)
-- Add on config the name of the tournament and read it to print on header (Critical...)
 - Load files from dropbox files
  - Add api token environment variable
-- Change repo name, etc (Critical Cup app?)
+- Change repo name
+  - Add on tournament-settings.json the name of the tournament and read it to print on header (Critical...)
 - Add playwright tests
 - Add testId

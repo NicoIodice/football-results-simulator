@@ -1,0 +1,20 @@
+{
+  "ui": {
+    "showLoadingMask": true,
+    "enableDebugMode": false,
+    "enableDarkMode": true
+  },
+  "admin": {
+    "role": "admin",
+    "validateTime": true
+  },
+  "openAI": {
+    "baseURL": "https://openrouter.ai/api/v1",
+    "model": "openai/gpt-4o",
+    "maxTokens": 500,
+    "temperature": 0.7,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "timeoutMs": 30000
+  }
+}
