@@ -14,3 +14,6 @@
 - Load files from dropbox files
  - Add api token environment variable
 - Add playwright tests
+
+- Separate loading methods to new js file
+  - Add loading type array (local, dropbox, db, etc)
