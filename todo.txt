@@ -9,7 +9,6 @@
 - Add login page with encrypted credentials (index.html)
  - redirect to landing page > dashboard with current tournaments the player is subscripted
 - Merge Forecast and Simulator tab
-- Add gameweek date on fixtures (consistency across all fixtures and group fixtures)
 - Add loading mask on app start while loading data (validate if needed)
 - Load files from dropbox files
  - Add api token environment variable
