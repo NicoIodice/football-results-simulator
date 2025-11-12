@@ -6990,7 +6990,7 @@ body.dark-mode .team-box.winner:hover {
     flex-direction: column;
 }
 
-.stat-value {
+.teams-stat-value {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1;
@@ -6998,7 +6998,7 @@ body.dark-mode .team-box.winner:hover {
     color: white;
 }
 
-.stat-label {
+.teams-stat-label {
     font-size: 1.2rem;
     opacity: 0.9;
     color: white;

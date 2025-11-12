@@ -392,22 +392,22 @@
                         <div class="stat-card" data-testid="stat-card-teams">
                             <div class="stat-icon">🏆</div>
                             <div class="stat-content">
-                                <div class="stat-value" id="total-teams">0</div>
-                                <div class="stat-label">Teams</div>
+                                <div class="teams-stat-value" id="total-teams">0</div>
+                                <div class="teams-stat-label">Teams</div>
                             </div>
                         </div>
                         <div class="stat-card" data-testid="stat-card-athletes">
                             <div class="stat-icon">👥</div>
                             <div class="stat-content">
-                                <div class="stat-value" id="total-athletes">0</div>
-                                <div class="stat-label">Athletes</div>
+                                <div class="teams-stat-value" id="total-athletes">0</div>
+                                <div class="teams-stat-label">Athletes</div>
                             </div>
                         </div>
                         <div class="stat-card" data-testid="stat-card-associations">
                             <div class="stat-icon">🤝</div>
                             <div class="stat-content">
-                                <div class="stat-value" id="total-associations">0</div>
-                                <div class="stat-label">Associations</div>
+                                <div class="teams-stat-value" id="total-associations">0</div>
+                                <div class="teams-stat-label">Associations</div>
                             </div>
                         </div>
                     </div>
@@ -438,64 +438,65 @@
                     
                     <div id="team-lineup-content">
                         <div class="football-field">
-                        <!-- Goalkeeper Area -->
-                        <div class="goalkeeper-area">
-                            <div class="goal">
-                                <div class="goalkeeper-position">
-                                    <div id="goalkeeper" class="player-icon goalkeeper">
-                                        <span class="player-number">1</span>
+                            <!-- Goalkeeper Area -->
+                            <div class="goalkeeper-area">
+                                <div class="goal">
+                                    <div class="goalkeeper-position">
+                                        <div id="goalkeeper" class="player-icon goalkeeper">
+                                            <span class="player-number">1</span>
+                                        </div>
+                                        <div id="goalkeeper-name" class="player-name">Goalkeeper</div>
                                     </div>
-                                    <div id="goalkeeper-name" class="player-name">Goalkeeper</div>
                                 </div>
                             </div>
-                        </div>
                         
-                        <!-- Field Players Area -->
-                        <div class="field-players">
-                            <div class="formation-line defense" data-line="defense">
-                                <div class="line-slot" data-slot="1"></div>
-                                <div class="line-slot" data-slot="2"></div>
-                                <div class="line-slot" data-slot="3"></div>
-                                <div class="line-slot" data-slot="4"></div>
-                                <div class="line-slot" data-slot="5"></div>
-                            </div>
+                            <!-- Field Players Area -->
+                            <div class="field-players">
+                                <div class="formation-line defense" data-line="defense">
+                                    <div class="line-slot" data-slot="1"></div>
+                                    <div class="line-slot" data-slot="2"></div>
+                                    <div class="line-slot" data-slot="3"></div>
+                                    <div class="line-slot" data-slot="4"></div>
+                                    <div class="line-slot" data-slot="5"></div>
+                                </div>
 
-                            <div class="formation-line midfield" data-line="midfield">
-                                <div class="line-slot" data-slot="1"></div>
-                                <div class="line-slot" data-slot="2"></div>
-                                <div class="line-slot" data-slot="3"></div>
-                                <div class="line-slot" data-slot="4"></div>
-                                <div class="line-slot" data-slot="5"></div>
-                            </div>
+                                <div class="formation-line midfield" data-line="midfield">
+                                    <div class="line-slot" data-slot="1"></div>
+                                    <div class="line-slot" data-slot="2"></div>
+                                    <div class="line-slot" data-slot="3"></div>
+                                    <div class="line-slot" data-slot="4"></div>
+                                    <div class="line-slot" data-slot="5"></div>
+                                </div>
 
-                            <div class="formation-line attack" data-line="attack">
-                                <div class="line-slot" data-slot="1"></div>
-                                <div class="line-slot" data-slot="2"></div>
-                                <div class="line-slot" data-slot="3"></div>
-                                <div class="line-slot" data-slot="4"></div>
-                                <div class="line-slot" data-slot="5"></div>
+                                <div class="formation-line attack" data-line="attack">
+                                    <div class="line-slot" data-slot="1"></div>
+                                    <div class="line-slot" data-slot="2"></div>
+                                    <div class="line-slot" data-slot="3"></div>
+                                    <div class="line-slot" data-slot="4"></div>
+                                    <div class="line-slot" data-slot="5"></div>
+                                </div>
+                            </div>
+                        
+                            <!-- Center Circle -->
+                            <div class="center-circle"></div>
+                        
+                            <!-- Field Lines -->
+                            <div class="field-lines">
+                                <div class="enemy-goal-area"></div>
+                                <div class="penalty-spot enemy-penalty"></div>
+                                <div class="enemy-penalty-arc"></div>
+                                <div class="penalty-area"></div>
+                                <div class="penalty-spot player-penalty"></div>
+                                <div class="goal-area"></div>
                             </div>
                         </div>
-                        
-                        <!-- Center Circle -->
-                        <div class="center-circle"></div>
-                        
-                        <!-- Field Lines -->
-                        <div class="field-lines">
-                            <div class="enemy-goal-area"></div>
-                            <div class="penalty-spot enemy-penalty"></div>
-                            <div class="enemy-penalty-arc"></div>
-                            <div class="penalty-area"></div>
-                            <div class="penalty-spot player-penalty"></div>
-                            <div class="goal-area"></div>
-                        </div>
-                    </div>
                     
-                    <!-- Bench Area -->
-                    <div class="bench-area">
-                        <h3>🪑 Bench</h3>
-                        <div id="bench-players" class="bench-players">
-                            <!-- Bench players will be populated by JavaScript -->
+                        <!-- Bench Area -->
+                        <div class="bench-area">
+                            <h3>🪑 Bench</h3>
+                            <div id="bench-players" class="bench-players">
+                                <!-- Bench players will be populated by JavaScript -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -534,6 +535,28 @@
                 </div>
             </div>
 
+            <!-- Forecast Tab -->
+            <div id="forecast" class="tab-content" data-testid="tab-forecast-content">
+                <h2>🔮 Championship Forecast & Predictions</h2>
+                <div class="forecast-description">
+                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
+                </div>
+                
+                <!-- Forecast Controls -->
+                <div class="forecast-controls" data-testid="forecast-controls">
+                    <div class="group-selector" data-testid="group-selector-forecast">
+                        <label for="forecast-group-select" data-testid="forecast-group-select-label">Group:</label>
+                        <select id="forecast-group-select" data-testid="selected-group-forecast" onchange="updateForecastForGroup()">
+                            <!-- Groups will be populated by JavaScript -->
+                        </select>
+                    </div>
+                </div>
+                
+                <div id="forecast-content">
+                    <!-- Forecast content will be populated by JavaScript -->
+                </div>
+            </div>
+
             <!-- Simulator Tab -->
             <div id="simulator" class="tab-content" data-testid="tab-simulator-content">
                 <h2>Championship Simulator</h2>
@@ -565,28 +588,6 @@
                     <div id="knockout-simulation-content">
                         <!-- Knockout simulation content will be populated by JavaScript -->
                     </div>
-                </div>
-            </div>
-
-            <!-- Forecast Tab -->
-            <div id="forecast" class="tab-content" data-testid="tab-forecast-content">
-                <h2>🔮 Championship Forecast & Predictions</h2>
-                <div class="forecast-description">
-                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
-                </div>
-                
-                <!-- Forecast Controls -->
-                <div class="forecast-controls" data-testid="forecast-controls">
-                    <div class="group-selector" data-testid="group-selector-forecast">
-                        <label for="forecast-group-select" data-testid="forecast-group-select-label">Group:</label>
-                        <select id="forecast-group-select" data-testid="selected-group-forecast" onchange="updateForecastForGroup()">
-                            <!-- Groups will be populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="forecast-content">
-                    <!-- Forecast content will be populated by JavaScript -->
                 </div>
             </div>
 

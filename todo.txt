@@ -14,3 +14,7 @@
 - Load files from dropbox files
  - Add api token environment variable
 - Add playwright tests
+
+- Why blue theme is displayed first in a blink before applying red (current) template
+- Update team members
+- Different emoji on teams card

@@ -2186,11 +2186,12 @@ function populateFixturesGroupSelector() {
     
     groupSelect.innerHTML = '';
     
-    groups.forEach(group => {
+    groups.forEach((group, index) => {
         const option = document.createElement('option');
         option.value = group.id;
         option.textContent = `${group.name} - ${group.description}`;
-        if (group.id === selectedGroupId) {
+        // Select the current group or default to first group
+        if (group.id === selectedGroupId || (!selectedGroupId && index === 0)) {
             option.selected = true;
         }
         groupSelect.appendChild(option);
@@ -2284,11 +2285,18 @@ function renderFixtures() {
     const showAllCheckbox = document.getElementById('show-all-fixtures');
     const groupSelect = document.getElementById('fixtures-group-select');
     
+    logger.log('renderFixtures - fixturesContent exists:', !!fixturesContent);
+    logger.log('renderFixtures - fixtures array:', fixtures);
+    logger.log('renderFixtures - groups array:', groups);
+    logger.log('renderFixtures - showAllCheckbox:', showAllCheckbox?.checked);
+    logger.log('renderFixtures - groupSelect value:', groupSelect?.value);
+    
     fixturesContent.innerHTML = '';
     
     let fixturesToShow = [];
     
     if (showAllCheckbox && showAllCheckbox.checked) {
+        logger.log('renderFixtures - BRANCH: Show all fixtures');
         // Show all fixtures ordered by date
         fixtures.forEach(gameweek => {
             gameweek.matches.forEach(match => {
@@ -2317,9 +2325,30 @@ function renderFixtures() {
         });
         
     } else {
+        logger.log('renderFixtures - BRANCH: Show group-specific fixtures');
         // Show fixtures for selected group only
-        const selectedGroupId = groupSelect ? groupSelect.value : this.selectedGroupId;
-        const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === selectedGroupId);
+        const selectedGroup = groupSelect && groupSelect.value ? groupSelect.value : selectedGroupId;
+        
+        // If no group is selected, use the first group as fallback
+        const groupToShow = selectedGroup || (groups.length > 0 ? groups[0].id : null);
+        
+        logger.log('renderFixtures - selectedGroup:', selectedGroup);
+        logger.log('renderFixtures - groupToShow:', groupToShow);
+        
+        if (!groupToShow) {
+            fixturesContent.innerHTML = '<p>No groups available</p>';
+            return;
+        }
+        
+        const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === groupToShow);
+        
+        logger.log('renderFixtures - groupFixtures found:', groupFixtures.length);
+        logger.log('renderFixtures - groupFixtures:', groupFixtures);
+        
+        if (groupFixtures.length === 0) {
+            fixturesContent.innerHTML = '<p>No fixtures available for this group</p>';
+            return;
+        }
         
         groupFixtures.forEach(gameweek => {
             renderGameweekSection(gameweek, false);
@@ -2364,6 +2393,8 @@ function renderDateSection(date, matches, showGroupIndicator) {
 function renderGameweekSection(gameweek, showGroupIndicator) {
     const fixturesContent = document.getElementById('fixtures-content');
     
+    logger.log('renderGameweekSection - gameweek:', gameweek.gameweek, 'matches:', gameweek.matches.length);
+    
     const gameweekDiv = document.createElement('div');
     gameweekDiv.className = 'gameweek-section';
     
@@ -2374,19 +2405,24 @@ function renderGameweekSection(gameweek, showGroupIndicator) {
     const matchesDiv = document.createElement('div');
     matchesDiv.className = 'gameweek-matches';
     
-    gameweek.matches.forEach(match => {
+    gameweek.matches.forEach((match, index) => {
+        logger.log(`Processing match ${index + 1}/${gameweek.matches.length}:`, match);
         const matchWithGameweek = {
             ...match,
             gameweek: gameweek.gameweek,
             groupId: gameweek.groupId
         };
         const matchDiv = createMatchElement(matchWithGameweek, showGroupIndicator);
+        logger.log(`Match element created:`, matchDiv);
         matchesDiv.appendChild(matchDiv);
     });
     
     gameweekDiv.appendChild(headerDiv);
     gameweekDiv.appendChild(matchesDiv);
     fixturesContent.appendChild(gameweekDiv);
+    
+    logger.log('renderGameweekSection - appended gameweekDiv to fixturesContent');
+    logger.log('fixturesContent.children.length:', fixturesContent.children.length);
 }
 
 // Create a match element
@@ -2395,6 +2431,19 @@ function createMatchElement(match, showGroupIndicator) {
     const awayTeam = teams.find(t => t.id === match.awayTeam);
     const result = results.find(r => r.matchId === match.id && r.played);
     const group = groups.find(g => g.id === match.groupId);
+    
+    // Debug logging
+    if (!homeTeam || !awayTeam) {
+        logger.error('createMatchElement - Missing team data:', {
+            matchId: match.id,
+            homeTeamId: match.homeTeam,
+            awayTeamId: match.awayTeam,
+            homeTeamFound: !!homeTeam,
+            awayTeamFound: !!awayTeam,
+            allTeamsCount: teams.length
+        });
+        return document.createElement('div'); // Return empty div if teams not found
+    }
     
     const matchDiv = document.createElement('div');
     matchDiv.className = 'match-item';
