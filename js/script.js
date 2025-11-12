@@ -2294,65 +2294,109 @@ function renderFixtures() {
     
     fixturesContent.innerHTML = '';
     
-    let fixturesToShow = [];
-    
+    // Get total gameweeks from tournamentSettings if available
+    const totalGameweeks = tournamentSettings?.groupStage?.gameWeeks || fixtures.length;
     if (showAllCheckbox && showAllCheckbox.checked) {
-        logger.log('renderFixtures - BRANCH: Show all fixtures');
-        // Show all fixtures ordered by date
+        logger.log('renderFixtures - BRANCH: Show all fixtures (merged by gameweek)');
+        // Flatten all matches with their gameweek and group info
+        const allMatches = [];
         fixtures.forEach(gameweek => {
             gameweek.matches.forEach(match => {
-                fixturesToShow.push({
+                allMatches.push({
                     ...match,
                     gameweek: gameweek.gameweek,
                     groupId: gameweek.groupId
                 });
             });
         });
-        
-        // Sort by date
-        fixturesToShow.sort((a, b) => new Date(a.date) - new Date(b.date));
-        
-        // Group by date for display
-        const matchesByDate = {};
-        fixturesToShow.forEach(match => {
-            if (!matchesByDate[match.date]) {
-                matchesByDate[match.date] = [];
-            }
-            matchesByDate[match.date].push(match);
+        // Group all matches by gameweek (across all groups)
+        const gameweekMap = {};
+        allMatches.forEach(match => {
+            if (!gameweekMap[match.gameweek]) gameweekMap[match.gameweek] = [];
+            gameweekMap[match.gameweek].push(match);
         });
-        
-        Object.keys(matchesByDate).forEach(date => {
-            renderDateSection(date, matchesByDate[date], true);
+        const sortedGameweeks = Object.keys(gameweekMap).map(Number).sort((a, b) => a - b);
+        sortedGameweeks.forEach(gw => {
+            // Gameweek banner (only once per week)
+            const gwHeader = document.createElement('div');
+            gwHeader.className = 'gameweek-header';
+            gwHeader.textContent = `Gameweek ${gw} of ${totalGameweeks}`;
+            fixturesContent.appendChild(gwHeader);
+
+            // Group all matches in this gameweek by date (across all groups)
+            const dateMap = {};
+            gameweekMap[gw].forEach(match => {
+                if (!dateMap[match.date]) dateMap[match.date] = [];
+                dateMap[match.date].push(match);
+            });
+            const sortedDates = Object.keys(dateMap).sort();
+            sortedDates.forEach(date => {
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'fixture-date-banner';
+                dateHeader.textContent = formattedDate;
+                fixturesContent.appendChild(dateHeader);
+                const matchesDiv = document.createElement('div');
+                matchesDiv.className = 'gameweek-matches';
+                dateMap[date].forEach(match => {
+                    const matchDiv = createMatchElement(match, true);
+                    matchesDiv.appendChild(matchDiv);
+                });
+                fixturesContent.appendChild(matchesDiv);
+            });
         });
-        
     } else {
         logger.log('renderFixtures - BRANCH: Show group-specific fixtures');
-        // Show fixtures for selected group only
         const selectedGroup = groupSelect && groupSelect.value ? groupSelect.value : selectedGroupId;
-        
-        // If no group is selected, use the first group as fallback
         const groupToShow = selectedGroup || (groups.length > 0 ? groups[0].id : null);
-        
         logger.log('renderFixtures - selectedGroup:', selectedGroup);
         logger.log('renderFixtures - groupToShow:', groupToShow);
-        
         if (!groupToShow) {
             fixturesContent.innerHTML = '<p>No groups available</p>';
             return;
         }
-        
         const groupFixtures = fixtures.filter(gameweek => gameweek.groupId === groupToShow);
-        
         logger.log('renderFixtures - groupFixtures found:', groupFixtures.length);
         logger.log('renderFixtures - groupFixtures:', groupFixtures);
-        
         if (groupFixtures.length === 0) {
             fixturesContent.innerHTML = '<p>No fixtures available for this group</p>';
             return;
         }
-        
-        groupFixtures.forEach(gameweek => {
-            renderGameweekSection(gameweek, false);
+        groupFixtures.forEach((gameweek, gwIdx) => {
+            const gameweekDiv = document.createElement('div');
+            gameweekDiv.className = 'gameweek-section';
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'gameweek-header';
+            headerDiv.textContent = `Gameweek ${gameweek.gameweek} of ${totalGameweeks}`;
+            gameweekDiv.appendChild(headerDiv);
+            // Group matches by date
+            const matchesByDate = {};
+            gameweek.matches.forEach(match => {
+                if (!matchesByDate[match.date]) matchesByDate[match.date] = [];
+                matchesByDate[match.date].push(match);
+            });
+            Object.keys(matchesByDate).sort().forEach(date => {
+                const dateObj = new Date(date);
+                const formattedDate = dateObj.toLocaleDateString('en-US', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                const dateHeader = document.createElement('div');
+                dateHeader.className = 'fixture-date-banner';
+                dateHeader.textContent = formattedDate;
+                gameweekDiv.appendChild(dateHeader);
+                const matchesDiv = document.createElement('div');
+                matchesDiv.className = 'gameweek-matches';
+                matchesByDate[date].forEach(match => {
+                    const matchWithGameweek = { ...match, gameweek: gameweek.gameweek, groupId: gameweek.groupId };
+                    const matchDiv = createMatchElement(matchWithGameweek, false);
+                    matchesDiv.appendChild(matchDiv);
+                });
+                gameweekDiv.appendChild(matchesDiv);
+            });
+            fixturesContent.appendChild(gameweekDiv);
         });
     }
 }
@@ -2446,16 +2490,19 @@ function createMatchElement(match, showGroupIndicator) {
         return document.createElement('div'); // Return empty div if teams not found
     }
     
-    const matchDiv = document.createElement('div');
-    matchDiv.className = 'match-item';
+    // Check for cancelled status from result data
+    const matchStatus = result?.matchStatus || match.matchStatus;
     
-    const date = new Date(match.date);
-    const formattedDate = date.toLocaleDateString('en-US', { 
-        weekday: 'short', 
-        year: 'numeric', 
-        month: 'short', 
-        day: 'numeric' 
-    });
+    const matchDiv = document.createElement('div');
+    matchDiv.className = 'match-item' + (matchStatus === 'cancelled' ? ' match-cancelled' : '');
+    
+    // Only show time (not date) on match cards
+    let formattedTime = match.time;
+    if (match.time) {
+        const [hour, minute] = match.time.split(':');
+        const dateObj = new Date(`${match.date}T${match.time}:00`);
+        formattedTime = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
     
     const scoreDisplay = result ? 
         `${result.homeScore} - ${result.awayScore}` : 
@@ -2495,15 +2542,22 @@ function createMatchElement(match, showGroupIndicator) {
             <span class="venue-icon">📍</span>
         </a>` : '';
     
+    // Cancelled match indicator
+    let cancelledIndicator = '';
+    if (match.matchStatus === 'cancelled') {
+        cancelledIndicator = '<span class="cancelled-indicator" title="Match Cancelled">Cancelled</span>';
+    }
+
     matchDiv.innerHTML = `
         <div class="match-teams">
             ${homeTeam.name}${renderTeamBadge(homeTeam.id)} <span class="match-vs">vs</span> ${awayTeam.name}${renderTeamBadge(awayTeam.id)}
             ${matchIndicator}
             ${groupIndicator}
+            ${cancelledIndicator}
         </div>
         <div class="match-row">
-            <div class="match-col match-date">${venueLink}${formattedDate} - ${match.time}</div>
             <div class="match-col match-btns">${addResultButton || editResultButton}</div>
+            <div class="match-col match-date">${venueLink}${formattedTime ? formattedTime : ''}</div>
             <div class="match-col match-score ${scoreClass}" style="cursor:${result ? 'pointer' : 'default'};">${scoreDisplay}</div>
         </div>
     `;
@@ -2514,15 +2568,15 @@ function createMatchElement(match, showGroupIndicator) {
             scoreElem.addEventListener('click', function(e) {
                 showScorersPopup(match.id, match.homeTeam, match.awayTeam);
             });
+            // Remove hyperlink underline on hover, just change pointer
             scoreElem.addEventListener('mouseenter', function(e) {
-                scoreElem.style.textDecoration = 'underline';
+                scoreElem.style.textDecoration = 'none';
             });
             scoreElem.addEventListener('mouseleave', function(e) {
-                scoreElem.style.textDecoration = '';
+                scoreElem.style.textDecoration = 'none';
             });
         }
     }
-    
     return matchDiv;
 }
 
@@ -7914,77 +7968,6 @@ function showTeamsSubTab(tabId) {
     }
 }
 
-// Association data mapping
-const TEAM_ASSOCIATIONS = {
-    'francesinha-united': {
-        name: 'Stiftung Ambulantes Kinderhospiz München',
-        url: 'https://www.kinderhospiz-muenchen.de/'
-    },
-    'sporting-esgaios': {
-        name: 'Bayerische Staatsforsten',
-        url: 'https://www.baysf.de/'
-    },
-    'logan-fc': {
-        name: 'APPACMD Porto',
-        url: 'https://www.appacdmporto.com/'
-    },
-    'critical-techballers': {
-        name: 'ZERO',
-        url: 'https://zero.ong/'
-    },
-    'ctrl-shift-golo': {
-        name: 'GAS Porto',
-        url: 'https://gasporto.org/'
-    },
-    'dataki': {
-        name: 'Opus Diversidades',
-        url: 'https://rainbowportal.opusdiversidades.org/'
-    },
-    'critigals': {
-        name: 'Quercus',
-        url: 'https://quercus.pt/'
-    },
-    'borg-coimbra': {
-        name: 'Clube de Tempos Livres Santa Clara',
-        url: 'https://www.ctl.pt/#!/#!%2F'
-    },
-    'borussia-doutromundo': {
-        name: 'Maggie\'s Southampton',
-        url: 'https://www.maggies.org/'
-    },
-    'underdogs-fc': {
-        name: 'Serve the City',
-        url: 'https://www.servethecity.pt/'
-    },
-    'fc-zerolhos': {
-        name: 'Instituto de Apoio à Criança',
-        url: 'https://iacrianca.pt/'
-    },
-    'desesperados-fc': {
-        name: 'APDPróstata',
-        url: 'https://www.apdprostata.com/'
-    },
-    'bestsellers': {
-        name: 'SOS Animal',
-        url: 'https://sosanimal.com/'
-    },
-    'red-star-lx': {
-        name: 'Casa Santo António',
-        url: 'https://www.casasantoantonio.org.pt/'
-    },
-    'critical-underdogs': {
-        name: 'Associação para a Defesa dos Animais e Ambiente de Vila Verde',
-        url: 'https://adaavv.com/'
-    },
-    'shadow-x': {
-        name: 'AJUDARIS',
-        url: 'https://ajudaris.org/'
-    },
-    'fish-kicks-united': {
-        name: 'APPACDM Condeixa',
-        url: 'https://www.appacdmcondeixa.pt/'
-    }
-};
 
 // Update team lineup view with statistics and team cards
 function updateTeamLineupView() {
@@ -7997,7 +7980,7 @@ function updateTeamLineupView() {
     const totalTeams = teams.length;
     const totalAthletes = teams.reduce((sum, team) => sum + (team.players?.length || 0), 0);
     const uniqueAssociations = new Set(
-        teams.map(team => TEAM_ASSOCIATIONS[team.id]?.name).filter(Boolean)
+        teams.map(team => team.association?.name).filter(Boolean)
     ).size;
     
     // Update statistics cards
@@ -8030,7 +8013,7 @@ function updateTeamLineupView() {
         
         groupTeams.forEach(team => {
             const captain = team.players?.find(p => p.isCaptain);
-            const association = TEAM_ASSOCIATIONS[team.id];
+            const association = team.association;
             const playerCount = team.players?.length || 0;
             
             html += `

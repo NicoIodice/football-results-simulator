@@ -1,3 +1,11 @@
+/* Fixture date banner subtle indent */
+.fixture-date-banner {
+    font-weight: 600;
+    font-size: 1.05em;
+    margin: 10px 0 2px 0;
+    color: var(--color-fixture-date, #888);
+    padding-left: 0.5em; /* subtle indent */
+}
 /* ===================================
    THEME VARIABLES
    =================================== */
@@ -531,7 +539,8 @@ body.dark-mode .simulation-header h3 {
     margin-left: 4px;
 }
 @media (max-width: 900px) {
-    .match-row {
+    /* Fixture result cell: remove hyperlink underline, keep pointer, allow custom indicator */
+    .match-score {
         word-wrap: break-word;
         overflow-wrap: break-word;
         width: 100%;
@@ -540,8 +549,25 @@ body.dark-mode .simulation-header h3 {
         display: flex !important;
         flex-direction: column !important;
         align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
+        cursor: pointer;
+        text-decoration: none !important;
+        border: none;
+        outline: none;
+    }
+
+    /* Cancelled match indicator */
+    .cancelled-indicator {
+        display: inline-block;
+        margin-left: 10px;
+        padding: 2px 8px;
+        font-size: 0.85em;
+        color: #fff;
+        background: #b22222;
+        border-radius: 8px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        vertical-align: middle;
+        opacity: 0.85;
     }
     .match-col {
         display: block !important;
@@ -577,7 +603,7 @@ body.dark-mode .simulation-header h3 {
 .match-row {
     display: flex;
     align-items: center;
-    /*gap: 18px;*/
+    gap: 18px;
     margin-bottom: 8px;
 }
 .match-col {
@@ -1574,7 +1600,7 @@ tr.first-place .goal-diff-negative {
 }
 
 .gameweek-matches {
-    padding: 20px;
+    padding: 10px;
 }
 
 /* Fixture match item layout (cleaned) */
@@ -1590,6 +1616,12 @@ tr.first-place .goal-diff-negative {
     position: relative;
     font-weight: 600;
     color: #2c3e50;
+}
+
+/* Cancelled match styling */
+.match-item.match-cancelled {
+    background-color: #fffbea;
+    border-left-color: #f59e0b;
 }
 
 .match-teams {
@@ -1651,7 +1683,7 @@ tr.first-place .goal-diff-negative {
     font-weight: bold;
     font-size: 1.1rem;
     color: #2c3e50;
-    min-width: 10px;
+    min-width: 80px;
     max-width: 80px;
     text-align: center;
     background: linear-gradient(135deg, #f8f9fa, #e9ecef);
@@ -1664,14 +1696,14 @@ tr.first-place .goal-diff-negative {
 
 .match-score.completed {
     background: linear-gradient(135deg, #d4edda, #c3e6cb);
-    border-color: #28a745;
+    /*border-color: #28a745;*/
     color: #155724;
     font-weight: 900;
 }
 
 .match-score.upcoming {
     background: linear-gradient(135deg, #fff3cd, #ffeaa7);
-    border-color: #ffc107;
+    /*border-color: #ffc107;*/
     color: #856404;
 }
 

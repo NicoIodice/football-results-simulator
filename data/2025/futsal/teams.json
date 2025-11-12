@@ -1,1468 +1,1536 @@
 [
-  {
-    "id": "desesperados-fc",
-    "name": "Desesperados FC",
-    "league": "CSW",
-    "fullName": "Desesperados FC (CSW)",
-    "groupId": "group-a",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "andre-farinha-carvalho",
-        "name": "André Farinha Carvalho",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "eduardo-marcal",
-        "name": "Eduardo Marçal",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "denil-baia",
-        "name": "Denil Baía",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "guilherme-abreu",
-        "name": "Guilherme Abreu",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "goncalo-lopes",
-        "name": "Gonçalo Lopes",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "jose-delgado",
-        "name": "José Delgado",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "miguel-lopo-ferreira",
-        "name": "Miguel Lopo Ferreira",
-        "number": 7,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "pedro-salgado",
-        "name": "Pedro Salgado",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tiago-jesus",
-        "name": "Tiago Jesus",
-        "number": 9,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tomas-rodrigues",
-        "name": "Tomás Rodrigues",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "bestsellers",
-    "name": "BestSellers",
-    "league": "CTW",
-    "fullName": "BestSellers (CTW)",
-    "groupId": "group-a",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "bestsellers-gk",
-        "name": "BestSellers Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "henrique-silva",
-        "name": "Henrique Macías Silva",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "filipe-foncesa",
-        "name": "Filipe Fonseca",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-correi",
-        "name": "João Correia",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "david-carvalho",
-        "name": "David Carvalho",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "bestsellers-sub1",
-        "name": "BestSellers Sub 1",
-        "number": 6,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "unknown",
-        "name": "Unknown",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "bestsellers-sub3",
-        "name": "BestSellers Sub 3",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "bestsellers-sub4",
-        "name": "BestSellers Sub 4",
-        "number": 9,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "bestsellers-sub5",
-        "name": "BestSellers Sub 5",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "red-star-lx",
-    "name": "Red Star LX",
-    "league": "CTW",
-    "fullName": "Red Star LX (CTW)",
-    "groupId": "group-a",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "red-star-gk",
-        "name": "Red Star Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "miguel-silva",
-        "name": "Miguel Silva",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "red-star-def2",
-        "name": "Red Star Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-mid",
-        "name": "Red Star Midfielder",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-fwd",
-        "name": "Red Star Forward",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-sub1",
-        "name": "Red Star Sub 1",
-        "number": 6,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-sub2",
-        "name": "Red Star Sub 2",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-sub3",
-        "name": "Red Star Sub 3",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-sub4",
-        "name": "Red Star Sub 4",
-        "number": 9,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "red-star-sub5",
-        "name": "Red Star Sub 5",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "critical-underdogs",
-    "name": "Critical Underdogs",
-    "league": "CTW",
-    "fullName": "Critical Underdogs (CTW)",
-    "groupId": "group-a",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "critical-underdogs-gk",
-        "name": "Critical Underdogs Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "ricardo-santos",
-        "name": "Ricardo Santos",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "critical-underdogs-def2",
-        "name": "Critical Underdogs Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "critical-underdogs-mid",
-        "name": "Critical Underdogs Midfielder",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "critical-underdogs-fwd",
-        "name": "Critical Underdogs Forward",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "shadow-x",
-    "name": "Shadow X",
-    "league": "CTW",
-    "fullName": "Shadow X (CTW)",
-    "groupId": "group-a",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "shadow-x-gk",
-        "name": "Shadow X Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "rodrigo-gomes",
-        "name": "Rodrigo Gomes",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "shadow-x-def2",
-        "name": "Shadow X Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "shadow-x-mid",
-        "name": "Shadow X Midfielder",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "shadow-x-fwd",
-        "name": "Shadow X Forward",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "critigals",
-    "name": "CritiGals",
-    "league": "CSW",
-    "fullName": "CritiGals (CSW)",
-    "groupId": "group-b",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "renata-silva",
-        "name": "Renata Silva",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "ana-rita-pires",
-        "name": "Ana Rita Pires",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "catarina-proenca",
-        "name": "Catarina Proença",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "maria-guerra",
-        "name": "Maria Guerra",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "jessica-correia",
-        "name": "Jéssica Correia",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "catia-alves",
-        "name": "Cátia Alves",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "anamta-khan",
-        "name": "Anamta Khan",
-        "number": 7,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "celia-goncalves",
-        "name": "Célia Gonçalves",
-        "number": 8,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "daniela-correia",
-        "name": "Daniela Correia",
-        "number": 9,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "eva-seica",
-        "name": "Eva Seiça",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "underdogs-fc",
-    "name": "UnderDogs FC",
-    "league": "CSW",
-    "fullName": "UnderDogs FC (CSW)",
-    "groupId": "group-b",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "elisio-alexandre-sousa",
-        "name": "Elísio Alexandre Sousa",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "guilherme-imperial",
-        "name": "Guilherme Imperial",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "raul-rosero",
-        "name": "Raúl Rosero",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "vitor-emanuel-santos",
-        "name": "Vitor Emanuel Santos",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "marcos-soares",
-        "name": "Marcos Soares",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "emanuel-barata",
-        "name": "Emanuel Barata",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-bernardo-jorge",
-        "name": "João Bernardo Jorge",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "fabio-horta-oliveira",
-        "name": "Fábio Horta de Oliveira",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "borussia-doutromundo",
-    "name": "Borussia Doutromundo",
-    "league": "CSW",
-    "fullName": "Borussia Doutromundo (CSW)",
-    "groupId": "group-b",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "adriano-tavares",
-        "name": "Adriano Tavares",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "henrique-fonseca",
-        "name": "Henrique Fonseca",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "hugo-monteiro",
-        "name": "Hugo Monteiro",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "hugo-marques",
-        "name": "Hugo Marques",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "nuno-silva",
-        "name": "Nuno Silva",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "gustavo-lemos",
-        "name": "Gustavo Lemos",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "daniel-santos",
-        "name": "Daniel Santos",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "fernando-costa",
-        "name": "Fernando Costa",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "fc-zerolhos",
-    "name": "FC ZÉrolhos",
-    "league": "CSW",
-    "fullName": "FC ZÉrolhos (CSW)",
-    "groupId": "group-b",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "damiao-santos",
-        "name": "Damião Santos",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-catalao-antunes",
-        "name": "João Catalão Antunes",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "cesar-neves",
-        "name": "César Neves",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "mario-pires",
-        "name": "Mário Pires",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "hugo-miguel-pereira",
-        "name": "Hugo Miguel Pereira",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "tiago-pedroso",
-        "name": "Tiago Pedroso",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tomas-martins",
-        "name": "Tomás Martins",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "pedro-cordeiro",
-        "name": "Pedro Cordeiro",
-        "number": 8,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-jacinto",
-        "name": "João Jacinto",
-        "number": 9,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "borg-coimbra",
-    "name": "Borg Coimbra",
-    "league": "CSW",
-    "fullName": "Borg Coimbra (CSW)",
-    "groupId": "group-b",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "alfonso-brandao",
-        "name": "Alfonso Brandão",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "pedro-martins",
-        "name": "Pedro Martins",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "andre-rainho",
-        "name": "André Rainho",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "diogo-campos",
-        "name": "Diogo Campos",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "jose-miguel-lopes",
-        "name": "José Miguel Lopes",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "pedro-lourenco",
-        "name": "Pedro Lourenço",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "sergio-santos",
-        "name": "Sérgio Santos",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "simao-santos",
-        "name": "Simão Santos",
-        "number": 8,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "rui-miguel-barbosa",
-        "name": "Rui Miguel Barbosa",
-        "number": 9,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tiago-alexandre-dias",
-        "name": "Tiago Alexandre Dias",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "logan-fc",
-    "name": "LOGAN FC",
-    "league": "CTW",
-    "fullName": "LOGAN FC (CTW)",
-    "groupId": "group-c",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "logan-gk",
-        "name": "Logan Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "hugo-ribeiro",
-        "name": "Hugo Ribeiro",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "logan-def2",
-        "name": "Logan Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "tiago",
-        "name": "Tiago",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "pedro",
-        "name": "Pedro",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "logan-sub1",
-        "name": "Logan Sub 1",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "miranda",
-        "name": "Miranda",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "logan-sub2",
-        "name": "Logan Sub 2",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "logan-sub3",
-        "name": "Logan Sub 3",
-        "number": 9,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "logan-sub4",
-        "name": "Logan Sub 4",
-        "number": 10,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "critical-techballers",
-    "name": "Critical Techballers Braga",
-    "league": "CTW",
-    "fullName": "Critical Techballers Braga (CTW)",
-    "groupId": "group-c",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "tech-gk",
-        "name": "Tech Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "mario-macedo",
-        "name": "Mário Macedo",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "tech-def2",
-        "name": "Tech Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "francisco-arantes",
-        "name": "Francisco Arantes",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "sergio",
-        "name": "Sérgio",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "tech-sub1",
-        "name": "Tech Sub 1",
-        "number": 6,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tech-sub2",
-        "name": "Tech Sub 2",
-        "number": 7,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tech-sub3",
-        "name": "Tech Sub 3",
-        "number": 8,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tech-sub4",
-        "name": "Tech Sub 4",
-        "number": 9,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "tech-sub5",
-        "name": "Tech Sub 5",
-        "number": 10,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "sporting-esgaios",
-    "name": "Sporting Clube dos Esgaios",
-    "league": "CSW",
-    "fullName": "Sporting Clube dos Esgaios (CSW)",
-    "groupId": "group-c",
-    "isDefault": true,
-    "formation": "1-1-2",
-    "players": [
-      {
-        "id": "angelo-iodice",
-        "name": "Ângelo Iodice",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "ricardo-mesquita",
-        "name": "Ricardo Mesquita",
-        "number": 7,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true,
-        "injury": {
-          "startDate": "2025-10-17",
-          "reason": "Knee tendinitis - season ending"
-        }
-      },
-      {
-        "id": "francisco-ferreira", 
-        "name": "Francisco Ferreira",
-        "number": 3,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "bruno-gandres",
-        "name": "Bruno Gandres", 
-        "number": 2,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "marcio-veiga",
-        "name": "Márcio Veiga",
-        "number": 4,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "carlos-daniel-silva",
-        "name": "Carlos Daniel Silva",
-        "number": 5,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-noronha",
-        "name": "João Noronha",
-        "number": 6,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-manuel-amorim",
-        "name": "João Manuel Amorim",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "sandro-carvalho",
-        "name": "Sandro Carvalho",
-        "number": 9,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "ricardo-moreira",
-        "name": "Ricardo Moreira",
-        "number": 10,
-        "position": "midfielder",
-        "status": "injured",
-        "isStarter": false,
-        "isCaptain": false,
-        "injury": {
-          "startDate": "2025-10-10",
-          "reason": "Broken foot - season ending"
-        }
-      }
-    ]
-  },
-  {
-    "id": "ctrl-shift-golo",
-    "name": "Ctrl+Shift+Golo",
-    "league": "CTW",
-    "fullName": "Ctrl+Shift+Golo (CTW)",
-    "groupId": "group-c",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "golo-gk",
-        "name": "Golo Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "francisco-martins",
-        "name": "Francisco Arrabaça Martins",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "golo-def2",
-        "name": "Golo Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "golo-mid",
-        "name": "Golo Midfielder",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "golo-fwd",
-        "name": "Golo Forward",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "golo-sub1",
-        "name": "Golo Sub 1",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "dataki",
-    "name": "Dataki",
-    "league": "CTW",
-    "fullName": "Dataki (CTW)",
-    "groupId": "group-c",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "dataki-gk",
-        "name": "Dataki Keeper",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "guilherme-amorim",
-        "name": "Guilherme Amorim",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "dataki-def2",
-        "name": "Dataki Defender 2",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "dataki-mid",
-        "name": "Dataki Midfielder",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "dataki-fwd",
-        "name": "Dataki Forward",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "dataki-sub1",
-        "name": "Dataki Sub 1",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "francesinha-united",
-    "name": "Francesinha United",
-    "league": "CSW",
-    "fullName": "Francesinha United (CSW)",
-    "groupId": "group-c",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "paulo-almeida-sousa",
-        "name": "Paulo Almeida Sousa",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "bruno-goncalves",
-        "name": "Bruno Gonçalves",
-        "number": 2,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "diogo-pedrosa",
-        "name": "Diogo Pedrosa",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "filipe-moreira",
-        "name": "Filipe Moreira",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "francisco-rodrigues",
-        "name": "Francisco Rodrigues",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-romao",
-        "name": "João Romão",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "jorge-diogo-lopes",
-        "name": "Jorge Diogo Lopes",
-        "number": 7,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "jose-barreirinho",
-        "name": "José Barreirinho",
-        "number": 8,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "luis-rodrigues",
-        "name": "Luís Rodrigues",
-        "number": 9,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  },
-  {
-    "id": "fish-kicks-united",
-    "name": "Fish & Kicks United",
-    "league": "CTW",
-    "fullName": "Fish & Kicks United (CTW)",
-    "groupId": "group-d",
-    "formation": "2-1-1",
-    "players": [
-      {
-        "id": "alexandre-gabriel",
-        "name": "Alexandre Gabriel",
-        "number": 1,
-        "position": "goalkeeper",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-afonso-almeida",
-        "name": "João Afonso Almeida",
-        "number": 2,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": true
-      },
-      {
-        "id": "alexander-read",
-        "name": "Alexander Read",
-        "number": 3,
-        "position": "defender",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "catarina-nunes",
-        "name": "Catarina Nunes",
-        "number": 4,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "jacob-pembroke-burn",
-        "name": "Jacob Pembroke-Burn",
-        "number": 5,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": true,
-        "isCaptain": false
-      },
-      {
-        "id": "joao-potes",
-        "name": "João Potes",
-        "number": 6,
-        "position": "midfielder",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      },
-      {
-        "id": "thomas-bromley",
-        "name": "Thomas Bromley",
-        "number": 7,
-        "position": "forward",
-        "status": "fit",
-        "isStarter": false,
-        "isCaptain": false
-      }
-    ]
-  }
+	{
+		"id": "desesperados-fc",
+		"association": {
+			"name": "APDPróstata",
+			"url": "https://www.apdprostata.com/"
+		},
+		"name": "Desesperados FC",
+		"league": "CSW",
+		"fullName": "Desesperados FC (CSW)",
+		"groupId": "group-a",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "andre-farinha-carvalho",
+				"name": "André Farinha Carvalho",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "eduardo-marcal",
+				"name": "Eduardo Marçal",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "denil-baia",
+				"name": "Denil Baía",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "guilherme-abreu",
+				"name": "Guilherme Abreu",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "goncalo-lopes",
+				"name": "Gonçalo Lopes",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "jose-delgado",
+				"name": "José Delgado",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "miguel-lopo-ferreira",
+				"name": "Miguel Lopo Ferreira",
+				"number": 7,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "pedro-salgado",
+				"name": "Pedro Salgado",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tiago-jesus",
+				"name": "Tiago Jesus",
+				"number": 9,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tomas-rodrigues",
+				"name": "Tomás Rodrigues",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "bestsellers",
+		"association": {
+			"name": "SOS Animal",
+			"url": "https://sosanimal.com/"
+		},
+		"name": "BestSellers",
+		"league": "CTW",
+		"fullName": "BestSellers (CTW)",
+		"groupId": "group-a",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "bestsellers-gk",
+				"name": "BestSellers Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "henrique-silva",
+				"name": "Henrique Macías Silva",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "filipe-foncesa",
+				"name": "Filipe Fonseca",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-correi",
+				"name": "João Correia",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "david-carvalho",
+				"name": "David Carvalho",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "bestsellers-sub1",
+				"name": "BestSellers Sub 1",
+				"number": 6,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "unknown",
+				"name": "Unknown",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "bestsellers-sub3",
+				"name": "BestSellers Sub 3",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "bestsellers-sub4",
+				"name": "BestSellers Sub 4",
+				"number": 9,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "bestsellers-sub5",
+				"name": "BestSellers Sub 5",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "red-star-lx",
+		"association": {
+			"name": "Casa Santo António",
+			"url": "https://www.casasantoantonio.org.pt/"
+		},
+		"name": "Red Star LX",
+		"league": "CTW",
+		"fullName": "Red Star LX (CTW)",
+		"groupId": "group-a",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "red-star-gk",
+				"name": "Red Star Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "miguel-silva",
+				"name": "Miguel Silva",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "red-star-def2",
+				"name": "Red Star Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-mid",
+				"name": "Red Star Midfielder",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-fwd",
+				"name": "Red Star Forward",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-sub1",
+				"name": "Red Star Sub 1",
+				"number": 6,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-sub2",
+				"name": "Red Star Sub 2",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-sub3",
+				"name": "Red Star Sub 3",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-sub4",
+				"name": "Red Star Sub 4",
+				"number": 9,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "red-star-sub5",
+				"name": "Red Star Sub 5",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "critical-underdogs",
+		"association": {
+			"name": "Associação para a Defesa dos Animais e Ambiente de Vila Verde",
+			"url": "https://adaavv.com/"
+		},
+		"name": "Critical Underdogs",
+		"league": "CTW",
+		"fullName": "Critical Underdogs (CTW)",
+		"groupId": "group-a",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "critical-underdogs-gk",
+				"name": "Critical Underdogs Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "ricardo-santos",
+				"name": "Ricardo Santos",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "critical-underdogs-def2",
+				"name": "Critical Underdogs Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "critical-underdogs-mid",
+				"name": "Critical Underdogs Midfielder",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "critical-underdogs-fwd",
+				"name": "Critical Underdogs Forward",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "shadow-x",
+		"association": {
+			"name": "AJUDARIS",
+			"url": "https://ajudaris.org/"
+		},
+		"name": "Shadow X",
+		"league": "CTW",
+		"fullName": "Shadow X (CTW)",
+		"groupId": "group-a",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "shadow-x-gk",
+				"name": "Shadow X Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "rodrigo-gomes",
+				"name": "Rodrigo Gomes",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "shadow-x-def2",
+				"name": "Shadow X Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "shadow-x-mid",
+				"name": "Shadow X Midfielder",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "shadow-x-fwd",
+				"name": "Shadow X Forward",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "critigals",
+		"association": {
+			"name": "Quercus",
+			"url": "https://quercus.pt/"
+		},
+		"name": "CritiGals",
+		"league": "CSW",
+		"fullName": "CritiGals (CSW)",
+		"groupId": "group-b",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "renata-silva",
+				"name": "Renata Silva",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "ana-rita-pires",
+				"name": "Ana Rita Pires",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "catarina-proenca",
+				"name": "Catarina Proença",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "maria-guerra",
+				"name": "Maria Guerra",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "jessica-correia",
+				"name": "Jéssica Correia",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "catia-alves",
+				"name": "Cátia Alves",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "anamta-khan",
+				"name": "Anamta Khan",
+				"number": 7,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "celia-goncalves",
+				"name": "Célia Gonçalves",
+				"number": 8,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "daniela-correia",
+				"name": "Daniela Correia",
+				"number": 9,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "eva-seica",
+				"name": "Eva Seiça",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "underdogs-fc",
+		"association": {
+			"name": "Serve the City",
+			"url": "https://www.servethecity.pt/"
+		},
+		"name": "UnderDogs FC",
+		"league": "CSW",
+		"fullName": "UnderDogs FC (CSW)",
+		"groupId": "group-b",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "elisio-alexandre-sousa",
+				"name": "Elísio Alexandre Sousa",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "guilherme-imperial",
+				"name": "Guilherme Imperial",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "raul-rosero",
+				"name": "Raúl Rosero",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "vitor-emanuel-santos",
+				"name": "Vitor Emanuel Santos",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "marcos-soares",
+				"name": "Marcos Soares",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "emanuel-barata",
+				"name": "Emanuel Barata",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-bernardo-jorge",
+				"name": "João Bernardo Jorge",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "fabio-horta-oliveira",
+				"name": "Fábio Horta de Oliveira",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "borussia-doutromundo",
+		"association": {
+			"name": "Maggie's Southampton",
+			"url": "https://www.maggies.org/"
+		},
+		"name": "Borussia Doutromundo",
+		"league": "CSW",
+		"fullName": "Borussia Doutromundo (CSW)",
+		"groupId": "group-b",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "adriano-tavares",
+				"name": "Adriano Tavares",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "henrique-fonseca",
+				"name": "Henrique Fonseca",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "hugo-monteiro",
+				"name": "Hugo Monteiro",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "hugo-marques",
+				"name": "Hugo Marques",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "nuno-silva",
+				"name": "Nuno Silva",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "gustavo-lemos",
+				"name": "Gustavo Lemos",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "daniel-santos",
+				"name": "Daniel Santos",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "fernando-costa",
+				"name": "Fernando Costa",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "fc-zerolhos",
+		"association": {
+			"name": "Instituto de Apoio à Criança",
+			"url": "https://iacrianca.pt/"
+		},
+		"name": "FC ZÉrolhos",
+		"league": "CSW",
+		"fullName": "FC ZÉrolhos (CSW)",
+		"groupId": "group-b",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "damiao-santos",
+				"name": "Damião Santos",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-catalao-antunes",
+				"name": "João Catalão Antunes",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "cesar-neves",
+				"name": "César Neves",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "mario-pires",
+				"name": "Mário Pires",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "hugo-miguel-pereira",
+				"name": "Hugo Miguel Pereira",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "tiago-pedroso",
+				"name": "Tiago Pedroso",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tomas-martins",
+				"name": "Tomás Martins",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "pedro-cordeiro",
+				"name": "Pedro Cordeiro",
+				"number": 8,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-jacinto",
+				"name": "João Jacinto",
+				"number": 9,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "borg-coimbra",
+		"association": {
+			"name": "Clube de Tempos Livres Santa Clara",
+			"url": "https://www.ctl.pt/#!/#!%2F"
+		},
+		"name": "Borg Coimbra",
+		"league": "CSW",
+		"fullName": "Borg Coimbra (CSW)",
+		"groupId": "group-b",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "alfonso-brandao",
+				"name": "Alfonso Brandão",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "pedro-martins",
+				"name": "Pedro Martins",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "andre-rainho",
+				"name": "André Rainho",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "diogo-campos",
+				"name": "Diogo Campos",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "jose-miguel-lopes",
+				"name": "José Miguel Lopes",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "pedro-lourenco",
+				"name": "Pedro Lourenço",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "sergio-santos",
+				"name": "Sérgio Santos",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "simao-santos",
+				"name": "Simão Santos",
+				"number": 8,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "rui-miguel-barbosa",
+				"name": "Rui Miguel Barbosa",
+				"number": 9,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tiago-alexandre-dias",
+				"name": "Tiago Alexandre Dias",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "logan-fc",
+		"association": {
+			"name": "APPACMD Porto",
+			"url": "https://www.appacdmporto.com/"
+		},
+		"name": "LOGAN FC",
+		"league": "CTW",
+		"fullName": "LOGAN FC (CTW)",
+		"groupId": "group-c",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "logan-gk",
+				"name": "Logan Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "hugo-ribeiro",
+				"name": "Hugo Ribeiro",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "logan-def2",
+				"name": "Logan Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "tiago",
+				"name": "Tiago",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "pedro",
+				"name": "Pedro",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "logan-sub1",
+				"name": "Logan Sub 1",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "miranda",
+				"name": "Miranda",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "logan-sub2",
+				"name": "Logan Sub 2",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "logan-sub3",
+				"name": "Logan Sub 3",
+				"number": 9,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "logan-sub4",
+				"name": "Logan Sub 4",
+				"number": 10,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "critical-techballers",
+		"association": {
+			"name": "ZERO",
+			"url": "https://zero.ong/"
+		},
+		"name": "Critical Techballers Braga",
+		"league": "CTW",
+		"fullName": "Critical Techballers Braga (CTW)",
+		"groupId": "group-c",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "tech-gk",
+				"name": "Tech Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "mario-macedo",
+				"name": "Mário Macedo",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "tech-def2",
+				"name": "Tech Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "francisco-arantes",
+				"name": "Francisco Arantes",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "sergio",
+				"name": "Sérgio",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "tech-sub1",
+				"name": "Tech Sub 1",
+				"number": 6,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tech-sub2",
+				"name": "Tech Sub 2",
+				"number": 7,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tech-sub3",
+				"name": "Tech Sub 3",
+				"number": 8,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tech-sub4",
+				"name": "Tech Sub 4",
+				"number": 9,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "tech-sub5",
+				"name": "Tech Sub 5",
+				"number": 10,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "sporting-esgaios",
+		"association": {
+			"name": "Bayerische Staatsforsten",
+			"url": "https://www.baysf.de/"
+		},
+		"name": "Sporting Clube dos Esgaios",
+		"league": "CSW",
+		"fullName": "Sporting Clube dos Esgaios (CSW)",
+		"groupId": "group-c",
+		"isDefault": true,
+		"formation": "1-1-2",
+		"players": [
+			{
+				"id": "angelo-iodice",
+				"name": "Ângelo Iodice",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "ricardo-mesquita",
+				"name": "Ricardo Mesquita",
+				"number": 7,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true,
+				"injury": {
+					"startDate": "2025-10-17",
+					"reason": "Knee tendinitis - season ending"
+				}
+			},
+			{
+				"id": "francisco-ferreira",
+				"name": "Francisco Ferreira",
+				"number": 3,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "bruno-gandres",
+				"name": "Bruno Gandres",
+				"number": 2,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "marcio-veiga",
+				"name": "Márcio Veiga",
+				"number": 4,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "carlos-daniel-silva",
+				"name": "Carlos Daniel Silva",
+				"number": 5,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-noronha",
+				"name": "João Noronha",
+				"number": 6,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-manuel-amorim",
+				"name": "João Manuel Amorim",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "sandro-carvalho",
+				"name": "Sandro Carvalho",
+				"number": 9,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "ricardo-moreira",
+				"name": "Ricardo Moreira",
+				"number": 10,
+				"position": "midfielder",
+				"status": "injured",
+				"isStarter": false,
+				"isCaptain": false,
+				"injury": {
+					"startDate": "2025-10-10",
+					"reason": "Broken foot - season ending"
+				}
+			}
+		]
+	},
+	{
+		"id": "ctrl-shift-golo",
+		"association": {
+			"name": "GAS Porto",
+			"url": "https://gasporto.org/"
+		},
+		"name": "Ctrl+Shift+Golo",
+		"league": "CTW",
+		"fullName": "Ctrl+Shift+Golo (CTW)",
+		"groupId": "group-c",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "golo-gk",
+				"name": "Golo Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "francisco-martins",
+				"name": "Francisco Arrabaça Martins",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "golo-def2",
+				"name": "Golo Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "golo-mid",
+				"name": "Golo Midfielder",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "golo-fwd",
+				"name": "Golo Forward",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "golo-sub1",
+				"name": "Golo Sub 1",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "dataki",
+		"association": {
+			"name": "Opus Diversidades",
+			"url": "https://rainbowportal.opusdiversidades.org/"
+		},
+		"name": "Dataki",
+		"league": "CTW",
+		"fullName": "Dataki (CTW)",
+		"groupId": "group-c",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "dataki-gk",
+				"name": "Dataki Keeper",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "guilherme-amorim",
+				"name": "Guilherme Amorim",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "dataki-def2",
+				"name": "Dataki Defender 2",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "dataki-mid",
+				"name": "Dataki Midfielder",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "dataki-fwd",
+				"name": "Dataki Forward",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "dataki-sub1",
+				"name": "Dataki Sub 1",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "francesinha-united",
+		"association": {
+			"name": "Stiftung Ambulantes Kinderhospiz München",
+			"url": "https://www.kinderhospiz-muenchen.de/"
+		},
+		"name": "Francesinha United",
+		"league": "CSW",
+		"fullName": "Francesinha United (CSW)",
+		"groupId": "group-c",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "paulo-almeida-sousa",
+				"name": "Paulo Almeida Sousa",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "bruno-goncalves",
+				"name": "Bruno Gonçalves",
+				"number": 2,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "diogo-pedrosa",
+				"name": "Diogo Pedrosa",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "filipe-moreira",
+				"name": "Filipe Moreira",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "francisco-rodrigues",
+				"name": "Francisco Rodrigues",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-romao",
+				"name": "João Romão",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "jorge-diogo-lopes",
+				"name": "Jorge Diogo Lopes",
+				"number": 7,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "jose-barreirinho",
+				"name": "José Barreirinho",
+				"number": 8,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "luis-rodrigues",
+				"name": "Luís Rodrigues",
+				"number": 9,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	},
+	{
+		"id": "fish-kicks-united",
+		"association": {
+			"name": "APPACDM Condeixa",
+			"url": "https://www.appacdmcondeixa.pt/"
+		},
+		"name": "Fish & Kicks United",
+		"league": "CTW",
+		"fullName": "Fish & Kicks United (CTW)",
+		"groupId": "group-d",
+		"formation": "2-1-1",
+		"players": [
+			{
+				"id": "alexandre-gabriel",
+				"name": "Alexandre Gabriel",
+				"number": 1,
+				"position": "goalkeeper",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-afonso-almeida",
+				"name": "João Afonso Almeida",
+				"number": 2,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": true
+			},
+			{
+				"id": "alexander-read",
+				"name": "Alexander Read",
+				"number": 3,
+				"position": "defender",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "catarina-nunes",
+				"name": "Catarina Nunes",
+				"number": 4,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "jacob-pembroke-burn",
+				"name": "Jacob Pembroke-Burn",
+				"number": 5,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": true,
+				"isCaptain": false
+			},
+			{
+				"id": "joao-potes",
+				"name": "João Potes",
+				"number": 6,
+				"position": "midfielder",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			},
+			{
+				"id": "thomas-bromley",
+				"name": "Thomas Bromley",
+				"number": 7,
+				"position": "forward",
+				"status": "fit",
+				"isStarter": false,
+				"isCaptain": false
+			}
+		]
+	}
 ]

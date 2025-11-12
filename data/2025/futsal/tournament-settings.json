@@ -29,6 +29,7 @@
 	"defaultGroup": "group-c",
 	"defaultTeam": "sporting-esgaios",
 	"groupStage": {
+		"gameWeeks": 5,
 		"startDate": "September 23rd, 2025",
 		"endDate": "October 24th, 2025",
 		"dateTimeFormatted": "📅 September 23rd - October 24th, 2025",
