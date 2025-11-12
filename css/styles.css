@@ -5657,7 +5657,7 @@ body.dark-mode .formation-line[data-line] .line-slot.occupied::after {
 }
 
 .score-inputs {
-    display: flex;
+    /*display: flex;*/
     align-items: center;
     gap: 8px;
     margin-top: 5px;

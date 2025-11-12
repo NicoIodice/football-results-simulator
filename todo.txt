@@ -14,7 +14,3 @@
 - Load files from dropbox files
  - Add api token environment variable
 - Add playwright tests
-
-- Add scorers for each match when adding results
- - Automatically loads all team players for each team
- - The injury players should not be selectable
