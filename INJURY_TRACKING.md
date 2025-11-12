@@ -63,7 +63,7 @@ Add an `injury` object to any player in the `teams.json` file:
 
 ## How It Works
 
-### When Adding Match Results
+### When Adding Match Results (Group Stage & Knockout Stage)
 
 1. **Enter the score** for home and away teams
 2. **Scorers section appears** automatically when goals are scored
@@ -74,6 +74,10 @@ Add an `injury` object to any player in the `teams.json` file:
    - If match date is before injury start date → Player is available
    - If match date is during injury period → Player is disabled
    - If match date is after injury end date → Player is available again
+
+**Note**: The scorer selection feature is available for both:
+- **Group Stage Fixtures**: Regular round-robin matches
+- **Knockout Stage Matches**: Semi-finals, finals, 3rd place playoff (including penalty shootouts)
 
 ### Visual Indicators
 
@@ -124,13 +128,22 @@ Add an `injury` object to any player in the `teams.json` file:
 
 ## Testing the Feature
 
+### Group Stage
 1. Add an injury to a player in `teams.json`
 2. Refresh the application
-3. Go to Fixtures tab
+3. Go to **Fixtures** tab
 4. Click "Add Result" on a match
 5. Enter scores with goals
-6. Click "Show" on the scorers section
-7. Verify injured players are disabled
+6. Click "Show Scorers" to expand the scorers section
+7. Verify injured players are disabled with 🤕 badge
+
+### Knockout Stage
+1. Navigate to the **Knockout** tab
+2. Click "Add Result" on a semi-final, final, or 3rd place match
+3. Enter scores (penalty shootout will appear if tied)
+4. Scorer section appears automatically when goals > 0
+5. Click "Show Scorers" to expand and select goal scorers
+6. Verify injured players are disabled correctly
 
 ---
 

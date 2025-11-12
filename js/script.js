@@ -5334,6 +5334,9 @@ function showAddResultModal(matchId, homeTeamName, awayTeamName, matchDate, matc
     // Reset form
     document.getElementById('addResultForm').reset();
     
+    // Render scorer inputs for both teams
+    renderScorerInputs();
+    
     // Show modal
     document.getElementById('addResultModal').style.display = 'block';
 }
@@ -5345,10 +5348,12 @@ function hideAddResultModal() {
     const scorersSection = document.getElementById('scorers-section');
     const scorersContent = document.getElementById('scorers-content');
     const toggleText = document.getElementById('scorers-toggle-text');
+    const toggleIcon = document.getElementById('scorers-toggle-icon');
     
     if (scorersSection) scorersSection.style.display = 'none';
     if (scorersContent) scorersContent.style.display = 'none';
-    if (toggleText) toggleText.textContent = 'Show';
+    if (toggleText) toggleText.textContent = 'Show Scorers';
+    if (toggleIcon) toggleIcon.textContent = '▼';
     
     currentMatch = null;
 }
@@ -5385,6 +5390,14 @@ function showEditResultModal(matchId, homeTeamName, awayTeamName, matchDate, mat
     document.querySelector('.modal-header h3').textContent = 'Edit Match Result';
     document.querySelector('.btn-primary').textContent = 'Update Result';
     
+    // Render scorer inputs for both teams
+    renderScorerInputs();
+    
+    // Show scorers section if there are goals
+    if (homeScore > 0 || awayScore > 0) {
+        updateScorerInputs();
+    }
+    
     // Show modal
     document.getElementById('addResultModal').style.display = 'block';
 }
@@ -5408,13 +5421,16 @@ function findMatchById(matchId) {
 function toggleScorersSection() {
     const scorersContent = document.getElementById('scorers-content');
     const toggleText = document.getElementById('scorers-toggle-text');
+    const toggleIcon = document.getElementById('scorers-toggle-icon');
     
     if (scorersContent.style.display === 'none') {
         scorersContent.style.display = 'block';
-        toggleText.textContent = 'Hide';
+        toggleText.textContent = 'Hide Scorers';
+        toggleIcon.textContent = '▲';
     } else {
         scorersContent.style.display = 'none';
-        toggleText.textContent = 'Show';
+        toggleText.textContent = 'Show Scorers';
+        toggleIcon.textContent = '▼';
     }
 }
 
@@ -5468,10 +5484,6 @@ function renderScorerInputs() {
     
     if (!homeTeam || !awayTeam) return;
     
-    // Update labels
-    document.getElementById('homeTeamScorerLabel').textContent = `${homeTeam.name} Scorers`;
-    document.getElementById('awayTeamScorerLabel').textContent = `${awayTeam.name} Scorers`;
-    
     // Render home team scorers
     renderTeamScorers(homeTeam, 'homeTeamScorers', matchDate);
     
@@ -5486,37 +5498,51 @@ function renderTeamScorers(team, containerId, matchDate) {
     
     container.innerHTML = '';
     
+    // Create table
+    const table = document.createElement('table');
+    table.className = 'scorers-table';
+    
+    // Create table header
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+            <th style="width: calc(100% - 70px);">${team.name}</th>
+            <th style="width: 70px; text-align: center;">Goals</th>
+        </tr>
+    `;
+    table.appendChild(thead);
+    
+    // Create table body
+    const tbody = document.createElement('tbody');
+    
     // Sort players by number
     const sortedPlayers = [...team.players].sort((a, b) => a.number - b.number);
     
     sortedPlayers.forEach(player => {
         const injured = isPlayerInjured(player, matchDate);
         
-        const scorerItem = document.createElement('div');
-        scorerItem.className = `scorer-item ${injured ? 'injured' : ''}`;
-        scorerItem.dataset.playerId = player.id;
+        const row = document.createElement('tr');
+        row.className = injured ? 'injured-row' : '';
+        row.dataset.playerId = player.id;
         
-        const playerInfo = document.createElement('div');
-        playerInfo.className = 'scorer-player-info';
-        
-        const playerNumber = document.createElement('div');
-        playerNumber.className = 'scorer-player-number';
-        playerNumber.textContent = player.number;
-        
+        // Player name cell
+        const nameCell = document.createElement('td');
         const playerName = document.createElement('span');
         playerName.className = 'scorer-player-name';
         playerName.textContent = player.name;
-        
-        playerInfo.appendChild(playerNumber);
-        playerInfo.appendChild(playerName);
+        nameCell.appendChild(playerName);
         
         if (injured) {
             const injuryBadge = document.createElement('span');
             injuryBadge.className = 'scorer-injury-badge';
             injuryBadge.textContent = '🤕 Injured';
             injuryBadge.title = player.injury.reason || 'Injured';
-            playerInfo.appendChild(injuryBadge);
+            nameCell.appendChild(injuryBadge);
         }
+        
+        // Goals input cell
+        const goalsCell = document.createElement('td');
+        goalsCell.style.textAlign = 'center';
         
         const goalsInput = document.createElement('input');
         goalsInput.type = 'number';
@@ -5531,16 +5557,21 @@ function renderTeamScorers(team, containerId, matchDate) {
         
         goalsInput.addEventListener('input', function() {
             if (parseInt(this.value) > 0) {
-                scorerItem.classList.add('has-goals');
+                row.classList.add('has-goals-row');
             } else {
-                scorerItem.classList.remove('has-goals');
+                row.classList.remove('has-goals-row');
             }
         });
         
-        scorerItem.appendChild(playerInfo);
-        scorerItem.appendChild(goalsInput);
-        container.appendChild(scorerItem);
+        goalsCell.appendChild(goalsInput);
+        
+        row.appendChild(nameCell);
+        row.appendChild(goalsCell);
+        tbody.appendChild(row);
     });
+    
+    table.appendChild(tbody);
+    container.appendChild(table);
 }
 
 // Collect scorers data from inputs
@@ -5588,6 +5619,83 @@ function validateScorers(homeScore, awayScore, homeScorers, awayScorers) {
         awayTotalGoals
     };
 }
+
+// ==========================================
+// KNOCKOUT STAGE SCORER FUNCTIONS
+// ==========================================
+
+function toggleKnockoutScorers() {
+    const content = document.getElementById('knockout-scorers-content');
+    const toggleText = document.getElementById('knockout-scorers-toggle-text');
+    const toggleIcon = document.getElementById('knockout-scorers-toggle-icon');
+    
+    if (content.style.display === 'none') {
+        content.style.display = 'block';
+        toggleText.textContent = 'Hide Scorers';
+        toggleIcon.textContent = '▲';
+    } else {
+        content.style.display = 'none';
+        toggleText.textContent = 'Show Scorers';
+        toggleIcon.textContent = '▼';
+    }
+}
+
+function updateKnockoutScorerInputs() {
+    const homeScore = parseInt(document.getElementById('knockout-home-score').value) || 0;
+    const awayScore = parseInt(document.getElementById('knockout-away-score').value) || 0;
+    const scorersSection = document.getElementById('knockout-scorers-section');
+    
+    if (homeScore > 0 || awayScore > 0) {
+        scorersSection.style.display = 'block';
+    } else {
+        scorersSection.style.display = 'none';
+    }
+}
+
+function renderKnockoutScorerInputs(homeTeam, awayTeam, matchDate) {
+    renderTeamScorers(homeTeam, 'knockout-home-scorers', matchDate);
+    renderTeamScorers(awayTeam, 'knockout-away-scorers', matchDate);
+}
+
+function collectKnockoutScorersData() {
+    const scorersData = [];
+    
+    // Collect from both teams
+    document.querySelectorAll('#knockout-home-scorers .scorer-goals-input, #knockout-away-scorers .scorer-goals-input').forEach(input => {
+        const goals = parseInt(input.value);
+        if (goals > 0) {
+            scorersData.push({
+                playerId: input.dataset.playerId,
+                playerName: input.dataset.playerName,
+                goals: goals
+            });
+        }
+    });
+    
+    return scorersData;
+}
+
+function validateKnockoutScorers() {
+    const homeScore = parseInt(document.getElementById('knockout-home-score').value) || 0;
+    const awayScore = parseInt(document.getElementById('knockout-away-score').value) || 0;
+    const totalScore = homeScore + awayScore;
+    
+    const scorersData = collectKnockoutScorersData();
+    const totalScorerGoals = scorersData.reduce((sum, scorer) => sum + scorer.goals, 0);
+    
+    if (scorersData.length > 0 && totalScorerGoals !== totalScore) {
+        return {
+            valid: false,
+            message: `Total scorer goals (${totalScorerGoals}) must match total score (${totalScore})`
+        };
+    }
+    
+    return { valid: true };
+}
+
+// ==========================================
+// END KNOCKOUT STAGE SCORER FUNCTIONS
+// ==========================================
 
 function validateMatchTime(matchDate, matchTime) {
     if (!appSettings?.admin?.validateTime) {
@@ -8959,7 +9067,7 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                             <div class="team-name team-name-modal">${homeTeam.name}</div>
                             <input type="number" id="knockout-home-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.homeScore : ''}" 
-                                   class="score-input" oninput="checkKnockoutScoreTie()">
+                                   class="score-input" oninput="checkKnockoutScoreTie(); updateKnockoutScorerInputs()">
                         </div>
                         <div class="vs-section">
                             <span class="vs-text">VS</span>
@@ -8968,7 +9076,7 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                             <div class="team-name team-name-modal">${awayTeam.name}</div>
                             <input type="number" id="knockout-away-score" min="0" max="99" 
                                    placeholder="0" value="${isEdit ? matchResult.awayScore : ''}" 
-                                   class="score-input" oninput="checkKnockoutScoreTie()">
+                                   class="score-input" oninput="checkKnockoutScoreTie(); updateKnockoutScorerInputs()">
                         </div>
                     </div>
                     
@@ -8996,6 +9104,23 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
                         </div>
                     </div>
                     
+                    <!-- Goal Scorers Section -->
+                    <div id="knockout-scorers-section" class="scorers-section" style="display: none;">
+                        <div class="scorers-header">
+                            <h4>⚽ Goal Scorers (Optional)</h4>
+                            <button type="button" class="toggle-scorers-btn" onclick="toggleKnockoutScorers()">
+                                <span id="knockout-scorers-toggle-text">Show Scorers</span>
+                                <span id="knockout-scorers-toggle-icon">▼</span>
+                            </button>
+                        </div>
+                        <div id="knockout-scorers-content" class="scorers-content" style="display: none;">
+                            <div class="scorers-grid">
+                                <div id="knockout-home-scorers" class="team-scorers"></div>
+                                <div id="knockout-away-scorers" class="team-scorers"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions">
                         <button class="cancel-btn" onclick="closeKnockoutScoreModal()">Cancel</button>
                         <button class="save-btn" id="knockout-save-btn" onclick="saveKnockoutScoreModal('${matchId}', ${isEdit})">
@@ -9016,12 +9141,25 @@ function showKnockoutScoreModal(matchId, homeTeam, awayTeam, isEdit) {
     // Add modal to DOM
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
+    // Store match info for later use
+    const modal = document.getElementById('knockout-score-modal');
+    modal.dataset.homeTeamId = homeTeam.id;
+    modal.dataset.awayTeamId = awayTeam.id;
+    modal.dataset.matchDate = matchResult.date || new Date().toISOString().split('T')[0];
+    
+    // Render scorer inputs
+    renderKnockoutScorerInputs(homeTeam, awayTeam, matchResult.date || new Date().toISOString().split('T')[0]);
+    
     // Focus on first input
     setTimeout(() => {
         document.getElementById('knockout-home-score').focus();
         // Check if we need to show penalties on edit
         if (isEdit && matchResult.homeScore === matchResult.awayScore) {
             checkKnockoutScoreTie();
+        }
+        // Show scorers if editing with existing goals
+        if (isEdit && (matchResult.homeScore > 0 || matchResult.awayScore > 0)) {
+            updateKnockoutScorerInputs();
         }
     }, 100);
 }
@@ -9083,11 +9221,26 @@ function saveKnockoutScoreModal(matchId, isEdit) {
         return;
     }
     
+    // Validate scorers if any were entered
+    const scorerValidation = validateKnockoutScorers();
+    if (!scorerValidation.valid) {
+        showToast(scorerValidation.message, 'error');
+        return;
+    }
+    
     const matchResult = knockoutResults[matchId];
     matchResult.homeScore = homeScore;
     matchResult.awayScore = awayScore;
     matchResult.played = true;
     matchResult.playedDate = new Date().toISOString();
+    
+    // Collect scorers data (optional)
+    const scorersData = collectKnockoutScorersData();
+    if (scorersData.length > 0) {
+        matchResult.scorers = scorersData;
+    } else {
+        delete matchResult.scorers; // Remove scorers if none entered
+    }
     
     // Check if match is tied and handle penalties
     if (homeScore === awayScore) {

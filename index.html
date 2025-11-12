@@ -645,20 +645,15 @@
                     <div class="scorers-section" id="scorers-section" style="display: none;">
                         <div class="scorers-header">
                             <h4>⚽ Goal Scorers (Optional)</h4>
-                            <button type="button" class="btn-toggle-scorers" onclick="toggleScorersSection()">
-                                <span id="scorers-toggle-text">Show</span>
+                            <button type="button" class="toggle-scorers-btn" onclick="toggleScorersSection()">
+                                <span id="scorers-toggle-text">Show Scorers</span>
+                                <span id="scorers-toggle-icon">▼</span>
                             </button>
                         </div>
                         <div class="scorers-content" id="scorers-content" style="display: none;">
-                            <div class="scorers-teams">
-                                <div class="scorer-team-section">
-                                    <h5 id="homeTeamScorerLabel"></h5>
-                                    <div id="homeTeamScorers" class="scorer-list"></div>
-                                </div>
-                                <div class="scorer-team-section">
-                                    <h5 id="awayTeamScorerLabel"></h5>
-                                    <div id="awayTeamScorers" class="scorer-list"></div>
-                                </div>
+                            <div class="scorers-grid">
+                                <div id="homeTeamScorers" class="team-scorers"></div>
+                                <div id="awayTeamScorers" class="team-scorers"></div>
                             </div>
                             <p class="scorers-hint">💡 Select players and enter goals scored. Injured players are disabled.</p>
                         </div>
