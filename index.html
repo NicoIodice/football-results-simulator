@@ -6,7 +6,7 @@
     <title>Multi Sport Tournament Manager</title>
     <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
     <link rel="apple-touch-icon" href="./assets/favicon-app.png">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
     <!-- Inline script to apply theme immediately and prevent flash -->
     <script>
         (function() {
@@ -19,6 +19,9 @@
                     const settings = JSON.parse(xhr.responseText);
                     if (settings.theme === 'csw') {
                         document.documentElement.classList.add('theme-csw');
+                    }
+                    if (settings.theme === 'ctw') {
+                        document.documentElement.classList.add('theme-ctw');
                     }
                 }
             } catch (e) {
@@ -629,14 +632,38 @@
                     <div class="score-inputs">
                         <div class="team-score">
                             <label for="homeScore" id="homeTeamLabel"></label>
-                            <input type="number" id="homeScore" min="0" max="99" required data-testid="home-score-input">
+                            <input type="number" id="homeScore" min="0" max="99" required data-testid="home-score-input" oninput="updateScorerInputs()">
                         </div>
                         <div class="vs-separator">VS</div>
                         <div class="team-score">
                             <label for="awayScore" id="awayTeamLabel"></label>
-                            <input type="number" id="awayScore" min="0" max="99" required data-testid="away-score-input">
+                            <input type="number" id="awayScore" min="0" max="99" required data-testid="away-score-input" oninput="updateScorerInputs()">
                         </div>
                     </div>
+                    
+                    <!-- Scorers Section (Optional) -->
+                    <div class="scorers-section" id="scorers-section" style="display: none;">
+                        <div class="scorers-header">
+                            <h4>⚽ Goal Scorers (Optional)</h4>
+                            <button type="button" class="btn-toggle-scorers" onclick="toggleScorersSection()">
+                                <span id="scorers-toggle-text">Show</span>
+                            </button>
+                        </div>
+                        <div class="scorers-content" id="scorers-content" style="display: none;">
+                            <div class="scorers-teams">
+                                <div class="scorer-team-section">
+                                    <h5 id="homeTeamScorerLabel"></h5>
+                                    <div id="homeTeamScorers" class="scorer-list"></div>
+                                </div>
+                                <div class="scorer-team-section">
+                                    <h5 id="awayTeamScorerLabel"></h5>
+                                    <div id="awayTeamScorers" class="scorer-list"></div>
+                                </div>
+                            </div>
+                            <p class="scorers-hint">💡 Select players and enter goals scored. Injured players are disabled.</p>
+                        </div>
+                    </div>
+                    
                     <div class="modal-actions" data-testid="modal-actions">
                         <button type="button" class="btn-secondary" data-testid="add-result-cancel-btn" onclick="hideAddResultModal()">Cancel</button>
                         <button type="submit" class="btn-primary" data-testid="add-result-submit-btn">Add Result</button>
@@ -671,6 +698,6 @@
 
     <!-- OpenAI SDK -->
     <!--<script src="https://cdn.jsdelivr.net/npm/openai@4.0.0/dist/openai.min.js"></script>-->
-    <script src="script.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>

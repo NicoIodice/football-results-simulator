@@ -1089,7 +1089,11 @@
         "position": "defender",
         "status": "fit",
         "isStarter": true,
-        "isCaptain": true
+        "isCaptain": true,
+        "injury": {
+          "startDate": "2025-10-17",
+          "reason": "Knee tendinitis - season ending"
+        }
       },
       {
         "id": "francisco-ferreira", 
@@ -1160,9 +1164,12 @@
         "number": 10,
         "position": "midfielder",
         "status": "injured",
-        "injury": "Big injury",
         "isStarter": false,
-        "isCaptain": false
+        "isCaptain": false,
+        "injury": {
+          "startDate": "2025-10-10",
+          "reason": "Broken foot - season ending"
+        }
       }
     ]
   },

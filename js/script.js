@@ -5340,6 +5340,16 @@ function showAddResultModal(matchId, homeTeamName, awayTeamName, matchDate, matc
 
 function hideAddResultModal() {
     document.getElementById('addResultModal').style.display = 'none';
+    
+    // Reset scorers section
+    const scorersSection = document.getElementById('scorers-section');
+    const scorersContent = document.getElementById('scorers-content');
+    const toggleText = document.getElementById('scorers-toggle-text');
+    
+    if (scorersSection) scorersSection.style.display = 'none';
+    if (scorersContent) scorersContent.style.display = 'none';
+    if (toggleText) toggleText.textContent = 'Show';
+    
     currentMatch = null;
 }
 
@@ -5394,6 +5404,191 @@ function findMatchById(matchId) {
     return null;
 }
 
+// Toggle scorers section visibility
+function toggleScorersSection() {
+    const scorersContent = document.getElementById('scorers-content');
+    const toggleText = document.getElementById('scorers-toggle-text');
+    
+    if (scorersContent.style.display === 'none') {
+        scorersContent.style.display = 'block';
+        toggleText.textContent = 'Hide';
+    } else {
+        scorersContent.style.display = 'none';
+        toggleText.textContent = 'Show';
+    }
+}
+
+// Check if player is injured on a specific date
+function isPlayerInjured(player, matchDate) {
+    if (!player.injury) return false;
+    
+    const match = new Date(matchDate);
+    const injuryStart = player.injury.startDate ? new Date(player.injury.startDate) : null;
+    const injuryEnd = player.injury.endDate ? new Date(player.injury.endDate) : null;
+    
+    // If no start date, player is not injured
+    if (!injuryStart) return false;
+    
+    // If injury started after match, player is not injured for this match
+    if (match < injuryStart) return false;
+    
+    // If no end date and match is after start, player is injured
+    if (!injuryEnd) return match >= injuryStart;
+    
+    // Check if match is within injury period
+    return match >= injuryStart && match <= injuryEnd;
+}
+
+// Update scorer inputs when scores change
+function updateScorerInputs() {
+    const homeScore = parseInt(document.getElementById('homeScore').value) || 0;
+    const awayScore = parseInt(document.getElementById('awayScore').value) || 0;
+    const scorersSection = document.getElementById('scorers-section');
+    
+    // Show scorers section if any goals scored
+    if (homeScore > 0 || awayScore > 0) {
+        scorersSection.style.display = 'block';
+        renderScorerInputs();
+    } else {
+        scorersSection.style.display = 'none';
+    }
+}
+
+// Render scorer input fields for both teams
+function renderScorerInputs() {
+    if (!currentMatch) return;
+    
+    const homeTeamId = currentMatch.homeTeam;
+    const awayTeamId = currentMatch.awayTeam;
+    const matchDate = currentMatch.date;
+    
+    // Find team data
+    const homeTeam = teams.find(t => t.id === homeTeamId);
+    const awayTeam = teams.find(t => t.id === awayTeamId);
+    
+    if (!homeTeam || !awayTeam) return;
+    
+    // Update labels
+    document.getElementById('homeTeamScorerLabel').textContent = `${homeTeam.name} Scorers`;
+    document.getElementById('awayTeamScorerLabel').textContent = `${awayTeam.name} Scorers`;
+    
+    // Render home team scorers
+    renderTeamScorers(homeTeam, 'homeTeamScorers', matchDate);
+    
+    // Render away team scorers
+    renderTeamScorers(awayTeam, 'awayTeamScorers', matchDate);
+}
+
+// Render scorer inputs for a specific team
+function renderTeamScorers(team, containerId, matchDate) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    // Sort players by number
+    const sortedPlayers = [...team.players].sort((a, b) => a.number - b.number);
+    
+    sortedPlayers.forEach(player => {
+        const injured = isPlayerInjured(player, matchDate);
+        
+        const scorerItem = document.createElement('div');
+        scorerItem.className = `scorer-item ${injured ? 'injured' : ''}`;
+        scorerItem.dataset.playerId = player.id;
+        
+        const playerInfo = document.createElement('div');
+        playerInfo.className = 'scorer-player-info';
+        
+        const playerNumber = document.createElement('div');
+        playerNumber.className = 'scorer-player-number';
+        playerNumber.textContent = player.number;
+        
+        const playerName = document.createElement('span');
+        playerName.className = 'scorer-player-name';
+        playerName.textContent = player.name;
+        
+        playerInfo.appendChild(playerNumber);
+        playerInfo.appendChild(playerName);
+        
+        if (injured) {
+            const injuryBadge = document.createElement('span');
+            injuryBadge.className = 'scorer-injury-badge';
+            injuryBadge.textContent = '🤕 Injured';
+            injuryBadge.title = player.injury.reason || 'Injured';
+            playerInfo.appendChild(injuryBadge);
+        }
+        
+        const goalsInput = document.createElement('input');
+        goalsInput.type = 'number';
+        goalsInput.className = 'scorer-goals-input';
+        goalsInput.min = '0';
+        goalsInput.max = '20';
+        goalsInput.value = '0';
+        goalsInput.placeholder = '0';
+        goalsInput.disabled = injured;
+        goalsInput.dataset.playerId = player.id;
+        goalsInput.dataset.playerName = player.name;
+        
+        goalsInput.addEventListener('input', function() {
+            if (parseInt(this.value) > 0) {
+                scorerItem.classList.add('has-goals');
+            } else {
+                scorerItem.classList.remove('has-goals');
+            }
+        });
+        
+        scorerItem.appendChild(playerInfo);
+        scorerItem.appendChild(goalsInput);
+        container.appendChild(scorerItem);
+    });
+}
+
+// Collect scorers data from inputs
+function collectScorersData() {
+    const homeScorers = [];
+    const awayScorers = [];
+    
+    // Collect home team scorers
+    const homeInputs = document.querySelectorAll('#homeTeamScorers .scorer-goals-input');
+    homeInputs.forEach(input => {
+        const goals = parseInt(input.value) || 0;
+        if (goals > 0) {
+            homeScorers.push({
+                playerId: input.dataset.playerId,
+                playerName: input.dataset.playerName,
+                goals: goals
+            });
+        }
+    });
+    
+    // Collect away team scorers
+    const awayInputs = document.querySelectorAll('#awayTeamScorers .scorer-goals-input');
+    awayInputs.forEach(input => {
+        const goals = parseInt(input.value) || 0;
+        if (goals > 0) {
+            awayScorers.push({
+                playerId: input.dataset.playerId,
+                playerName: input.dataset.playerName,
+                goals: goals
+            });
+        }
+    });
+    
+    return { homeScorers, awayScorers };
+}
+
+// Validate scorers match the score
+function validateScorers(homeScore, awayScore, homeScorers, awayScorers) {
+    const homeTotalGoals = homeScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
+    const awayTotalGoals = awayScorers.reduce((sum, scorer) => sum + scorer.goals, 0);
+    
+    return {
+        valid: homeTotalGoals === homeScore && awayTotalGoals === awayScore,
+        homeTotalGoals,
+        awayTotalGoals
+    };
+}
+
 function validateMatchTime(matchDate, matchTime) {
     if (!appSettings?.admin?.validateTime) {
         return true; // Skip validation if disabled
@@ -5430,12 +5625,33 @@ function submitResult(event) {
         return;
     }
     
+    // Collect scorers data (optional)
+    const { homeScorers, awayScorers } = collectScorersData();
+    
+    // Validate scorers if any were entered
+    if (homeScorers.length > 0 || awayScorers.length > 0) {
+        const validation = validateScorers(homeScore, awayScore, homeScorers, awayScorers);
+        if (!validation.valid) {
+            showToast(
+                `Goals mismatch! Home: ${validation.homeTotalGoals}/${homeScore}, Away: ${validation.awayTotalGoals}/${awayScore}. Please adjust scorers or leave empty.`,
+                'error',
+                5000
+            );
+            return;
+        }
+    }
+    
     if (currentMatch.isEdit) {
         // Edit existing result
         const existingResultIndex = results.findIndex(r => r.matchId === currentMatch.id);
         if (existingResultIndex !== -1) {
             results[existingResultIndex].homeScore = homeScore;
             results[existingResultIndex].awayScore = awayScore;
+            
+            // Update scorers if provided
+            if (homeScorers.length > 0 || awayScorers.length > 0) {
+                results[existingResultIndex].scorers = [...homeScorers, ...awayScorers];
+            }
         }
         
         // Trigger download of updated group-stage-results.json
@@ -5464,6 +5680,11 @@ function submitResult(event) {
             groupId: currentMatch.groupId,
             played: true
         };
+        
+        // Add scorers if provided
+        if (homeScorers.length > 0 || awayScorers.length > 0) {
+            newResult.scorers = [...homeScorers, ...awayScorers];
+        }
         
         // Add to results array (only in memory for current session)
         results.push(newResult);
