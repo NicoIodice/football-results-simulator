@@ -12,6 +12,8 @@
     --primary-gradient-dark-end: #3498db;
 }
 
+/* CSW Theme - Red colors (applied to html or body) */
+html.theme-csw,
 body.theme-csw {
     /* CSW Theme - Red colors */
     --primary-color: #c01722;

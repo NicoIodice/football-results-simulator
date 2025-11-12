@@ -548,6 +548,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Load app and tournament settings first
     await loadAppSettings();
     await loadTournamentSettings();
+    // Initialize theme immediately after loading settings
+    initializeTheme?.();
+    initializeDarkMode?.();
     // ...existing code...
     await loadData();
     loadPendingResults();
@@ -1125,8 +1128,6 @@ async function loadData() {
         updateAllTabs();
         initializeKnockoutDates?.();
         await loadPlayersData?.();
-        initializeTheme?.();
-        initializeDarkMode?.();
     } catch (error) {
         logger.error('Error loading data:', error);
     }
@@ -7717,7 +7718,7 @@ function updateTeamLineupView() {
                             </div>
                             ${captain ? `
                             <div class="team-meta-item">
-                                <span class="meta-icon">⚽</span>
+                                <span class="meta-icon"><span class="member-captain" title="Captain">Ⓒ</span></span>
                                 <span class="meta-label">Captain:</span>
                                 <span class="meta-value">${captain.name}</span>
                             </div>
@@ -9140,20 +9141,24 @@ function initializeTheme() {
     
     // Default to CTW (blue) if no theme is specified
     if (!theme || theme === '') {
+        document.documentElement.classList.remove('theme-csw');
         document.body.classList.remove('theme-csw');
         logger.warn('⚠️ No theme defined in config.json, using default (CTW - blueish colors)');
         return;
     }
     
-    // Apply theme class to body
+    // Apply theme class to html element (for consistency with inline script)
     if (theme === 'csw') {
+        document.documentElement.classList.add('theme-csw');
         document.body.classList.add('theme-csw');
         logger.log('🎨 CSW theme applied (reddish colors)');
     } else if (theme === 'ctw') {
+        document.documentElement.classList.remove('theme-csw');
         document.body.classList.remove('theme-csw');
         logger.log('🎨 CTW theme applied (blueish colors)');
     } else {
         // Unknown theme - default to CTW (blue)
+        document.documentElement.classList.remove('theme-csw');
         document.body.classList.remove('theme-csw');
         logger.warn(`⚠️ Unknown theme "${theme}" in config.json, using default (CTW - blueish colors)`);
     }

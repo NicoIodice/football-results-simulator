@@ -7,6 +7,25 @@
     <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
     <link rel="apple-touch-icon" href="./assets/favicon-app.png">
     <link rel="stylesheet" href="styles.css">
+    <!-- Inline script to apply theme immediately and prevent flash -->
+    <script>
+        (function() {
+            // Fetch theme from tournament-settings.json synchronously
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', './data/2025/futsal/tournament-settings.json', false);
+            try {
+                xhr.send(null);
+                if (xhr.status === 200) {
+                    const settings = JSON.parse(xhr.responseText);
+                    if (settings.theme === 'csw') {
+                        document.documentElement.classList.add('theme-csw');
+                    }
+                }
+            } catch (e) {
+                // Fail silently - theme will be applied by JS later
+            }
+        })();
+    </script>
 </head>
 <body>
     <div class="container" data-testid="main-container">
@@ -390,7 +409,7 @@
                     <!-- Statistics Cards -->
                     <div class="team-statistics-cards" data-testid="team-statistics-cards">
                         <div class="stat-card" data-testid="stat-card-teams">
-                            <div class="stat-icon">🏆</div>
+                            <div class="stat-icon">⚽</div>
                             <div class="stat-content">
                                 <div class="teams-stat-value" id="total-teams">0</div>
                                 <div class="teams-stat-label">Teams</div>
