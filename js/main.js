@@ -449,8 +449,8 @@ function loadOpenAIKeyFromSession() {
 // Note: localStorage persistence removed to avoid overriding default settings
 // Configuration is now purely based on code defaults and API key availability
 
-// Show loading mask
-function showLoadingMask() {
+// Show AI loading mask
+function showAILoadingMask() {
     const mask = document.getElementById('openai-loading-mask');
     if (mask) {
         mask.classList.remove('hide', 'hidden');
@@ -795,7 +795,7 @@ function getUserFriendlyLabel(key, category) {
         useOpenAI: 'Use OpenAI',
         pointsGapLimit: 'Points Gap Limit',
         maxScenarios: 'Max Scenarios',
-        showLoadingMask: 'Show Loading Mask',
+        showAILoadingMask: 'Show AI Loading Mask',
         enableDebugMode: 'Enable Debug Mode',
         enableDarkMode: 'Enable Dark Mode',
         title: 'Title',
