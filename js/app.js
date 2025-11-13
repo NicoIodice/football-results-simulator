@@ -1,3 +1,14 @@
+// Import utilities from other modules
+import { logger } from './logger.js';
+import { 
+    appSettings,
+    setAppSettings,
+    getLoadingMethod,
+    loadAppSettings,
+    loadTournamentSettings,
+    loadOpenAIKeyFromConfig
+} from './dataLoader.js';
+
 // Show/hide scorer warning popup for mismatch in Top Scorers panel
 function showScorerWarningPopup(event, teamName, teamTotalGoals, sumPlayerGoals) {
     let popup = document.getElementById('scorer-warning-popup');
@@ -189,7 +200,6 @@ let selectedGroupId = null;
 let selectedForecastGroupId = null;
 
 // Configuration loaded from settings.json
-let appSettings = null;
 let tournamentSettings = null;
 
 // Local storage keys
@@ -233,162 +243,6 @@ function persistTeamState() {
         localStorage.setItem(STORAGE_KEYS.teamFormations, JSON.stringify(formations));
         localStorage.setItem(STORAGE_KEYS.teamStarters, JSON.stringify(starters));
     } catch (e) { logger.warn('Failed to persist team state', e); }
-}
-
-// Centralized logging system that respects debug mode setting
-const logger = {
-    log: (...args) => {
-        if (appSettings?.ui?.enableDebugMode) {
-            console.log(...args);
-        }
-    },
-    warn: (...args) => {
-        if (appSettings?.ui?.enableDebugMode) {
-            console.warn(...args);
-        }
-    },
-    error: (...args) => {
-        // Always show errors regardless of debug mode
-        console.error(...args);
-        handleError(args[0]);
-    },
-    info: (...args) => {
-        if (appSettings?.ui?.enableDebugMode) {
-            console.info(...args);
-        }
-    },
-    debug: (...args) => {
-        if (appSettings?.ui?.enableDebugMode) {
-            console.debug(...args);
-        }
-    }
-};
-
-// Error handling with toast notifications
-function handleError(error) {
-    let message;
-    let type = 'error';
-    
-    if (typeof error === 'string') {
-        // Business logic errors or custom messages
-        if (error.includes('not found') || error.includes('missing') || error.includes('required')) {
-            message = error; // Show specific business error
-        } else if (error.includes('TypeError') || error.includes('not iterable') || error.includes('undefined')) {
-            message = 'A technical issue occurred. Please refresh the page and try again.';
-        } else {
-            message = error; // Show the error as-is for other cases
-        }
-    } else if (error instanceof Error) {
-        // Technical errors
-        if (error.name === 'TypeError' || error.name === 'ReferenceError' || error.name === 'SyntaxError') {
-            message = 'A technical issue occurred. Please refresh the page and try again.';
-        } else {
-            message = error.message || 'An unexpected error occurred.';
-        }
-    } else {
-        message = 'An unexpected error occurred.';
-    }
-    
-    // Show toast notification
-    showToast(message, type, 5000); // Show for 5 seconds for errors
-}
-
-// Enhanced error wrapper for async functions
-function withErrorHandling(fn) {
-    return async function(...args) {
-        try {
-            return await fn.apply(this, args);
-        } catch (error) {
-            logger.error('Function error:', error);
-            throw error; // Re-throw so caller can handle if needed
-        }
-    };
-}
-
-// Load app settings (ui/admin) from app-settings.json
-async function loadAppSettings() {
-    try {
-        const response = await fetch('data/app-settings.json');
-        if (!response.ok) throw new Error('Failed to load app-settings.json');
-        appSettings = await response.json();
-    } catch (e) {
-        logger.error('Error loading app-settings.json:', e);
-        appSettings = {};
-    }
-}
-
-// Load tournament settings from tournament-settings.json
-async function loadTournamentSettings() {
-    try {
-        const response = await fetch('data/2025/futsal/tournament-settings.json');
-        if (!response.ok) throw new Error('Failed to load tournament-settings.json');
-        tournamentSettings = await response.json();
-        // Set document title and header dynamically
-        if (tournamentSettings.tournamentTitle && tournamentSettings.tournamentSubTitle && tournamentSettings.year) {
-            const fullTitle = `${tournamentSettings.tournamentTitle}: ${tournamentSettings.tournamentSubTitle} ${tournamentSettings.year}`;
-            document.title = fullTitle;
-            // Update header h1 and p
-            const h1 = document.querySelector('header h1');
-            if (h1) h1.textContent = `${tournamentSettings.tournamentTitle} ${tournamentSettings.year}`;
-            const p = document.querySelector('header p');
-            if (p) p.textContent = tournamentSettings.tournamentSubTitle;
-        }
-    } catch (e) {
-        logger.error('Error loading tournament-settings.json:', e);
-        tournamentSettings = {};
-    }
-}
-
-// Load OpenAI key from app-config.json (not app-settings.json)
-async function loadOpenAIKeyFromConfig() {
-    try {
-        const response = await fetch('app-config.json');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        const appConfig = await response.json();
-        const apiKey = appConfig.OPENAI_API_KEY;
-        if (apiKey && apiKey !== 'your-api-key-here' && apiKey.trim()) {
-            OPENAI_CONFIG.apiKey = apiKey.trim();
-            initializeOpenAI(OPENAI_CONFIG.apiKey);
-            logger.log('✅ OpenRouter API key loaded from app-config.json');
-            return;
-        } else {
-            logger.warn('⚠️ No valid OpenRouter API key found in app-config.json');
-        }
-    } catch (error) {
-        logger.warn('⚠️ Could not load app-config.json:', error.message);
-        logger.info('💡 Create an app-config.json file with: {"OPENAI_API_KEY": "your-openrouter-key-here"}');
-    }
-}
-
-// Fallback: Load API key from .env file (if app-config.json fails)
-async function loadOpenAIKeyFromEnv() {
-    try {
-        const response = await fetch('.env');
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-        
-        const envContent = await response.text();
-        const envLines = envContent.split('\n');
-        
-        for (const line of envLines) {
-            if (line.startsWith('OPENAI_API_KEY=')) {
-                const apiKey = line.split('=')[1].trim();
-                if (apiKey && apiKey !== 'your-api-key-here') {
-                    OPENAI_CONFIG.apiKey = apiKey;
-                    initializeOpenAI(apiKey);
-                    logger.log('✅ OpenRouter API key loaded from .env file');
-                    return;
-                }
-            }
-        }
-        logger.warn('⚠️ No valid OpenRouter API key found in .env file');
-    } catch (error) {
-        // Don't log .env errors since it's expected to fail often
-        logger.debug('.env file not accessible via HTTP (this is normal)');
-    }
 }
 
 // OpenRouter API configuration
@@ -449,8 +303,8 @@ function loadOpenAIKeyFromSession() {
 // Note: localStorage persistence removed to avoid overriding default settings
 // Configuration is now purely based on code defaults and API key availability
 
-// Show AI loading mask
-function showAILoadingMask() {
+// Show loading mask
+function showLoadingMask() {
     const mask = document.getElementById('openai-loading-mask');
     if (mask) {
         mask.classList.remove('hide', 'hidden');
@@ -519,13 +373,24 @@ async function initializeOpenRouterSystem() {
     try {
         logger.log('🔄 Initializing OpenRouter system...');
         
+        // Get loading method from settings
+        const loadingMethod = getLoadingMethod(appSettings);
+        
         // Try to load API key in order of preference
-        await loadOpenAIKeyFromConfig(); // Try app-config.json first
-        if (!OPENAI_CONFIG.apiKey) {
-            await loadOpenAIKeyFromEnv(); // Fallback to .env
-        }
-        if (!OPENAI_CONFIG.apiKey) {
-            loadOpenAIKeyFromSession(); // Final fallback to session storage
+        const apiKeyFromConfig = await loadOpenAIKeyFromConfig(loadingMethod);
+        if (apiKeyFromConfig) {
+            OPENAI_CONFIG.apiKey = apiKeyFromConfig;
+            initializeOpenAI(apiKeyFromConfig);
+        } else {
+            // Fallback to .env
+            const apiKeyFromEnv = await loadOpenAIKeyFromEnv();
+            if (apiKeyFromEnv) {
+                OPENAI_CONFIG.apiKey = apiKeyFromEnv;
+                initializeOpenAI(apiKeyFromEnv);
+            } else {
+                // Final fallback to session storage
+                loadOpenAIKeyFromSession();
+            }
         }
 
         // Show success or error toast
@@ -545,23 +410,38 @@ async function initializeOpenRouterSystem() {
 
 // Load data when page loads
 document.addEventListener('DOMContentLoaded', async function() {
-    // Load app and tournament settings first
-    await loadAppSettings();
-    await loadTournamentSettings();
+    // Load app and tournament settings first using the new data loader
+    let tempAppSettings = await loadAppSettings();
+    
+    // Update logger with app settings reference
+    setAppSettings(tempAppSettings);
+    
+    // Get loading method from settings
+    const loadingMethod = getLoadingMethod(appSettings);
+    
+    // Load tournament settings
+    tournamentSettings = await loadTournamentSettings(loadingMethod);
+    
+    // Apply OpenAI settings from app-settings
+    applyOpenAISettingsFromAppSettings(appSettings);
+    
     // Initialize theme immediately after loading settings
     initializeTheme?.();
     initializeDarkMode?.();
-    // ...existing code...
+    
+    // Load all tournament data
     await loadData();
     loadPendingResults();
     showTab('overview');
     setTimeout(() => initializeSubTabIndicators(), 200);
+    
     // Initialize OpenRouter only if enabled
     if (tournamentSettings?.simulation?.useOpenAI) {
         initializeOpenRouterSystem();
     } else {
         logger.log('ℹ️ OpenRouter feature disabled, skipping initialization');
     }
+    
     const settingsToggle = document.getElementById('settings-toggle');
     if (settingsToggle) {
         settingsToggle.addEventListener('click', showConfigModal);
@@ -795,7 +675,7 @@ function getUserFriendlyLabel(key, category) {
         useOpenAI: 'Use OpenAI',
         pointsGapLimit: 'Points Gap Limit',
         maxScenarios: 'Max Scenarios',
-        showAILoadingMask: 'Show AI Loading Mask',
+        showLoadingMask: 'Show Loading Mask',
         enableDebugMode: 'Enable Debug Mode',
         enableDarkMode: 'Enable Dark Mode',
         title: 'Title',
@@ -1252,32 +1132,6 @@ function getGoalsForGroup(groupId = selectedGroupId) {
 
 // Calculate goal statistics by team and player for current group
 function calculateGoalStatistics() {
-    // Use scorers from results (group-stage-results.json)
-    const groupId = selectedGroupId;
-    const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
-    const stats = {};
-    groupResults.forEach(match => {
-        Object.entries(match.scorers).forEach(([teamId, players]) => {
-            if (!stats[teamId]) {
-                // Find team name from teams array
-                const teamObj = Array.isArray(teams) ? teams.find(t => t.id === teamId) : null;
-                stats[teamId] = { players: {}, teamName: teamObj ? teamObj.name : teamId };
-            }
-            players.forEach(player => {
-                if (!stats[teamId].players[player.id]) {
-                    stats[teamId].players[player.id] = {
-                        playerName: player.name,
-                        goals: 0,
-                        goalType: player.goalType || 'regular'
-                    };
-                }
-                stats[teamId].players[player.id].goals += player.goals;
-            });
-        });
-    });
-    return stats;
-}
-function calculateGoalStatistics() {
     // Use group-stage-results.json scorers property
     const groupId = selectedGroupId;
     const groupResults = results.filter(r => r.groupId === groupId && r.scorers);
@@ -1298,136 +1152,6 @@ function calculateGoalStatistics() {
         });
     });
     return stats;
-}
-
-// Show goal tooltip on hover (desktop) or click (mobile)
-function showGoalTooltip(event, teamId) {
-    const goalStats = calculateGoalStatistics();
-    const teamStats = goalStats[teamId];
-        if (!teamStats || !teamStats.players) return; // Prevent Object.keys error
-    // Optionally, you can show a 'No scorer data' tooltip here
-    // Check if this is a mobile device
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    // Create tooltip if it doesn't exist
-    let tooltip = document.getElementById('goal-tooltip');
-    if (!tooltip) {
-        tooltip = document.createElement('div');
-        tooltip.id = 'goal-tooltip';
-        tooltip.className = 'goal-tooltip';
-        document.body.appendChild(tooltip);
-    }
-    
-    // If mobile and tooltip is already visible for this team, hide it
-    if (isMobile && tooltip.style.display === 'block' && tooltip.dataset.currentTeam === teamId) {
-        hideGoalTooltip();
-        return;
-    }
-    
-    // Sort players by goals scored (descending)
-    const sortedPlayers = Object.keys(teamStats.players)
-        .map(playerId => ({
-            playerId,
-            ...teamStats.players[playerId]
-        }))
-        .filter(player => player.goals > 0)
-        .sort((a, b) => b.goals - a.goals);
-    if (sortedPlayers.length === 0) {
-        tooltip.style.display = 'none';
-        return;
-    }
-    
-    // Generate tooltip content
-    let content = `
-        <div class="tooltip-header">
-            <strong>${teamStats.teamName}</strong><br>
-            Top Scorers
-        </div>
-        <div class="tooltip-content">
-    `;
-    
-    sortedPlayers.forEach((player, index) => {
-        const isTopScorer = teamStats.topScorer && player.playerId === teamStats.topScorer.playerId;
-        const championIcon = isTopScorer ? ' <span class="champion-icon">👑</span>' : '';
-        
-        content += `
-            <div class="player-goal-stat ${isTopScorer ? 'top-scorer' : ''}">
-                <span class="player-name">${player.playerName}${championIcon}</span>
-                <span class="player-goals">${player.goals} goal${player.goals !== 1 ? 's' : ''}</span>
-            </div>
-        `;
-    });
-    
-    content += '</div>';
-    tooltip.innerHTML = content;
-    tooltip.dataset.currentTeam = teamId; // Track which team tooltip is showing
-    tooltip.style.maxWidth = '320px';
-    tooltip.style.whiteSpace = 'normal';
-    
-    // Position tooltip
-    if (isMobile) {
-        // Center the tooltip on mobile
-        tooltip.style.display = 'block';
-        tooltip.style.left = '50%';
-        tooltip.style.top = '50%';
-        tooltip.style.transform = 'translate(-50%, -50%)';
-        tooltip.classList.add('mobile-tooltip');
-    } else {
-        // Desktop positioning (original behavior)
-        const rect = event.target.getBoundingClientRect();
-        tooltip.style.display = 'block';
-        tooltip.style.left = (rect.left + window.scrollX + rect.width + 10) + 'px';
-        tooltip.style.top = (rect.top + window.scrollY) + 'px';
-        tooltip.style.transform = 'none';
-        tooltip.classList.remove('mobile-tooltip');
-        
-        // Adjust if tooltip goes off screen
-        const tooltipRect = tooltip.getBoundingClientRect();
-        if (tooltipRect.right > window.innerWidth) {
-            tooltip.style.left = (rect.left + window.scrollX - tooltipRect.width - 10) + 'px';
-        }
-        if (tooltipRect.bottom > window.innerHeight) {
-            tooltip.style.top = (rect.top + window.scrollY - tooltipRect.height) + 'px';
-        }
-    }
-}
-
-// Hide goal tooltip
-function hideGoalTooltip() {
-    const tooltip = document.getElementById('goal-tooltip');
-    if (tooltip) {
-        tooltip.style.display = 'none';
-        tooltip.classList.remove('mobile-tooltip');
-        delete tooltip.dataset.currentTeam;
-    }
-}
-
-// Add global click handler for mobile tooltip dismissal
-document.addEventListener('click', function(event) {
-    const tooltip = document.getElementById('goal-tooltip');
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
-    // Only handle on mobile and if tooltip is visible
-    if (!isMobile || !tooltip || tooltip.style.display !== 'block') {
-        return;
-    }
-    
-    // Check if the click was on a goals cell or inside the tooltip
-    const clickedOnGoalsCell = event.target.closest('.goals-cell');
-    const clickedOnTooltip = event.target.closest('#goal-tooltip');
-    
-    if (!clickedOnGoalsCell && !clickedOnTooltip) {
-        hideGoalTooltip();
-    }
-});
-
-// Prevent mouseout from hiding tooltip on mobile
-function handleTooltipMouseOut(event, teamId) {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
-    // Don't hide on mobile (only click-to-dismiss)
-    if (!isMobile) {
-        hideGoalTooltip();
-    }
 }
 
 // Tab switching functionality
@@ -2080,11 +1804,7 @@ function updateOverview() {
                             ((result.homeTeam === team.id && result.awayTeam === otherTeam.id) ||
                             (result.homeTeam === otherTeam.id && result.awayTeam === team.id)) &&
                             result.played
-                        ) {
-                            const response = await fetch('data/app-settings.json');
-                            if (!response.ok) throw new Error('Failed to load app-settings.json');
-                            appSettings = await response.json();
-                            
+                        ) {                            
                             // Apply openAI settings to OPENAI_CONFIG (except apiKey)
                             applyOpenAISettingsFromAppSettings(appSettings);
                             
@@ -2120,9 +1840,7 @@ function updateOverview() {
                                 team.goalDifference < 0 ? 'goal-diff-negative' : 'goal-diff-zero';
 
             // Get goal statistics for this team
-            const goalStats = calculateGoalStatistics();
-            const teamGoalStats = goalStats[team.id];
-            
+            const goalStats = calculateGoalStatistics();            
 
             row.innerHTML = `
                 <td class="rank ${rankClass}">${index + 1}</td>
@@ -2662,8 +2380,6 @@ async function generateAISimulation(teamId, team) {
     selectedGroupId = teamData.groupId; // Temporarily switch to team's group
 
     const currentStandings = calculateStandings();
-    const teamStanding = currentStandings.find(t => t.id === teamId);
-    const currentPosition = currentStandings.findIndex(t => t.id === teamId) + 1;
     const remainingMatches = getRemainingMatches(teamId);
     const nextGameweek = findNextGameweek();
     
@@ -2685,44 +2401,8 @@ async function generateAISimulation(teamId, team) {
     }
 }
 
-function generateAPIKeyPrompt() {
-    return `
-        <div class="api-key-prompt">
-            <div class="simulation-header">🔑 OpenAI Configuration</div>
-            <div class="simulation-content">
-                <p><strong>Option 1:</strong> Create a <code>app-config.json</code> file:</p>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace;">{"OPENAI_API_KEY": "your-api-key-here"}</pre>
-                
-                <p style="margin-top: 15px;"><strong>Option 2:</strong> Add to <code>.env</code> file (may not work in all servers):</p>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 4px; font-family: monospace;">OPENAI_API_KEY=your-api-key-here</pre>
-                
-                <p style="margin-top: 15px;"><strong>Option 3:</strong> Enter your API key manually:</p>
-                <div style="margin: 15px 0;">
-                    <input type="password" id="openai-key-input" placeholder="Enter your OpenAI API key" style="width: 300px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                    <button onclick="saveAPIKey()" style="margin-left: 10px; padding: 8px 15px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Key</button>
-                </div>
-                <p style="font-size: 0.9em; color: #666;">Get your API key at <a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>. Keys are stored securely and never sent to our servers.</p>
-            </div>
-        </div>
-    `;
-}
-
-function saveAPIKey() {
-    const keyInput = document.getElementById('openai-key-input');
-    const apiKey = keyInput.value.trim();
-    
-    if (apiKey) {
-        setOpenAIKey(apiKey);
-        updateSimulation(); // Refresh simulation with AI
-    } else {
-        alert('Please enter a valid API key');
-    }
-}
-
 function prepareAIContext(teamId, team, standings, nextGameweek) {
     const teamPosition = standings.findIndex(t => t.id === teamId) + 1;
-    const teamsAbove = standings.slice(0, teamPosition - 1);
-    const teamsBelow = standings.slice(teamPosition);
     
     // Get next gameweek matches involving top teams
     const relevantMatches = nextGameweek ? nextGameweek.matches.filter(match => {
@@ -4090,119 +3770,6 @@ function calculateRecentForm(teamStanding) {
     return formPoints / recentMatches.length;
 }
 
-function calculateSmartProbability(result, teamStrength, opponentStrength, isHome) {
-    const homeAdvantage = isHome ? 0.1 : -0.1;
-    const strengthDiff = teamStrength - opponentStrength + homeAdvantage;
-    
-    let baseProbability;
-    if (result === 'win') {
-        baseProbability = 0.33 + strengthDiff * 0.4;
-    } else if (result === 'draw') {
-        baseProbability = 0.33 - Math.abs(strengthDiff) * 0.2;
-    } else { // loss
-        baseProbability = 0.33 - strengthDiff * 0.4;
-    }
-    
-    // Clamp between realistic bounds
-    baseProbability = Math.max(0.1, Math.min(0.8, baseProbability));
-    
-    if (baseProbability > 0.55) return 'high';
-    if (baseProbability > 0.35) return 'medium';
-    return 'low';
-}
-
-function findNextGameweek() {
-    // Find the first gameweek with unplayed matches
-    for (const gameweek of fixtures) {
-        const hasUnplayedMatches = gameweek.matches.some(match => {
-            const result = results.find(r => r.matchId === match.id && r.played);
-            return !result;
-        });
-        if (hasUnplayedMatches) {
-            return gameweek;
-        }
-    }
-    return null;
-}
-
-function calculateProjectedStandings(currentStandings, matchResults) {
-    // Create a copy of current standings
-    const projectedStandings = currentStandings.map(team => ({
-        ...team,
-        played: team.played,
-        wins: team.wins,
-        losses: team.losses,
-        draws: team.draws,
-        goalsFor: team.goalsFor,
-        goalsAgainst: team.goalsAgainst,
-        goalDifference: team.goalDifference,
-        points: team.points,
-        matchHistory: [...team.matchHistory],
-        headToHeadWins: {...team.headToHeadWins}
-    }));
-    
-    // Apply match results
-    matchResults.forEach(matchResult => {
-        const homeTeam = projectedStandings.find(t => t.id === matchResult.match.homeTeam);
-        const awayTeam = projectedStandings.find(t => t.id === matchResult.match.awayTeam);
-        
-        if (homeTeam && awayTeam) {
-            // Update match counts
-            homeTeam.played++;
-            awayTeam.played++;
-            
-            // Update goals
-            homeTeam.goalsFor += matchResult.homeScore;
-            homeTeam.goalsAgainst += matchResult.awayScore;
-            awayTeam.goalsFor += matchResult.awayScore;
-            awayTeam.goalsAgainst += matchResult.homeScore;
-            
-            // Update results
-            if (matchResult.homeScore > matchResult.awayScore) {
-                homeTeam.wins++;
-                homeTeam.points += 3;
-                homeTeam.matchHistory.push('W');
-                if (!homeTeam.headToHeadWins[awayTeam.id]) homeTeam.headToHeadWins[awayTeam.id] = 0;
-                homeTeam.headToHeadWins[awayTeam.id]++;
-                awayTeam.losses++;
-                awayTeam.matchHistory.push('L');
-            } else if (matchResult.homeScore < matchResult.awayScore) {
-                awayTeam.wins++;
-                awayTeam.points += 3;
-                awayTeam.matchHistory.push('W');
-                if (!awayTeam.headToHeadWins[homeTeam.id]) awayTeam.headToHeadWins[homeTeam.id] = 0;
-                awayTeam.headToHeadWins[homeTeam.id]++;
-                homeTeam.losses++;
-                homeTeam.matchHistory.push('L');
-            } else {
-                homeTeam.draws++;
-                homeTeam.points += 1;
-                homeTeam.matchHistory.push('D');
-                awayTeam.draws++;
-                awayTeam.points += 1;
-                awayTeam.matchHistory.push('D');
-            }
-            
-            // Update goal difference
-            homeTeam.goalDifference = homeTeam.goalsFor - homeTeam.goalsAgainst;
-            awayTeam.goalDifference = awayTeam.goalsFor - awayTeam.goalsAgainst;
-        }
-    });
-    
-    // Sort with same tie-breaker rules
-    projectedStandings.sort((a, b) => {
-        if (a.points !== b.points) return b.points - a.points;
-        if (a.goalDifference !== b.goalDifference) return b.goalDifference - a.goalDifference;
-        if (a.goalsFor !== b.goalsFor) return b.goalsFor - a.goalsFor;
-        const aHeadToHeadWins = Object.values(a.headToHeadWins).reduce((sum, wins) => sum + wins, 0);
-        const bHeadToHeadWins = Object.values(b.headToHeadWins).reduce((sum, wins) => sum + wins, 0);
-        if (aHeadToHeadWins !== bHeadToHeadWins) return bHeadToHeadWins - aHeadToHeadWins;
-        return a.name.localeCompare(b.name);
-    });
-    
-    return projectedStandings;
-}
-
 function getOrdinalSuffix(number) {
     const j = number % 10;
     const k = number % 100;
@@ -5275,22 +4842,6 @@ function getRatingColor(rating) {
     if (rating >= 4) return '#f39c12';
     if (rating >= 2) return '#e67e22';
     return '#e74c3c';
-}
-
-// Helper functions for forecast
-function calculateRecentForm(team) {
-    if (!team.matchHistory || team.matchHistory.length === 0) return 0.5;
-    
-    const recentMatches = team.matchHistory.slice(-3); // Last 3 matches
-    if (recentMatches.length === 0) return 0.5;
-    
-    const points = recentMatches.reduce((sum, result) => {
-        if (result === 'W') return sum + 1;
-        if (result === 'D') return sum + 0.5;
-        return sum;
-    }, 0);
-    
-    return points / recentMatches.length;
 }
 
 function findNextGameweek() {
@@ -6372,18 +5923,6 @@ function updateFieldPlayers(team) {
     allocateLine('attack', 'forward', forwards, newFwd);
 
     persistTeamState();
-}
-
-// Validate futsal formation
-function validateFutsalFormation(formation) {
-    const validFormations = ['1-1-2', '1-2-1', '2-1-1', '2-2-0', '0-2-2'];
-    
-    if (validFormations.includes(formation)) {
-        return formation;
-    }
-    
-    // Default futsal formation
-    return '2-0-2';
 }
 
 // Clear all field positions
@@ -8747,22 +8286,6 @@ function updateKnockoutDisclaimer() {
     const disclaimerElement = document.getElementById('knockout-disclaimer');
     if (!disclaimerElement) return;
     
-    // Check if all group stage matches are complete
-    const allGroupMatchesComplete = checkAllGroupMatchesComplete();
-    
-    if (allGroupMatchesComplete) {
-        disclaimerElement.className = 'knockout-disclaimer success';
-        disclaimerElement.innerHTML = '<strong>✅ Group Stage Complete!</strong><br>All group winners have been determined and knockout stage teams are finalized. Let the ball roll and the best team win!';
-    } else {
-        disclaimerElement.className = 'knockout-disclaimer warning';
-        disclaimerElement.innerHTML = '<strong>⚠️ Group Stage In Progress...</strong><br>Group winners are not yet finalized. Complete all group matches to determine knockout stage participants.';
-    }
-}
-
-function updateKnockoutDisclaimer() {
-    const disclaimerElement = document.getElementById('knockout-disclaimer');
-    if (!disclaimerElement) return;
-    
     // Check overall group stage status (all groups)
     const globalStatus = checkQualificationStatus(); // null = check all groups
     
@@ -9658,3 +9181,44 @@ function renderTeamBadge(teamId, large = false) {
     return `<span class="team-company-badge company-${company} ${sizeClass}" title="${company.toUpperCase()}">${label}</span>`;
 }
 
+// ===================================
+// EXPOSE FUNCTIONS TO GLOBAL SCOPE
+// (Required for HTML inline event handlers to work with ES6 modules)
+// ===================================
+window.showTab = showTab;
+window.showStandingsSubTab = showStandingsSubTab;
+window.showSimulatorSubTab = showSimulatorSubTab;
+window.showTeamsSubTab = showTeamsSubTab;
+window.updateStandingsForGroup = updateStandingsForGroup;
+window.updateFixturesForGroup = updateFixturesForGroup;
+window.updateForecastForGroup = updateForecastForGroup;
+window.toggleAllFixtures = toggleAllFixtures;
+window.toggleAllStatistics = toggleAllStatistics;
+window.toggleAllTopScorers = toggleAllTopScorers;
+window.updateTopScorersFilter = updateTopScorersFilter;
+window.updateFormation = updateFormation;
+window.showConfigModal = showConfigModal;
+window.hideConfigModal = hideConfigModal;
+window.toggleDarkMode = toggleDarkMode;
+window.showAddResultModal = showAddResultModal;
+window.hideAddResultModal = hideAddResultModal;
+window.submitResult = submitResult;
+window.toggleScorersSection = toggleScorersSection;
+window.updateScorerInputs = updateScorerInputs;
+window.toggleKnockoutScorers = toggleKnockoutScorers;
+window.updateKnockoutScorerInputs = updateKnockoutScorerInputs;
+window.toggleTeamCard = toggleTeamCard;
+window.toggleRegionGroup = toggleRegionGroup;
+window.showScorersPopup = showScorersPopup;
+window.showScorerWarningPopup = showScorerWarningPopup;
+window.hideScorerWarningPopup = hideScorerWarningPopup;
+window.showKnockoutWarningPopup = showKnockoutWarningPopup;
+window.hideKnockoutWarningPopup = hideKnockoutWarningPopup;
+window.toggleScorerPredictions = toggleScorerPredictions;
+window.saveConfig = saveConfig;
+window.renderConfigCategories = renderConfigCategories;
+window.renderConfigFieldsPanel = renderConfigFieldsPanel;
+window.updateSimulation = updateSimulation;
+window.updateTeamLineup = updateTeamLineup;
+window.updateStatisticsForGroup = updateStatisticsForGroup;
+window.updateTopScorers = updateTopScorers;

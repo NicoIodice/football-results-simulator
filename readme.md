@@ -81,6 +81,329 @@ A comprehensive multi-sport tournament management system featuring real-time sta
 - **Championship Odds**: Data-driven title probability calculations
 - **OpenRouter Integration**: Flexible AI model selection (view models at https://openrouter.ai/)
 
+## 🏗️ Application Architecture
+
+### Overview
+This section describes the modular architecture of the Multi-Sport Tournament Manager application.
+
+### Project Structure
+
+```
+multi-sport-tournament-manager/
+├── js/
+│   ├── logger.js          # Centralized logging system
+│   ├── errorHandler.js    # Error handling utilities
+│   ├── dataLoader.js      # Data loading from various sources
+│   └── app.js             # Main application logic
+├── data/
+│   ├── app-settings.json  # Application configuration
+│   └── 2025/
+│       └── futsal/
+│           ├── tournament-settings.json
+│           ├── teams.json
+│           ├── groups.json
+│           ├── fixtures.json
+│           ├── group-stage-results.json
+│           └── knockout-stage-results.json
+└── index.html             # Main HTML file
+```
+
+### Module Descriptions
+
+#### 1. logger.js
+**Purpose**: Provides centralized logging functionality that respects debug mode settings.
+
+**Key Features**:
+- Debug mode toggle (controlled via `app-settings.json`)
+- Multiple log levels: `log`, `warn`, `error`, `info`, `debug`
+- Errors are always logged regardless of debug mode
+- Integrates with error handler for user-facing error messages
+
+**Functions**:
+- `setAppSettings(settings)` - Initialize logger with app settings
+- `logger.log()` - Debug-mode-only logging
+- `logger.warn()` - Debug-mode-only warnings
+- `logger.error()` - Always shown, triggers error handler
+- `logger.info()` - Debug-mode-only information
+- `logger.debug()` - Debug-mode-only debug messages
+
+**Usage**:
+```javascript
+// In main script
+setAppSettings(appSettings);
+
+// Anywhere in the application
+logger.log('Debug information');
+logger.error('Something went wrong', error);
+```
+
+#### 2. errorHandler.js
+**Purpose**: Handles errors consistently across the application with user-friendly toast notifications.
+
+**Key Features**:
+- Distinguishes between business logic errors and technical errors
+- User-friendly error messages
+- Toast notification integration
+- Async function error wrapper
+
+**Functions**:
+- `handleError(error)` - Process and display errors to users
+- `withErrorHandling(fn)` - Wrap async functions with automatic error handling
+
+**Usage**:
+```javascript
+// Manual error handling
+try {
+    // some operation
+} catch (error) {
+    handleError(error);
+}
+
+// Automatic error wrapping
+const safeFunction = withErrorHandling(async () => {
+    // async operations
+});
+```
+
+#### 3. dataLoader.js
+**Purpose**: Abstract data loading to support multiple sources (local files, databases, remote APIs).
+
+**Key Features**:
+- Configurable loading methods via `app-settings.json`
+- Validation of loading method configuration
+- Centralized data loading logic
+- Support for future data sources
+
+**Supported Loading Methods**:
+- `local-file` - Load from local JSON files (default)
+- `local-db` - Load from local database (not yet implemented)
+- `remote-api` - Load from remote API (not yet implemented)
+- `remote-dropbox` - Load from Dropbox (not yet implemented)
+- `remote-github` - Load from GitHub (not yet implemented)
+
+**Functions**:
+- `getLoadingMethod(appSettings)` - Get configured loading method
+- `isValidLoadingMethod(method)` - Validate loading method
+- `loadAppSettings()` - Load application settings
+- `loadTournamentSettings()` - Load tournament configuration
+- `loadOpenAIKeyFromConfig()` - Load OpenAI API key from config
+- `loadOpenAIKeyFromEnv()` - Load OpenAI API key from .env (fallback)
+- `loadJSONData(filePath, method)` - Generic JSON data loader
+
+**Usage**:
+```javascript
+// Load with configured method
+const settings = await loadAppSettings();
+const loadingMethod = getLoadingMethod(settings);
+const tournamentData = await loadTournamentSettings(loadingMethod);
+
+// Load generic JSON data
+const teams = await loadJSONData('data/2025/futsal/teams.json', loadingMethod);
+```
+
+#### 4. app.js
+**Purpose**: Main application logic, UI interactions, and business logic.
+
+**Responsibilities**:
+- Tournament data management
+- UI rendering and interactions
+- Match result management
+- Simulation and forecast logic
+- OpenRouter/AI integration
+
+**Key Sections**:
+- Global state variables
+- OpenAI/OpenRouter configuration
+- Tab navigation
+- Standings calculations
+- Fixture rendering
+- Knockout stage management
+- Admin functions
+
+### Configuration
+
+#### app-settings.json
+```json
+{
+  "data": {
+    "loadingMethod": "local-file"  // Configures data source
+  },
+  "ui": {
+    "showLoadingMask": true,
+    "enableDebugMode": false,      // Controls logger output
+    "enableDarkMode": true
+  },
+  "admin": {
+    "role": "admin",
+    "validateTime": true
+  },
+  "openAI": {
+    "baseURL": "https://openrouter.ai/api/v1",
+    "model": "openai/gpt-4o",
+    "maxTokens": 500,
+    "temperature": 0.7,
+    "retryAttempts": 3,
+    "retryDelay": 1000,
+    "timeoutMs": 30000
+  }
+}
+```
+
+#### Loading Method Configuration
+
+The `data.loadingMethod` property in `app-settings.json` controls where the application loads data from:
+
+- **`local-file`** (default): Load from local JSON files in the `data/` directory
+- **`local-db`**: Load from browser's IndexedDB (future)
+- **`remote-api`**: Load from a REST API (future)
+- **`remote-dropbox`**: Load from Dropbox (future)
+- **`remote-github`**: Load from GitHub repository (future)
+
+**Validation**: Invalid loading methods will default to `local-file` with a warning.
+
+### Script Loading Order
+
+The scripts must be loaded in the following order in `index.html`:
+
+```html
+<!-- Core utility modules (load in order) -->
+<script src="./js/logger.js"></script>
+<script src="./js/errorHandler.js"></script>
+<script src="./js/dataLoader.js"></script>
+
+<!-- Main application script -->
+<script src="./js/app.js"></script>
+```
+
+**Why this order?**
+1. **logger.js** - Provides logging functionality used by all other modules
+2. **errorHandler.js** - Depends on logger, provides error handling for all modules
+3. **dataLoader.js** - Depends on logger and errorHandler, loads configuration
+4. **app.js** - Main application, depends on all utility modules
+
+### Development Guidelines
+
+#### Adding New Loading Methods
+
+To add a new data source:
+
+1. Add the method to `DATA_LOADING_METHODS` in `dataLoader.js`:
+```javascript
+const DATA_LOADING_METHODS = {
+    // ... existing methods
+    MY_NEW_METHOD: 'my-new-method'
+};
+```
+
+2. Implement the loader function:
+```javascript
+async function loadFromMySource(filePath) {
+    // Implementation
+    return data;
+}
+```
+
+3. Add case to `loadData()` switch statement:
+```javascript
+switch (loadingMethod) {
+    // ... existing cases
+    case DATA_LOADING_METHODS.MY_NEW_METHOD:
+        return await loadFromMySource(filePath);
+    // ...
+}
+```
+
+4. Update `app-settings.json` to use new method:
+```json
+{
+  "data": {
+    "loadingMethod": "my-new-method"
+  }
+}
+```
+
+#### Error Handling Best Practices
+
+1. **Use logger for all logging**:
+   ```javascript
+   logger.log('Info message');    // Only in debug mode
+   logger.error('Error', err);    // Always shown + toast
+   ```
+
+2. **Wrap async functions with error handling**:
+   ```javascript
+   const safeFn = withErrorHandling(async () => {
+       // Your code
+   });
+   ```
+
+3. **Provide user-friendly error messages**:
+   ```javascript
+   throw new Error('Team not found: ' + teamId);  // Good
+   throw new Error('Error');                       // Bad
+   ```
+
+#### Debugging
+
+Enable debug mode in `app-settings.json`:
+```json
+{
+  "ui": {
+    "enableDebugMode": true
+  }
+}
+```
+
+This will output all `logger.log()`, `logger.warn()`, `logger.info()`, and `logger.debug()` calls to the console.
+
+### Planned Architecture Enhancements
+
+1. **Remote Data Sources**:
+   - GitHub repository integration
+   - Dropbox file sync
+   - REST API support
+   - Real-time database integration
+
+2. **Data Caching**:
+   - IndexedDB for offline support
+   - Service worker for PWA functionality
+   - Cache invalidation strategies
+
+3. **Module System**:
+   - ES6 modules (import/export)
+   - Build system (Webpack/Rollup)
+   - Code splitting
+
+4. **Testing**:
+   - Unit tests for each module
+   - Integration tests
+   - E2E tests
+
+### Migration Notes
+
+#### Changes from Previous Architecture
+
+**Before**:
+- All code in single `script.js` file
+- Logger defined inline
+- Error handlers scattered throughout
+- Data loading functions mixed with business logic
+
+**After**:
+- Modular architecture with separate concerns
+- Centralized logger with configuration
+- Unified error handling
+- Abstracted data loading with multiple source support
+
+**Benefits**:
+- ✅ Better code organization
+- ✅ Easier testing and maintenance
+- ✅ Flexible data source configuration
+- ✅ Consistent error handling and logging
+- ✅ Smaller, more focused files
+
+---
+
 ## 🎨 Visual Design
 
 ### Color-Coded Analysis:
@@ -464,3 +787,7 @@ Add an `injury` object to any player in `teams.json`:
 *This multi-sport tournament manager combines mathematical precision with intuitive design to provide a comprehensive tournament management and analysis tool.*
 
 **Powered by OpenRouter AI** - View available models at https://openrouter.ai/
+
+---
+
+*Last Updated: November 12, 2025*
