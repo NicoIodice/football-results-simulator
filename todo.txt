@@ -1,15 +1,22 @@
 - Fix formations green field and players move action
 - Finalize settings page
+- Fix logout button and settings button (desktop and mobile)
+
 - Separate code
 - Clean code
-- Add pages folder for different urls and url links (/teams, /forecast, etc)
+
 - Add admin dashboard (settings and dark/light-mode toggle)
   - Setup tournaments configurations, etc
   - On dashboard, when selecting one tournament, all the configs should read from the correct data folder
-- Add login page with encrypted credentials (index.html)
- - redirect to landing page > dashboard with current tournaments the player is subscripted
+
 - Merge Forecast and Simulator tab
+
+- Add playwright tests
+
 - Add loading mask on app start while loading data (validate if needed)
+
 - Load files from dropbox files
  - Add api token environment variable
-- Add playwright tests
+
+- Add login page with encrypted credentials (index.html)
+ - redirect to landing page > dashboard with current tournaments the player is subscripted

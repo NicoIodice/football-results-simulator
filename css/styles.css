@@ -7614,6 +7614,8 @@ body.dark-mode .member-position {
     
     .stat-card {
         min-width: 100%;
+        padding: 5px;
+        gap: 55px;
     }
     
     .team-card-meta {
