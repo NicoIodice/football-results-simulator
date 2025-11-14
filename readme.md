@@ -419,6 +419,101 @@ This will output all `logger.log()`, `logger.warn()`, `logger.info()`, and `logg
 - **Responsive Layout**: Optimized for all devices
 - **Dark Mode**: Full theme support across all features
 
+## Authentication & Routing Update
+
+### Authentication System
+- **Created**: `data/users.json` with admin credentials
+- **Created**: `js/auth/auth.js` - Authentication module with login/logout functionality
+- **Features**:
+  - Session-based authentication using `sessionStorage`
+  - User validation against `users.json`
+  - Auto-redirect to login if not authenticated
+  - Logout functionality with session cleanup
+
+### URL-Based Routing
+- **Created**: `js/router.js` - URL routing module
+- **Features**:
+  - Hash-based routing (#/overview, #/teams, etc.)
+  - URL updates when switching tabs
+  - Direct URL navigation support
+  - Route validation with fallback to /overview
+
+### How It Works
+
+### Login Flow
+1. User visits root URL (`/`)
+2. `index.html` loads with login form
+3. User enters credentials (default: admin/admin)
+4. `auth.js` validates against `data/users.json`
+5. On success: Session token stored, redirect to `/pages/app.html#/overview`
+6. On failure: Error message displayed
+
+### Authentication Check
+1. `pages/app.html` loads
+2. Inline script imports `auth.js` and calls `requireAuth()`
+3. If not authenticated: Redirect to `/`
+4. If authenticated: Initialize router and load app
+
+### URL Routing
+1. Router listens for hash changes (`hashchange` event)
+2. When tab clicked: `showTab()` called → Updates URL via `updateURL()`
+3. URL change triggers `hashchange` → Router navigates to tab
+4. Direct URL access: Router parses hash and activates correct tab
+
+### Logout
+1. User clicks logout button (🚪 icon in header)
+2. Calls `logout()` from `auth.js`
+3. Session cleared from `sessionStorage`
+4. Redirect to `/` (login page)
+
+## URL Routes
+
+- `/` - Login page
+- `/pages/app.html#/overview` - Overview tab (default)
+- `/pages/app.html#/teams` - Teams tab
+- `/pages/app.html#/fixtures` - Fixtures tab
+- `/pages/app.html#/forecast` - Forecast tab
+- `/pages/app.html#/simulator` - Simulator tab
+
+## Testing Credentials
+
+- **Username**: admin
+- **Password**: admin
+
+## No Features Broken
+
+All existing functionality preserved:
+- ✅ Tab navigation
+- ✅ Data loading
+- ✅ Settings modal
+- ✅ Dark mode toggle
+- ✅ All tournament features
+- ✅ AI predictions
+- ✅ Knockout stage
+- ✅ Statistics
+- ✅ Team formations
+
+## Browser Compatibility
+
+- Modern browsers with ES6 module support
+- `sessionStorage` support required
+- Hash-based routing (works with GitHub Pages)
+
+## Security Notes
+
+⚠️ **Current Implementation**:
+- Authentication is client-side only
+- User credentials stored in plain JSON
+- Session token is simple Base64 encoding
+
+🔒 **For Production**:
+- Move authentication to server-side
+- Use proper password hashing (bcrypt, etc.)
+- Implement JWT or similar token system
+- Add HTTPS enforcement
+- Add session timeout
+- Add brute-force protection
+
 ## 🧠 Intelligent Analysis
 
 ### Advanced Calculations:

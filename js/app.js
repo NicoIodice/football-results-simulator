@@ -8,6 +8,7 @@ import {
     loadTournamentSettings,
     loadOpenAIKeyFromConfig
 } from './dataLoader.js';
+import { updateURL } from './router.js';
 
 // Show/hide scorer warning popup for mismatch in Top Scorers panel
 function showScorerWarningPopup(event, teamName, teamTotalGoals, sumPlayerGoals) {
@@ -986,7 +987,7 @@ async function loadData() {
         // Use tournamentSettings for tournament config
         const year = tournamentSettings?.year || '2025';
         const sportType = tournamentSettings?.sportType || 'futsal';
-        const basePath = `data/${year}/${sportType}`;
+        const basePath = `/data/${year}/${sportType}`;
         const [groupsResponse, teamsResponse, fixturesResponse, groupStageResultsResponse, knockoutResponse] = await Promise.all([
             fetch(`${basePath}/groups.json`),
             fetch(`${basePath}/teams.json`),
@@ -1156,6 +1157,11 @@ function calculateGoalStatistics() {
 
 // Tab switching functionality
 function showTab(tabName) {
+    // Update URL when tab changes
+    if (typeof updateURL === 'function') {
+        updateURL('/' + tabName);
+    }
+    
     // Hide all tab contents
     const tabContents = document.querySelectorAll('.tab-content');
     tabContents.forEach(tab => tab.classList.remove('active'));
@@ -5799,9 +5805,9 @@ async function loadPlayersData() {
         // Use year and sportType from config to construct the path
         const year = defaults.year || '2025';
         const sportType = defaults.sportType || 'futsal';
-        const basePath = `data/${year}/${sportType}`;
+        const basePath = `/data/${year}/${sportType}`;
         
-        const response = await fetch(`./${basePath}/teams.json`);
+        const response = await fetch(`${basePath}/teams.json`);
         teamsData = await response.json();
         logger.log('Teams data loaded:', teamsData);
         // Apply persisted formations/starters if available
@@ -9222,3 +9228,9 @@ window.updateSimulation = updateSimulation;
 window.updateTeamLineup = updateTeamLineup;
 window.updateStatisticsForGroup = updateStatisticsForGroup;
 window.updateTopScorers = updateTopScorers;
+window.addKnockoutResult = addKnockoutResult;
+window.editKnockoutResult = editKnockoutResult;
+window.closeKnockoutScoreModal = closeKnockoutScoreModal;
+window.saveKnockoutScoreModal = saveKnockoutScoreModal;
+window.checkKnockoutScoreTie = checkKnockoutScoreTie;
+window.validatePenaltyInputs = validatePenaltyInputs;

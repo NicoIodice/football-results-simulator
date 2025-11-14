@@ -10,10 +10,8 @@ const logger = {
     error: (...args) => {
         // Always show errors regardless of debug mode
         console.error(...args);
-        // Call handleError if it's available (defined in errorHandler.js)
-        if (typeof handleError === 'function') {
-            handleError(args[0]);
-        }
+        // Don't call handleError automatically to avoid circular dependencies
+        // and issues during initialization when showToast might not be available
     },
     warn: (...args) => {
         if (appSettings?.ui?.enableDebugMode) {

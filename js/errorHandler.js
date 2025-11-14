@@ -32,10 +32,11 @@ function handleError(error) {
     }
     
     // Show toast notification (assumes showToast function exists in main script)
-    if (typeof showToast === 'function') {
-        showToast(message, type, 5000); // Show for 5 seconds for errors
+    if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast(message, type, 5000); // Show for 5 seconds for errors
     } else {
-        console.error('Toast function not available:', message);
+        // Fallback to console error when showToast is not available
+        console.error(message);
     }
 }
 

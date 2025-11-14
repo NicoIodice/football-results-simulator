@@ -3,695 +3,347 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Multi Sport Tournament Manager</title>
+    <title>Login - Multi Sport Tournament Manager</title>
     <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
     <link rel="apple-touch-icon" href="./assets/favicon-app.png">
-    <link rel="stylesheet" href="./css/styles.css">
-    <!-- Inline script to apply theme immediately and prevent flash -->
-    <script>
-        (function() {
-            // Fetch theme from tournament-settings.json synchronously
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', './data/2025/futsal/tournament-settings.json', false);
-            try {
-                xhr.send(null);
-                if (xhr.status === 200) {
-                    const settings = JSON.parse(xhr.responseText);
-                    if (settings.theme === 'csw') {
-                        document.documentElement.classList.add('theme-csw');
-                    }
-                    if (settings.theme === 'ctw') {
-                        document.documentElement.classList.add('theme-ctw');
-                    }
-                }
-            } catch (e) {
-                // Fail silently - theme will be applied by JS later
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
             }
-        })();
-    </script>
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input.error {
+            border-color: #dc3545;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-error {
+            background: #fee;
+            color: #c33;
+            border: 1px solid #fcc;
+        }
+
+        .alert-success {
+            background: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
+        .loading-spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .login-btn.loading .btn-text {
+            display: none;
+        }
+
+        .login-btn.loading .loading-spinner {
+            display: block;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px;
+            }
+
+            .login-header h1 {
+                font-size: 24px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container" data-testid="main-container">
-        <header data-testid="main-header">
-            <h1 data-testid="header-title">Multi Sport</h1>
-            <p data-testid="header-subtitle">Tournament Manager</p>
-            <!-- Floating action buttons for settings and dark mode (mobile-friendly) -->
-            <div class="fab-vertical-stack">
-                <button id="dark-mode-toggle" class="dark-mode-toggle" onclick="toggleDarkMode()" title="Toggle Dark Mode">
-                    <span class="dark-mode-icon">🌙</span>
-                </button>
-                <button id="settings-toggle" class="settings-toggle" onclick="showConfigModal()" title="Settings">
-                    <span class="settings-icon">⚙️</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Config Modal -->
-        <div id="configModal" class="modal config-modal" style="display:none;">
-            <div class="modal-content config-modal-content">
-                <div class="modal-header config-modal-header">
-                    <h3>Configuration Settings</h3>
-                    <span class="close-modal" onclick="hideConfigModal()">&times;</span>
-                </div>
-                <div class="config-modal-main">
-                    <aside class="config-categories-panel" id="config-categories-panel">
-                        <!-- Categories will be rendered here by JS -->
-                    </aside>
-                    <section class="config-fields-panel" id="config-fields-panel">
-                        <!-- Fields for selected category will be rendered here by JS -->
-                    </section>
-                </div>
-                <div class="modal-actions config-modal-actions">
-                    <button type="button" class="btn-primary" id="config-save-btn" disabled onclick="saveConfig()">Save</button>
-                </div>
-            </div>
+    <div class="login-container">
+        <div class="login-header">
+            <h1>🏆 Multi Sport</h1>
+            <p>Tournament Manager</p>
         </div>
 
-        <nav class="tabs" data-testid="main-tabs">
-            <button class="tab-button active" data-testid="tab-overview" onclick="showTab('overview')">
-                <span class="tab-icon">📊</span>
-                <span class="tab-label">Overview</span>
-            </button>
-            <button class="tab-button" data-testid="tab-teams" onclick="showTab('teams')">
-                <span class="tab-icon">👥</span>
-                <span class="tab-label">Teams</span>
-            </button>
-            <button class="tab-button" data-testid="tab-fixtures" onclick="showTab('fixtures')">
-                <span class="tab-icon">📅</span>
-                <span class="tab-label">Fixtures</span>
-            </button>
-            <button class="tab-button" data-testid="tab-forecast" onclick="showTab('forecast')">
-                <span class="tab-icon">🔮</span>
-                <span class="tab-label">Forecast</span>
-            </button>
-            <button class="tab-button" data-testid="tab-simulator" onclick="showTab('simulator')">
-                <span class="tab-icon">🎮</span>
-                <span class="tab-label">Simulator</span>
-            </button>
-        </nav>
+        <div id="alert" class="alert"></div>
 
-        <main>
-            <!-- Overview Tab (formerly Standings) -->
-            <div id="overview" class="tab-content active" data-testid="tab-overview-content">
-                <h2>Championship Overview</h2>
-                
-                <!-- Sub-tabs for Overview -->
-                <div class="sub-tabs">
-                    <button class="sub-tab-button active" data-testid="sub-tab-league-standings" onclick="showStandingsSubTab('league-standings')">League Standings</button>
-                    <button class="sub-tab-button" data-testid="sub-tab-knockout-stage" onclick="showStandingsSubTab('knockout-stage')">Knockout</button>
-                    <button class="sub-tab-button" data-testid="sub-tab-statistics" onclick="showStandingsSubTab('statistics')">Statistics</button>
-                </div>
-                
-                <!-- League Standings Sub-tab -->
-                <div id="league-standings" class="sub-tab-content active" data-testid="league-standings-content">
-                    <div class="group-selector" data-testid="group-selector">
-                        <label for="selected-group">Group:</label>
-                        <div class="group-selector-container">
-                            <select id="selected-group" onchange="updateStandingsForGroup()">
-                                <!-- Groups will be populated by JavaScript -->
-                            </select>
-                            <div id="group-status-indicator" class="group-status-indicator">
-                                <!-- Status icon and message will be populated dynamically -->
-                            </div>
-                        </div>
-                    </div>
-                    <div class="table-container" data-testid="standings-table-container">
-                        <table id="standings-table" data-testid="standings-table">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>Team</th>
-                                    <th>Matches</th>
-                                    <th>W-L-D</th>
-                                    <th title="Total goals scored minus goals given up">Goals Diff (TB1)</th>
-                                    <th title="Number of total goals scored per team">Total Goals (TB2)</th>
-                                    <th title="The highest number of points obtained by the tied teams in the matches they played against each other">Head-to-Head (TB3)</th>
-                                    <th>Match History</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody id="standings-body">
-                                <!-- Standings will be populated by JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Knockout Stage Sub-tab -->
-                <div id="knockout-stage" class="sub-tab-content">
-                    <div class="knockout-header">
-                        <h3>🏆 Semi-Finals & Finals</h3>
-                        <p class="knockout-date" id="knockout-date"><!-- Date will be loaded from config --></p>
-                    </div>
-                    
-                    <!-- Knockout Stage Status Disclaimer -->
-                    <div id="knockout-disclaimer" class="knockout-disclaimer">
-                        <!-- Will be populated dynamically -->
-                    </div>
-                    
-                    <div class="knockout-bracket">
-                        <!-- Semi-Finals -->
-                        <div class="knockout-round semi-finals">
-                            <h4>Semi-Finals</h4>
-                            <div class="matches-container">
-                                <div class="knockout-match">
-                                    <div class="match-header">
-                                        <div class="match-label">Semi-Final 1</div>
-                                        <div class="match-time" id="semi1-time"></div>
-                                        <div class="match-venue" id="semi1-venue"></div>
-                                    </div>
-                                    <div class="match-participants">
-                                        <div class="participant">
-                                            <div id="group-b-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label" id="semi1-home-label">Winner of Group B</div>
-                                        </div>
-                                        <div class="vs-section">
-                                            <div class="vs-text">VS</div>
-                                        </div>
-                                        <div class="participant">
-                                            <div id="group-d-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label" id="semi1-away-label">Winner of Group D</div>
-                                        </div>
-                                    </div>
-                                    <div class="match-controls">
-                                        <div class="score-display" id="semi1-score"> - </div>
-                                        <button class="add-result-btn" onclick="addKnockoutResult('semi1')" id="semi1-add-btn">
-                                            <span class="plus-icon">+</span>
-                                        </button>
-                                        <button class="edit-result-btn" onclick="editKnockoutResult('semi1')" id="semi1-edit-btn" style="display: none;">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="knockout-match">
-                                    <div class="match-header">
-                                        <div class="match-label">Semi-Final 2</div>
-                                        <div class="match-time" id="semi2-time"></div>
-                                        <div class="match-venue" id="semi2-venue"></div>
-                                    </div>
-                                    <div class="match-participants">
-                                        <div class="participant">
-                                            <div id="group-a-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label" id="semi2-home-label">Winner of Group A</div>
-                                        </div>
-                                        <div class="vs-section">
-                                            <div class="vs-text">VS</div>
-                                        </div>
-                                        <div class="participant">
-                                            <div id="group-c-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label" id="semi2-away-label">Winner of Group C</div>
-                                        </div>
-                                    </div>
-                                    <div class="match-controls">
-                                        <div class="score-display" id="semi2-score"> - </div>
-                                        <button class="add-result-btn" onclick="addKnockoutResult('semi2')" id="semi2-add-btn">
-                                            <span class="plus-icon">+</span>
-                                        </button>
-                                        <button class="edit-result-btn" onclick="editKnockoutResult('semi2')" id="semi2-edit-btn" style="display: none;">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Finals -->
-                        <div class="knockout-round final">
-                            <h4>Final</h4>
-                            <div class="matches-container">
-                                <div class="knockout-match final-match">
-                                    <div class="match-header">
-                                        <div class="match-label">Championship Final</div>
-                                        <div class="match-time" id="final-time"></div>
-                                        <div class="match-venue" id="final-venue"></div>
-                                    </div>
-                                    <div class="match-participants">
-                                        <div class="participant">
-                                            <div id="semifinal-1-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label">Winner of Semi-Final 1</div>
-                                        </div>
-                                        <div class="vs-section">
-                                            <div class="vs-text">VS</div>
-                                        </div>
-                                        <div class="participant">
-                                            <div id="semifinal-2-winner" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label">Winner of Semi-Final 2</div>
-                                        </div>
-                                    </div>
-                                    <div class="match-controls">
-                                        <div class="score-display" id="final-score"> - </div>
-                                        <button class="add-result-btn" onclick="addKnockoutResult('final')" id="final-add-btn">
-                                            <span class="plus-icon">+</span>
-                                        </button>
-                                        <button class="edit-result-btn" onclick="editKnockoutResult('final')" id="final-edit-btn" style="display: none;">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 3rd/4th Place Playoff -->
-                        <div class="knockout-round third-place">
-                            <h4>3rd/4th Place Playoff</h4>
-                            <div class="matches-container">
-                                <div class="knockout-match">
-                                    <div class="match-header">
-                                        <div class="match-label">3rd Place Match</div>
-                                        <div class="match-time" id="third-time"></div>
-                                        <div class="match-venue" id="third-venue"></div>
-                                    </div>
-                                    <div class="match-participants">
-                                        <div class="participant">
-                                            <div id="semifinal-1-loser" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label">Loser of Semi-Final 1</div>
-                                        </div>
-                                        <div class="vs-section">
-                                            <div class="vs-text">VS</div>
-                                        </div>
-                                        <div class="participant">
-                                            <div id="semifinal-2-loser" class="team-box">
-                                                <span class="team-name">TBD</span>
-                                            </div>
-                                            <div class="team-label">Loser of Semi-Final 2</div>
-                                        </div>
-                                    </div>
-                                    <div class="match-controls">
-                                        <div class="score-display" id="third-score"> - </div>
-                                        <button class="add-result-btn" onclick="addKnockoutResult('third')" id="third-add-btn">
-                                            <span class="plus-icon">+</span>
-                                        </button>
-                                        <button class="edit-result-btn" onclick="editKnockoutResult('third')" id="third-edit-btn" style="display: none;">
-                                            Edit
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Tournament Top Scorers Section -->
-                    <div class="statistics-section" style="margin-top: 30px;">
-                        <div class="statistics-header">
-                            ⚽ Tournament Top Scorers
-                        </div>
-                        <div id="knockout-topscorers-content" class="statistics-content">
-                            <!-- Top Scorers will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Statistics Sub-tab -->
-                <div id="statistics" class="sub-tab-content">
-                    <!-- Statistics Controls -->
-                    <div class="statistics-controls">
-                        <div class="control-row">
-                            <div class="group-selector">
-                                <label for="statistics-group-select">Group:</label>
-                                <select id="statistics-group-select" onchange="updateStatisticsForGroup()">
-                                    <!-- Groups will be populated by JavaScript -->
-                                </select>
-                            </div>
-                            <div class="checkbox-control">
-                                <label for="show-all-statistics">
-                                    <input type="checkbox" id="show-all-statistics" onchange="toggleAllStatistics()">
-                                    Show All Groups
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Team Performance Analysis Section -->
-                    <div class="statistics-section">
-                        <div class="statistics-header">
-                            📊 Team Performance Analysis
-                        </div>
-                        <div id="team-performance-content" class="statistics-content">
-                            <!-- Team Performance Analysis will be populated by JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- Statistical Insights Section -->
-                    <div class="statistics-section">
-                        <div class="statistics-header">
-                            📈 Statistical Insights
-                        </div>
-                        <div id="statistical-insights-content" class="statistics-content">
-                            <!-- Statistical Insights will be populated by JavaScript -->
-                        </div>
-                    </div>
-                    
-                    <!-- Top Scorers Section -->
-                    <div class="statistics-section">
-                        <div class="statistics-header">
-                            ⚽ Top Scorers
-                        </div>
-                        <div class="topscorers-controls">
-                            <div class="control-row">
-                                <div class="filter-selector">
-                                    <label for="topscorers-filter">Filter by:</label>
-                                    <select id="topscorers-filter" onchange="updateTopScorersFilter()">
-                                        <option value="group">Group</option>
-                                        <option value="team">Team</option>
-                                    </select>
-                                </div>
-                                <div class="group-selector-inline" id="topscorers-group-selector">
-                                    <label for="topscorers-group-select">Group:</label>
-                                    <select id="topscorers-group-select" onchange="updateTopScorers()">
-                                        <!-- Groups will be populated by JavaScript -->
-                                    </select>
-                                </div>
-                                <div class="team-selector-inline" id="topscorers-team-selector" style="display: none;">
-                                    <label for="topscorers-team-select">Team:</label>
-                                    <select id="topscorers-team-select" onchange="updateTopScorers()">
-                                        <!-- Teams will be populated by JavaScript -->
-                                    </select>
-                                </div>
-                                <div class="checkbox-control">
-                                    <label for="show-all-topscorers">
-                                        <input type="checkbox" id="show-all-topscorers" onchange="toggleAllTopScorers()">
-                                        Show All Groups
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="topscorers-content" class="statistics-content">
-                            <!-- Top Scorers will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
+        <form id="loginForm" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required 
+                    autocomplete="username"
+                    placeholder="Enter your username"
+                >
+                <div class="error-message" id="username-error"></div>
             </div>
 
-            <!-- Teams Tab -->
-            <div id="teams" class="tab-content" data-testid="tab-teams-content">
-                <h2>Team Lineup & Squad</h2>
-                
-                <!-- Sub-tabs for Teams -->
-                <div class="sub-tabs">
-                    <button class="sub-tab-button active" data-testid="sub-tab-team-lineup" onclick="showTeamsSubTab('team-lineup')">Team Lineup</button>
-                    <button class="sub-tab-button" data-testid="sub-tab-team-formations" onclick="showTeamsSubTab('team-formations')">Formations</button>
-                </div>
-                
-                <!-- Team Lineup Sub-tab -->
-                <div id="team-lineup" class="sub-tab-content active" data-testid="team-lineup-content">
-                    <!-- Statistics Cards -->
-                    <div class="team-statistics-cards" data-testid="team-statistics-cards">
-                        <div class="stat-card" data-testid="stat-card-teams">
-                            <div class="stat-icon">⚽</div>
-                            <div class="stat-content">
-                                <div class="teams-stat-value" id="total-teams">0</div>
-                                <div class="teams-stat-label">Teams</div>
-                            </div>
-                        </div>
-                        <div class="stat-card" data-testid="stat-card-athletes">
-                            <div class="stat-icon">👥</div>
-                            <div class="stat-content">
-                                <div class="teams-stat-value" id="total-athletes">0</div>
-                                <div class="teams-stat-label">Athletes</div>
-                            </div>
-                        </div>
-                        <div class="stat-card" data-testid="stat-card-associations">
-                            <div class="stat-icon">🤝</div>
-                            <div class="stat-content">
-                                <div class="teams-stat-value" id="total-associations">0</div>
-                                <div class="teams-stat-label">Associations</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Teams grouped by region -->
-                    <div id="teams-by-region" data-testid="teams-by-region">
-                        <!-- Will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <!-- Team Formations Sub-tab -->
-                <div id="team-formations" class="sub-tab-content" data-testid="team-formations-content">
-                    <div class="teams-controls">
-                        <div class="team-selector" data-testid="team-selector-formations">
-                            <label for="selected-team-lineup">Team:</label>
-                            <select id="selected-team-lineup" data-testid="selected-team-lineup" onchange="updateTeamLineup()">
-                                <!-- Teams will be populated by JavaScript -->
-                            </select>
-                        </div>
-                        
-                        <div class="formations-selector" data-testid="formations-selector-formations">
-                            <label for="selected-formations">Formation:</label>
-                            <select id="selected-formations" data-testid="selected-formations" onchange="updateFormation()">
-                                <!-- Formations will be populated by JavaScript -->
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div id="team-lineup-content">
-                        <div class="football-field">
-                            <!-- Goalkeeper Area -->
-                            <div class="goalkeeper-area">
-                                <div class="goal">
-                                    <div class="goalkeeper-position">
-                                        <div id="goalkeeper" class="player-icon goalkeeper">
-                                            <span class="player-number">1</span>
-                                        </div>
-                                        <div id="goalkeeper-name" class="player-name">Goalkeeper</div>
-                                    </div>
-                                </div>
-                            </div>
-                        
-                            <!-- Field Players Area -->
-                            <div class="field-players">
-                                <div class="formation-line defense" data-line="defense">
-                                    <div class="line-slot" data-slot="1"></div>
-                                    <div class="line-slot" data-slot="2"></div>
-                                    <div class="line-slot" data-slot="3"></div>
-                                    <div class="line-slot" data-slot="4"></div>
-                                    <div class="line-slot" data-slot="5"></div>
-                                </div>
-
-                                <div class="formation-line midfield" data-line="midfield">
-                                    <div class="line-slot" data-slot="1"></div>
-                                    <div class="line-slot" data-slot="2"></div>
-                                    <div class="line-slot" data-slot="3"></div>
-                                    <div class="line-slot" data-slot="4"></div>
-                                    <div class="line-slot" data-slot="5"></div>
-                                </div>
-
-                                <div class="formation-line attack" data-line="attack">
-                                    <div class="line-slot" data-slot="1"></div>
-                                    <div class="line-slot" data-slot="2"></div>
-                                    <div class="line-slot" data-slot="3"></div>
-                                    <div class="line-slot" data-slot="4"></div>
-                                    <div class="line-slot" data-slot="5"></div>
-                                </div>
-                            </div>
-                        
-                            <!-- Center Circle -->
-                            <div class="center-circle"></div>
-                        
-                            <!-- Field Lines -->
-                            <div class="field-lines">
-                                <div class="enemy-goal-area"></div>
-                                <div class="penalty-spot enemy-penalty"></div>
-                                <div class="enemy-penalty-arc"></div>
-                                <div class="penalty-area"></div>
-                                <div class="penalty-spot player-penalty"></div>
-                                <div class="goal-area"></div>
-                            </div>
-                        </div>
-                    
-                        <!-- Bench Area -->
-                        <div class="bench-area">
-                            <h3>🪑 Bench</h3>
-                            <div id="bench-players" class="bench-players">
-                                <!-- Bench players will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required 
+                    autocomplete="current-password"
+                    placeholder="Enter your password"
+                >
+                <div class="error-message" id="password-error"></div>
             </div>
 
-            <!-- Fixtures Tab -->
-            <div id="fixtures" class="tab-content" data-testid="tab-fixtures-content">
-                <h2>Fixtures & Results</h2>
-                
-                <!-- Today's Games Header Card -->
-                <div id="todays-games-header" class="todays-games-card" style="display: none;">
-                    <h3>🏆 Today's Matches</h3>
-                    <div id="todays-games-list"></div>
-                </div>
-                
-                <!-- Fixtures Controls -->
-                <div class="fixtures-controls">
-                    <div class="control-row">
-                        <div class="group-selector" data-testid="group-selector-fixtures">
-                            <label for="fixtures-group-select">Group:</label>
-                            <select id="fixtures-group-select" data-testid="selected-group-fixtures" onchange="updateFixturesForGroup()">
-                                <!-- Groups will be populated by JavaScript -->
-                            </select>
-                        </div>
-                        <div class="checkbox-control">
-                            <label for="show-all-fixtures" data-testid="show-all-fixtures-label">
-                                <input type="checkbox" id="show-all-fixtures" data-testid="show-all-fixtures-checkbox" onchange="toggleAllFixtures()">
-                                Show All Fixtures
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="fixtures-content" data-testid="fixtures-content">
-                    <!-- Fixtures will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Forecast Tab -->
-            <div id="forecast" class="tab-content" data-testid="tab-forecast-content">
-                <h2>🔮 Championship Forecast & Predictions</h2>
-                <div class="forecast-description">
-                    <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
-                </div>
-                
-                <!-- Forecast Controls -->
-                <div class="forecast-controls" data-testid="forecast-controls">
-                    <div class="group-selector" data-testid="group-selector-forecast">
-                        <label for="forecast-group-select" data-testid="forecast-group-select-label">Group:</label>
-                        <select id="forecast-group-select" data-testid="selected-group-forecast" onchange="updateForecastForGroup()">
-                            <!-- Groups will be populated by JavaScript -->
-                        </select>
-                    </div>
-                </div>
-                
-                <div id="forecast-content">
-                    <!-- Forecast content will be populated by JavaScript -->
-                </div>
-            </div>
-
-            <!-- Simulator Tab -->
-            <div id="simulator" class="tab-content" data-testid="tab-simulator-content">
-                <h2>Championship Simulator</h2>
-                
-                <!-- Sub-tabs for Simulator -->
-                <div class="sub-tabs">
-                    <button class="sub-tab-button active" data-testid="sub-tab-group-stage-sim" onclick="showSimulatorSubTab('group-stage-sim')">Group Stage</button>
-                    <button class="sub-tab-button" data-testid="sub-tab-knockout-stage-sim" onclick="showSimulatorSubTab('knockout-stage-sim')">Knockout Stage</button>
-                </div>
-                
-                <!-- Group Stage Simulation Sub-tab -->
-                <div id="group-stage-sim" class="sub-tab-content active">
-                    <div class="simulator-controls">
-                        <div class="team-selector" data-testid="team-selector-simulator">
-                            <label for="selected-team">Team to Analyze:</label>
-                            <select id="selected-team" data-testid="selected-team-simulator" onchange="updateSimulation()">
-                                <!-- Teams will be populated by JavaScript -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <div id="simulation-results">
-                        <!-- Simulation results will be populated by JavaScript -->
-                    </div>
-                </div>
-                
-                <!-- Knockout Stage Simulation Sub-tab -->
-                <div id="knockout-stage-sim" class="sub-tab-content">
-                    <div id="knockout-simulation-content">
-                        <!-- Knockout simulation content will be populated by JavaScript -->
-                    </div>
-                </div>
-            </div>
-
-        </main>
+            <button type="submit" class="login-btn" id="loginBtn">
+                <span class="btn-text">Login</span>
+                <div class="loading-spinner"></div>
+            </button>
+        </form>
     </div>
 
-    <!-- Add Result Modal -->
-    <div id="addResultModal" class="modal" data-testid="add-result-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Add Match Result</h3>
-                <span class="close-modal" onclick="hideAddResultModal()">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="match-info">
-                    <p><strong>Match:</strong> <span id="modal-teams"></span></p>
-                    <p><strong>Date & Time:</strong> <span id="modal-datetime"></span></p>
-                </div>
-                <form id="addResultForm" data-testid="add-result-form" onsubmit="submitResult(event)">
-                    <div class="score-inputs">
-                        <div class="team-score">
-                            <label for="homeScore" id="homeTeamLabel"></label>
-                            <input type="number" id="homeScore" min="0" max="99" required data-testid="home-score-input" oninput="updateScorerInputs()">
-                        </div>
-                        <div class="vs-separator">VS</div>
-                        <div class="team-score">
-                            <label for="awayScore" id="awayTeamLabel"></label>
-                            <input type="number" id="awayScore" min="0" max="99" required data-testid="away-score-input" oninput="updateScorerInputs()">
-                        </div>
-                    </div>
-                    
-                    <!-- Scorers Section (Optional) -->
-                    <div class="scorers-section" id="scorers-section" style="display: none;">
-                        <div class="scorers-header">
-                            <h4>⚽ Goal Scorers (Optional)</h4>
-                            <button type="button" class="toggle-scorers-btn" onclick="toggleScorersSection()">
-                                <span id="scorers-toggle-text">Show Scorers</span>
-                                <span id="scorers-toggle-icon">▼</span>
-                            </button>
-                        </div>
-                        <div class="scorers-content" id="scorers-content" style="display: none;">
-                            <div class="scorers-grid">
-                                <div id="homeTeamScorers" class="team-scorers"></div>
-                                <div id="awayTeamScorers" class="team-scorers"></div>
-                            </div>
-                            <p class="scorers-hint">💡 Select players and enter goals scored. Injured players are disabled.</p>
-                        </div>
-                    </div>
-                    
-                    <div class="modal-actions" data-testid="modal-actions">
-                        <button type="button" class="btn-secondary" data-testid="add-result-cancel-btn" onclick="hideAddResultModal()">Cancel</button>
-                        <button type="submit" class="btn-primary" data-testid="add-result-submit-btn">Add Result</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
+    <script type="module">
+        import { authenticate, isAuthenticated } from './js/auth/auth.js';
 
-    <!-- Toast Notification -->
-    <div id="toast" class="toast" data-testid="toast"></div>
+        // Check if already authenticated
+        if (isAuthenticated()) {
+            window.location.href = '/pages/app.html#/overview';
+        }
 
-    <!-- Loading Mask for OpenAI SDK -->
-    <div id="openai-loading-mask" class="loading-mask hide" data-testid="openai-loading-mask">
-        <div class="loading-spinner">
-            <div class="spinner"></div>
-            <div class="loading-text">
-                <h3>🤖 Initializing AI Engine</h3>
-                <p>Loading OpenAI SDK for advanced analysis...</p>
-                <div class="loading-progress">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="loading-progress-fill"></div>
-                    </div>
-                    <span class="progress-text" id="loading-progress-text">0%</span>
-                </div>
-            </div>
-        </div>
-    </div>
+        const loginForm = document.getElementById('loginForm');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+        const alert = document.getElementById('alert');
 
-    <!-- Knockout warning popup for team replacements -->
-    <div id="knockout-warning-popup" class="knockout-warning-popup" style="display: none;" data-testid="knockout-warning-popup"></div>
+        // Clear error on input
+        usernameInput.addEventListener('input', () => {
+            clearFieldError('username');
+        });
 
-    <!-- Main application script (imports all modules) -->
-    <script type="module" src="./js/app.js"></script>
+        passwordInput.addEventListener('input', () => {
+            clearFieldError('password');
+        });
+
+        // Handle form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Clear previous errors
+            clearAllErrors();
+
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+
+            // Validation
+            let hasError = false;
+
+            if (!username) {
+                showFieldError('username', 'Username is required');
+                hasError = true;
+            }
+
+            if (!password) {
+                showFieldError('password', 'Password is required');
+                hasError = true;
+            }
+
+            if (hasError) {
+                return;
+            }
+
+            // Show loading state
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            try {
+                // Authenticate
+                const result = await authenticate(username, password);
+
+                if (result.success) {
+                    showAlert('Login successful! Redirecting...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/pages/app.html#/overview';
+                    }, 500);
+                } else {
+                    showAlert(result.error || 'Invalid username or password', 'error');
+                    loginBtn.classList.remove('loading');
+                    loginBtn.disabled = false;
+                }
+            } catch (error) {
+                showAlert('An error occurred. Please try again.', 'error');
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+            }
+        });
+
+        function showFieldError(field, message) {
+            const input = document.getElementById(field);
+            const errorDiv = document.getElementById(`${field}-error`);
+            input.classList.add('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function clearFieldError(field) {
+            const input = document.getElementById(field);
+            const errorDiv = document.getElementById(`${field}-error`);
+            input.classList.remove('error');
+            errorDiv.classList.remove('show');
+        }
+
+        function clearAllErrors() {
+            clearFieldError('username');
+            clearFieldError('password');
+            alert.classList.remove('show');
+        }
+
+        function showAlert(message, type) {
+            alert.textContent = message;
+            alert.className = `alert alert-${type} show`;
+        }
+    </script>
 </body>
 </html>

@@ -53,7 +53,15 @@ function getLoadingMethod(appSettings) {
  * @returns {Promise<Object>} - The loaded data
  */
 async function loadFromLocalFile(filePath) {
-    const response = await fetch(filePath);
+    // Convert relative paths to absolute paths from root
+    let finalPath = filePath;
+    
+    // If path doesn't start with '/', add it to make it absolute from root
+    if (!filePath.startsWith('/')) {
+        finalPath = '/' + filePath;
+    }
+    
+    const response = await fetch(finalPath);
     if (!response.ok) {
         throw new Error(`Failed to load ${filePath}: HTTP ${response.status}`);
     }

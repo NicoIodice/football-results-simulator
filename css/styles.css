@@ -4040,7 +4040,7 @@ tr.first-place .goal-diff-negative {
     border-radius: 8px;
     color: white;
     font-weight: 600;
-    z-index: 3000;
+    z-index: 10001;
     transform: translateX(400px);
     transition: transform 0.3s ease;
     max-width: 350px;
