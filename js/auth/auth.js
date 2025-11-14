@@ -1,6 +1,7 @@
 // Authentication Module
 import { handleError } from '../errorHandler.js';
 import { logger } from '../logger.js';
+import { navigateTo, resolvePath } from '../utils/pathUtils.js';
 
 /**
  * Check if user is authenticated
@@ -19,7 +20,7 @@ async function authenticate(username, password) {
         logger.log('Attempting to authenticate user:', username);
         
         // Load users from users.json
-        const response = await fetch('./data/users.json');
+        const response = await fetch(resolvePath('data/users.json'));
         if (!response.ok) {
             throw new Error('Failed to load user data');
         }
@@ -62,7 +63,7 @@ function logout() {
     logger.log('Logging out user');
     sessionStorage.removeItem('authToken');
     sessionStorage.removeItem('username');
-    window.location.href = '/';
+    navigateTo('');
 }
 
 /**
@@ -71,7 +72,7 @@ function logout() {
 function requireAuth() {
     if (!isAuthenticated()) {
         logger.log('User not authenticated, redirecting to login');
-        window.location.href = '/';
+        navigateTo('');
         return false;
     }
     return true;

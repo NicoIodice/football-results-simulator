@@ -10,9 +10,25 @@
     <!-- Inline script to apply theme immediately and prevent flash -->
     <script>
         (function() {
+            // Helper function to get base path
+            function getBasePath() {
+                const path = window.location.pathname;
+                const pathParts = path.split('/').filter(p => p);
+                
+                if (window.location.hostname !== 'localhost' && 
+                    window.location.hostname !== '127.0.0.1' && 
+                    pathParts.length > 0 && 
+                    !pathParts[0].endsWith('.html')) {
+                    return `/${pathParts[0]}/`;
+                }
+                
+                return '/';
+            }
+            
             // Fetch theme from tournament-settings.json synchronously
             const xhr = new XMLHttpRequest();
-            xhr.open('GET', '../data/2025/futsal/tournament-settings.json', false);
+            const basePath = getBasePath();
+            xhr.open('GET', basePath + 'data/2025/futsal/tournament-settings.json', false);
             try {
                 xhr.send(null);
                 if (xhr.status === 200) {

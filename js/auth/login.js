@@ -1,9 +1,10 @@
 // Login Page Script
 import { authenticate, isAuthenticated } from './auth.js';
+import { navigateTo } from '../utils/pathUtils.js';
 
 // Check if already authenticated
 if (isAuthenticated()) {
-    window.location.href = '/pages/tournaments.html';
+    navigateTo('pages/tournaments.html');
 }
 
 const loginForm = document.getElementById('loginForm');
@@ -59,7 +60,7 @@ loginForm.addEventListener('submit', async (e) => {
         if (result.success) {
             showAlert('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = '/pages/tournaments.html';
+                navigateTo('pages/tournaments.html');
             }, 500);
         } else {
             showAlert(result.error || 'Invalid username or password', 'error');

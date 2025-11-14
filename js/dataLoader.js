@@ -3,6 +3,8 @@
  * Handles loading data from various sources (local files, remote APIs, etc.)
  */
 
+import { resolvePath } from './utils/pathUtils.js';
+
 // Supported data loading methods
 const DATA_LOADING_METHODS = {
     LOCAL_FILE: 'local-file',        // Load from local JSON files
@@ -53,13 +55,8 @@ function getLoadingMethod(appSettings) {
  * @returns {Promise<Object>} - The loaded data
  */
 async function loadFromLocalFile(filePath) {
-    // Convert relative paths to absolute paths from root
-    let finalPath = filePath;
-    
-    // If path doesn't start with '/', add it to make it absolute from root
-    if (!filePath.startsWith('/')) {
-        finalPath = '/' + filePath;
-    }
+    // Use resolvePath to handle both local and GitHub Pages environments
+    const finalPath = resolvePath(filePath);
     
     const response = await fetch(finalPath);
     if (!response.ok) {
@@ -222,7 +219,7 @@ async function loadOpenAIKeyFromConfig(loadingMethod = DATA_LOADING_METHODS.LOCA
  */
 async function loadOpenAIKeyFromEnv() {
     try {
-        const response = await fetch('.env');
+        const response = await fetch(resolvePath('.env'));
         if (!response.ok) {
             throw new Error(`HTTP ${response.status}`);
         }

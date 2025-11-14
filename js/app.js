@@ -9,6 +9,7 @@ import {
     loadOpenAIKeyFromConfig
 } from './dataLoader.js';
 import { updateURL } from './router.js';
+import { resolvePath } from './utils/pathUtils.js';
 
 // Show/hide scorer warning popup for mismatch in Top Scorers panel
 function showScorerWarningPopup(event, teamName, teamTotalGoals, sumPlayerGoals) {
@@ -987,13 +988,13 @@ async function loadData() {
         // Use tournamentSettings for tournament config
         const year = tournamentSettings?.year || '2025';
         const sportType = tournamentSettings?.sportType || 'futsal';
-        const basePath = `/data/${year}/${sportType}`;
+        const basePath = `data/${year}/${sportType}`;
         const [groupsResponse, teamsResponse, fixturesResponse, groupStageResultsResponse, knockoutResponse] = await Promise.all([
-            fetch(`${basePath}/groups.json`),
-            fetch(`${basePath}/teams.json`),
-            fetch(`${basePath}/fixtures.json`),
-            fetch(`${basePath}/group-stage-results.json`),
-            fetch(`${basePath}/knockout-stage-results.json`)
+            fetch(resolvePath(`${basePath}/groups.json`)),
+            fetch(resolvePath(`${basePath}/teams.json`)),
+            fetch(resolvePath(`${basePath}/fixtures.json`)),
+            fetch(resolvePath(`${basePath}/group-stage-results.json`)),
+            fetch(resolvePath(`${basePath}/knockout-stage-results.json`))
         ]);
         groups = await groupsResponse.json();
         teams = await teamsResponse.json();
@@ -5774,7 +5775,7 @@ window.footballAdmin = {
         logger.log('🧪 Testing configuration files...');
         
         // Test config.json
-        fetch('config.json')
+        fetch(resolvePath('config.json'))
             .then(response => {
                 logger.log('config.json status:', response.status, response.ok ? '✅' : '❌');
                 return response.json();
@@ -5783,7 +5784,7 @@ window.footballAdmin = {
             .catch(err => logger.log('config.json error:', err.message));
             
         // Test .env
-        fetch('.env')
+        fetch(resolvePath('.env'))
             .then(response => {
                 logger.log('.env status:', response.status, response.ok ? '✅' : '❌');
                 return response.text();
@@ -5807,7 +5808,7 @@ async function loadPlayersData() {
         const sportType = defaults.sportType || 'futsal';
         const basePath = `/data/${year}/${sportType}`;
         
-        const response = await fetch(`${basePath}/teams.json`);
+        const response = await fetch(resolvePath(`${basePath}/teams.json`));
         teamsData = await response.json();
         logger.log('Teams data loaded:', teamsData);
         // Apply persisted formations/starters if available

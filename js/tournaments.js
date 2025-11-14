@@ -1,6 +1,7 @@
 // Tournament Selection Page
 import { requireAuth, getCurrentUsername, logout } from './auth/auth.js';
 import { logger } from './logger.js';
+import { resolvePath } from './utils/pathUtils.js';
 
 // Check authentication
 if (!requireAuth()) {
@@ -81,48 +82,31 @@ async function populateYearSelector() {
 }
 
 /**
- * Get available years from data folder
+ * Get available years from tournaments metadata
  */
 async function getAvailableYears() {
-    const potentialYears = [];
-    const startYear = currentYear - 5;
-    const endYear = currentYear + 2;
-    
-    for (let year = startYear; year <= endYear; year++) {
-        potentialYears.push(year);
-    }
-    
-    const availableYears = [];
-    
-    for (const year of potentialYears) {
-        const hasData = await checkYearHasData(year);
-        if (hasData) {
-            availableYears.push(year);
+    try {
+        const response = await fetch(resolvePath('data/tournaments.json'));
+        if (!response.ok) {
+            logger.warn('tournaments.json not found');
+            return [];
         }
+        
+        const tournamentList = await response.json();
+        
+        // Extract unique years from active tournaments
+        const years = [...new Set(
+            tournamentList
+                .filter(t => t.active !== false)
+                .map(t => parseInt(t.year))
+        )];
+        
+        // Sort in descending order (newest first)
+        return years.sort((a, b) => b - a);
+    } catch (error) {
+        logger.error('Error loading tournaments metadata:', error);
+        return [];
     }
-    
-    // Sort in descending order (newest first)
-    return availableYears.sort((a, b) => b - a);
-}
-
-/**
- * Check if a year has any tournament data
- */
-async function checkYearHasData(year) {
-    const knownSports = ['futsal', 'football', 'basketball', 'volleyball', 'tennis'];
-    
-    for (const sport of knownSports) {
-        try {
-            const response = await fetch(`/data/${year}/${sport}/tournament-settings.json`);
-            if (response.ok) {
-                return true;
-            }
-        } catch (error) {
-            // Continue checking
-        }
-    }
-    
-    return false;
 }
 
 /**
@@ -137,28 +121,38 @@ async function loadTournamentsForYear() {
     showLoading();
     
     try {
-        // Get list of sport types in the year folder
-        const sportTypes = await getSportTypesForYear(selectedYear);
+        // Load tournaments metadata
+        const response = await fetch(resolvePath('data/tournaments.json'));
+        if (!response.ok) {
+            throw new Error('Failed to load tournaments metadata');
+        }
         
-        if (sportTypes.length === 0) {
+        const tournamentList = await response.json();
+        
+        // Filter tournaments for selected year
+        const yearTournaments = tournamentList.filter(t => 
+            t.year === selectedYear && t.active !== false
+        );
+        
+        if (yearTournaments.length === 0) {
             showEmpty();
             return;
         }
         
-        // Load tournament data for each sport
+        // Load tournament data for each
         tournaments = [];
-        for (const sportType of sportTypes) {
+        for (const tournamentMeta of yearTournaments) {
             try {
-                const tournamentData = await loadTournamentData(selectedYear, sportType);
+                const tournamentData = await loadTournamentData(tournamentMeta.year, tournamentMeta.sportType);
                 if (tournamentData) {
                     tournaments.push({
-                        year: selectedYear,
-                        sportType: sportType,
+                        year: tournamentMeta.year,
+                        sportType: tournamentMeta.sportType,
                         ...tournamentData
                     });
                 }
             } catch (error) {
-                logger.warn(`Failed to load tournament data for ${sportType}:`, error);
+                logger.warn(`Failed to load tournament data for ${tournamentMeta.sportType}:`, error);
             }
         }
         
@@ -175,41 +169,19 @@ async function loadTournamentsForYear() {
 }
 
 /**
- * Get sport types available for a given year
- */
-async function getSportTypesForYear(year) {
-    // Try to detect available sport types by attempting to load known sports
-    const knownSports = ['futsal', 'football', 'basketball', 'volleyball', 'tennis'];
-    const availableSports = [];
-    
-    for (const sport of knownSports) {
-        try {
-            const response = await fetch(`/data/${year}/${sport}/tournament-settings.json`);
-            if (response.ok) {
-                availableSports.push(sport);
-            }
-        } catch (error) {
-            // Sport doesn't exist, continue
-        }
-    }
-    
-    return availableSports;
-}
-
-/**
  * Load tournament data for a specific year and sport
  */
 async function loadTournamentData(year, sportType) {
     try {
         // Load tournament settings
-        const settingsResponse = await fetch(`/data/${year}/${sportType}/tournament-settings.json`);
+        const settingsResponse = await fetch(resolvePath(`data/${year}/${sportType}/tournament-settings.json`));
         if (!settingsResponse.ok) {
             throw new Error('Failed to load tournament settings');
         }
         const settings = await settingsResponse.json();
         
         // Load groups to count them
-        const groupsResponse = await fetch(`/data/${year}/${sportType}/groups.json`);
+        const groupsResponse = await fetch(resolvePath(`data/${year}/${sportType}/groups.json`));
         let groupCount = 0;
         if (groupsResponse.ok) {
             const groups = await groupsResponse.json();
@@ -217,7 +189,7 @@ async function loadTournamentData(year, sportType) {
         }
         
         // Load teams to count teams, players, and associations
-        const teamsResponse = await fetch(`/data/${year}/${sportType}/teams.json`);
+        const teamsResponse = await fetch(resolvePath(`data/${year}/${sportType}/teams.json`));
         let teamCount = 0;
         let playerCount = 0;
         let associationSet = new Set();
@@ -238,7 +210,7 @@ async function loadTournamentData(year, sportType) {
         }
         
         // Load knockout results to get winner
-        const knockoutResponse = await fetch(`/data/${year}/${sportType}/knockout-stage-results.json`);
+        const knockoutResponse = await fetch(resolvePath(`data/${year}/${sportType}/knockout-stage-results.json`));
         let winner = null;
         
         if (knockoutResponse.ok) {
@@ -582,7 +554,7 @@ function openTournament(year, sportType) {
     sessionStorage.setItem('selectedTournamentSport', sportType);
     
     // Redirect to app
-    window.location.href = '/pages/app.html#/overview';
+    window.location.href = resolvePath('pages/app.html#/overview');
 }
 
 /**
