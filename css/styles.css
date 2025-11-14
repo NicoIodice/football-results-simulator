@@ -366,7 +366,7 @@ body.dark-mode .knockout-round {
 }
 
 body.dark-mode .knockout-round h4 {
-    color: #5dade2;
+    color: var(--primary-color);
 }
 
 body.dark-mode .simulated-match {
@@ -383,7 +383,7 @@ body.dark-mode .team-sim.winner {
 }
 
 body.dark-mode .team-sim .team-score {
-    color: #5dade2;
+    color: var(--primary-color);
 }
 
 body.dark-mode .team-sim.winner .team-score {
@@ -391,12 +391,12 @@ body.dark-mode .team-sim.winner .team-score {
 }
 
 body.dark-mode .confidence-badge {
-    background: #2c5282;
+    background: var(--primary-darker);
     color: #e0e0e0;
 }
 
 body.dark-mode .simulation-header h3 {
-    color: #5dade2;
+    color: var(--primary-color);
 }
 
 /* Analysis Panel Styles for Predictions */
@@ -6829,7 +6829,7 @@ body.dark-mode .container {
 }
 
 body.dark-mode header {
-    background: linear-gradient(135deg, #1e3a52, #2c5282);
+    background: linear-gradient(135deg, var(--primary-gradient-dark-start), var(--primary-darker));
 }
 
 body.dark-mode .tabs {
@@ -6847,7 +6847,7 @@ body.dark-mode .tab-button:hover {
 }
 
 body.dark-mode .tab-button.active {
-    background-color: #2c5282;
+    background-color: var(--primary-darker);
     color: white;
 }
 
@@ -6881,7 +6881,7 @@ body.dark-mode .tab-content {
 
 body.dark-mode .tab-content h2 {
     color: #e0e0e0;
-    border-bottom-color: #2c5282;
+    border-bottom-color: var(--primary-darker);
 }
 
 body.dark-mode table {
@@ -6912,7 +6912,7 @@ body.dark-mode .team-name {
 
 body.dark-mode .match-item {
     background-color: #2a2a2a;
-    border-left-color: #2c5282;
+    border-left-color: var(--primary-darker);
     color: #e0e0e0;
 }
 
@@ -6947,7 +6947,7 @@ body.dark-mode .gameweek-section {
 }
 
 body.dark-mode .gameweek-header {
-    background-color: #2c5282;
+    background-color: var(--primary-darker);
 }
 
 body.dark-mode .group-selector,
@@ -6957,7 +6957,7 @@ body.dark-mode .fixtures-controls,
 body.dark-mode .statistics-controls,
 body.dark-mode .teams-controls {
     background-color: #2a2a2a;
-    border-left-color: #2c5282;
+    border-left-color: var(--primary-darker);
 }
 
 body.dark-mode .group-selector select,
@@ -6985,7 +6985,7 @@ body.dark-mode .simulation-section {
 }
 
 body.dark-mode .simulation-header {
-    background: linear-gradient(135deg, #1e3a52, #2c5282);
+    background: linear-gradient(135deg, var(--primary-gradient-dark-start), var(--primary-darker));
 }
 
 body.dark-mode .simulation-content {
@@ -6994,8 +6994,8 @@ body.dark-mode .simulation-content {
 }
 
 body.dark-mode .current-position {
-    background-color: #1e3a52;
-    border-color: #2c5282;
+    background-color: var(--primary-gradient-dark-start);
+    border-color: var(--primary-darker);
 }
 
 body.dark-mode .stat-item {
@@ -7089,7 +7089,7 @@ body.dark-mode .modal-body input {
 }
 
 body.dark-mode .btn-primary {
-    background: linear-gradient(135deg, var(--primary-darker), #1e3a52);
+    background: linear-gradient(135deg, var(--primary-darker), var(--primary-gradient-dark-start));
 }
 
 body.dark-mode .btn-secondary {
