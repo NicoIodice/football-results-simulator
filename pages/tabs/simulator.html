@@ -1,0 +1,31 @@
+<!-- Simulator Tab Content -->
+<h2>Championship Simulator</h2>
+
+<!-- Sub-tabs for Simulator -->
+    <div class="sub-tabs">
+        <button class="sub-tab-button active" data-testid="sub-tab-group-stage-sim" onclick="showSimulatorSubTab('group-stage-sim')">Group Stage</button>
+        <button class="sub-tab-button" data-testid="sub-tab-knockout-stage-sim" onclick="showSimulatorSubTab('knockout-stage-sim')">Knockout Stage</button>
+    </div>
+    
+    <!-- Group Stage Simulation Sub-tab -->
+    <div id="group-stage-sim" class="sub-tab-content active">
+        <div class="simulator-controls">
+            <div class="team-selector" data-testid="team-selector-simulator">
+                <label for="selected-team">Team to Analyze:</label>
+                <select id="selected-team" data-testid="selected-team-simulator" onchange="updateSimulation()">
+                    <!-- Teams will be populated by JavaScript -->
+                </select>
+            </div>
+        </div>
+
+        <div id="simulation-results">
+            <!-- Simulation results will be populated by JavaScript -->
+        </div>
+    </div>
+    
+    <!-- Knockout Stage Simulation Sub-tab -->
+    <div id="knockout-stage-sim" class="sub-tab-content">
+        <div id="knockout-simulation-content">
+            <!-- Knockout simulation content will be populated by JavaScript -->
+        </div>
+    </div>

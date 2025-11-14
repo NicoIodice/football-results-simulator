@@ -99,7 +99,7 @@ async function loadData(filePath, loadingMethod = DATA_LOADING_METHODS.LOCAL_FIL
                 throw new Error(`Unsupported loading method: ${loadingMethod}`);
         }
     } catch (error) {
-        console.error(`Failed to load ${filePath}:`, error);
+        logger.error(`Failed to load ${filePath}:`, error);
         throw error; // Re-throw so caller can handle it
     }
 }

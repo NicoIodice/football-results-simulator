@@ -36,7 +36,7 @@ function handleError(error) {
         window.showToast(message, type, 5000); // Show for 5 seconds for errors
     } else {
         // Fallback to console error when showToast is not available
-        console.error(message);
+        logger.error(message);
     }
 }
 
@@ -53,7 +53,7 @@ function withErrorHandling(fn) {
             if (typeof logger !== 'undefined') {
                 logger.error('Function error:', error);
             } else {
-                console.error('Function error:', error);
+                logger.error('Function error:', error);
             }
             handleError(error);
             throw error; // Re-throw so caller can handle if needed

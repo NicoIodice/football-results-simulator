@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         // Load all tournament data
         await loadData();
         loadPendingResults();
-        showTab('overview');
+        await showTab('overview');
         setTimeout(() => initializeSubTabIndicators(), 200);
     } catch (error) {
         logger.error('Failed to load tournament data:', error);
@@ -1017,10 +1017,9 @@ async function loadData() {
         // Set default group based on tournamentSettings
         selectedGroupId = tournamentSettings?.defaultGroup || (groups.length > 0 ? groups[0].id : null);
         logger.log('Data loaded successfully');
-        applyTabVisibilitySettings();
         populateGroupSelector();
         updateTeamSelectorForGroup();
-        updateAllTabs();
+        // Note: updateAllTabs() removed - tabs update when loaded via initializeTabContent()
         initializeKnockoutDates?.();
         await loadPlayersData?.();
     } catch (error) {
@@ -1170,25 +1169,15 @@ function calculateGoalStatistics() {
 }
 
 // Tab switching functionality
-function showTab(tabName) {
+async function showTab(tabName) {
     // Update URL when tab changes
     if (typeof updateURL === 'function') {
         updateURL('/' + tabName);
     }
     
-    // Hide all tab contents
-    const tabContents = document.querySelectorAll('.tab-content');
-    tabContents.forEach(tab => tab.classList.remove('active'));
-    
     // Remove active class from all tab buttons
     const tabButtons = document.querySelectorAll('.tab-button');
     tabButtons.forEach(button => button.classList.remove('active'));
-    
-    // Show selected tab content
-    const tabContent = document.getElementById(tabName);
-    if (tabContent) {
-        tabContent.classList.add('active');
-    }
 
     // Add active class to clicked button
     const activeButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
@@ -1196,13 +1185,49 @@ function showTab(tabName) {
         activeButton.classList.add('active');
     }
 
-    // Update content based on tab
+    // Load partial HTML for the tab
+    const mainContent = document.getElementById('main-content');
+    if (!mainContent) {
+        logger.error('Main content container not found');
+        return;
+    }
+
+    try {
+        // Show loading indicator with card styling
+        mainContent.innerHTML = '<div class="tab-content active"><div class="loading">Loading...</div></div>';
+        
+        // Fetch the partial HTML
+        const tabPath = resolvePath(`/pages/tabs/${tabName}.html`);
+        const response = await fetch(tabPath);
+        
+        if (!response.ok) {
+            throw new Error(`Failed to load ${tabName} content: ${response.status}`);
+        }
+        
+        const html = await response.text();
+        
+        // Wrap the loaded HTML in a tab-content div with proper ID and classes
+        mainContent.innerHTML = `<div id="${tabName}" class="tab-content active" data-testid="tab-${tabName}-content">${html}</div>`;
+        
+        // Execute tab-specific initialization after content is loaded
+        await initializeTabContent(tabName);
+        
+    } catch (error) {
+        logger.error('Error loading tab content:', error);
+        mainContent.innerHTML = `<div class="tab-content active"><div class="error">Error loading ${tabName} content. Please try again.</div></div>`;
+    }
+}
+
+// Initialize tab content after HTML is loaded
+async function initializeTabContent(tabName) {
     switch(tabName) {
         case 'overview':
+            // Populate group selector for overview tab
+            populateGroupSelector();
             updateOverview();
             // Update sub-tab indicators when switching to overview tab
             setTimeout(() => {
-                const overviewSubTabs = document.querySelector('#overview .sub-tabs');
+                const overviewSubTabs = document.querySelector('.sub-tabs');
                 if (overviewSubTabs) {
                     const activeOverviewButton = overviewSubTabs.querySelector('.sub-tab-button.active');
                     if (activeOverviewButton) {
@@ -1212,6 +1237,9 @@ function showTab(tabName) {
             }, 50);
             break;
         case 'teams':
+            // Populate team lineup selector
+            populateTeamLineupSelector();
+            
             // Ensure default teams sub-tab (team-lineup) is visible
             const defaultTeamsTab = document.getElementById('team-lineup');
             if (defaultTeamsTab && !defaultTeamsTab.classList.contains('active')) {
@@ -1219,7 +1247,7 @@ function showTab(tabName) {
             }
 
             // Ensure the first sub-tab button has active class
-            const teamsSubTabs = document.querySelector('#teams .sub-tabs');
+            const teamsSubTabs = document.querySelector('.sub-tabs');
             if (teamsSubTabs) {
                 const firstTeamsButton = teamsSubTabs.querySelector('.sub-tab-button');
                 const activeTeamsButton = teamsSubTabs.querySelector('.sub-tab-button.active');
@@ -1235,7 +1263,7 @@ function showTab(tabName) {
 
             // Update sub-tab indicators
             setTimeout(() => {
-                const teamsSubTabs = document.querySelector('#teams .sub-tabs');
+                const teamsSubTabs = document.querySelector('.sub-tabs');
                 if (teamsSubTabs) {
                     const activeTeamsButton = teamsSubTabs.querySelector('.sub-tab-button.active');
                     if (activeTeamsButton) {
@@ -1248,6 +1276,8 @@ function showTab(tabName) {
             updateFixtures();
             break;
         case 'forecast':
+            // Populate forecast controls
+            populateForecastControls();
             updateForecast();
             break;
         case 'simulator':
@@ -1258,7 +1288,7 @@ function showTab(tabName) {
             }
 
             // Ensure the first sub-tab button has active class
-            const simulatorSubTabs = document.querySelector('#simulator .sub-tabs');
+            const simulatorSubTabs = document.querySelector('.sub-tabs');
             if (simulatorSubTabs) {
                 const firstSimButton = simulatorSubTabs.querySelector('.sub-tab-button');
                 const activeSimButton = simulatorSubTabs.querySelector('.sub-tab-button.active');
@@ -1271,7 +1301,7 @@ function showTab(tabName) {
 
             // Update sub-tab indicators when switching to simulator tab
             setTimeout(() => {
-                const simulatorSubTabs = document.querySelector('#simulator .sub-tabs');
+                const simulatorSubTabs = document.querySelector('.sub-tabs');
                 if (simulatorSubTabs) {
                     const activeSimButton = simulatorSubTabs.querySelector('.sub-tab-button.active');
                     if (activeSimButton) {
@@ -1300,6 +1330,57 @@ function showTab(tabName) {
                 updateSimulation();
             }
             break;
+    }
+    
+    // Apply tab visibility settings after content is loaded
+    applyTabVisibilitySettingsForCurrentTab(tabName);
+}
+
+// Apply visibility settings for the currently loaded tab
+function applyTabVisibilitySettingsForCurrentTab(tabName) {
+    if (!defaults || !defaults.subTabs) return;
+    
+    if (tabName === 'overview' && defaults.subTabs.overview) {
+        const subTabConfig = defaults.subTabs.overview;
+        const subTabsContainer = document.querySelector('.sub-tabs');
+        
+        // Hide/show sub-tabs container based on configuration
+        if (subTabsContainer) {
+            subTabsContainer.style.display = subTabConfig.enabled !== false ? '' : 'none';
+        }
+        
+        // Configure individual sub-tab buttons
+        if (subTabConfig.knockoutStage !== undefined) {
+            const knockoutButton = document.querySelector('button[onclick="showStandingsSubTab(\'knockout-stage\')"]');
+            if (knockoutButton) {
+                knockoutButton.style.display = subTabConfig.knockoutStage !== false ? '' : 'none';
+            }
+        }
+    }
+    
+    if (tabName === 'simulator' && defaults.subTabs.simulator) {
+        const simSubTabConfig = defaults.subTabs.simulator;
+        const simSubTabsContainer = document.querySelector('.sub-tabs');
+        
+        // Hide/show sub-tabs container based on configuration
+        if (simSubTabsContainer) {
+            simSubTabsContainer.style.display = simSubTabConfig.enabled !== false ? '' : 'none';
+        }
+        
+        // Configure individual simulator sub-tab buttons
+        if (simSubTabConfig.groupStageSim !== undefined) {
+            const groupStageSimButton = document.querySelector('button[onclick="showSimulatorSubTab(\'group-stage-sim\')"]');
+            if (groupStageSimButton) {
+                groupStageSimButton.style.display = simSubTabConfig.groupStageSim !== false ? '' : 'none';
+            }
+        }
+        
+        if (simSubTabConfig.knockoutStageSim !== undefined) {
+            const knockoutStageSimButton = document.querySelector('button[onclick="showSimulatorSubTab(\'knockout-stage-sim\')"]');
+            if (knockoutStageSimButton) {
+                knockoutStageSimButton.style.display = simSubTabConfig.knockoutStageSim !== false ? '' : 'none';
+            }
+        }
     }
 }
 
@@ -1342,7 +1423,7 @@ function applyTabVisibilitySettings() {
     // Apply sub-tab configurations if they exist in defaults
     if (defaults.subTabs && defaults.subTabs.overview) {
         const subTabConfig = defaults.subTabs.overview;
-        const subTabsContainer = document.querySelector('#overview .sub-tabs');
+        const subTabsContainer = document.querySelector('.sub-tabs');
         
         // Hide/show sub-tabs container based on configuration
         if (subTabsContainer) {

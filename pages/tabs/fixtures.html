@@ -1,0 +1,30 @@
+<!-- Fixtures Tab Content -->
+<h2>Fixtures & Results</h2>
+    
+    <!-- Today's Games Header Card -->
+    <div id="todays-games-header" class="todays-games-card" style="display: none;">
+        <h3>🏆 Today's Matches</h3>
+        <div id="todays-games-list"></div>
+    </div>
+    
+    <!-- Fixtures Controls -->
+    <div class="fixtures-controls">
+        <div class="control-row">
+            <div class="group-selector" data-testid="group-selector-fixtures">
+                <label for="fixtures-group-select">Group:</label>
+                <select id="fixtures-group-select" data-testid="selected-group-fixtures" onchange="updateFixturesForGroup()">
+                    <!-- Groups will be populated by JavaScript -->
+                </select>
+            </div>
+            <div class="checkbox-control">
+                <label for="show-all-fixtures" data-testid="show-all-fixtures-label">
+                    <input type="checkbox" id="show-all-fixtures" data-testid="show-all-fixtures-checkbox" onchange="toggleAllFixtures()">
+                    Show All Fixtures
+                </label>
+            </div>
+        </div>
+    </div>
+    
+    <div id="fixtures-content" data-testid="fixtures-content">
+        <!-- Fixtures will be populated by JavaScript -->
+    </div>

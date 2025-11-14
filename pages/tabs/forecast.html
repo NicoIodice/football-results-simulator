@@ -1,0 +1,19 @@
+<!-- Forecast Tab Content -->
+<h2>🔮 Championship Forecast & Predictions</h2>
+    <div class="forecast-description">
+        <p>AI-powered predictions based on team performance, form, consistency, and statistical analysis.</p>
+    </div>
+    
+    <!-- Forecast Controls -->
+    <div class="forecast-controls" data-testid="forecast-controls">
+        <div class="group-selector" data-testid="group-selector-forecast">
+            <label for="forecast-group-select" data-testid="forecast-group-select-label">Group:</label>
+            <select id="forecast-group-select" data-testid="selected-group-forecast" onchange="updateForecastForGroup()">
+                <!-- Groups will be populated by JavaScript -->
+            </select>
+        </div>
+    </div>
+    
+    <div id="forecast-content">
+        <!-- Forecast content will be populated by JavaScript -->
+    </div>
