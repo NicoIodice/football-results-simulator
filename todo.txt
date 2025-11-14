@@ -2,7 +2,7 @@
 - Finalize settings page
 - Fix logout button and settings button (desktop and mobile)
 
-- Separate code
+- Separate code (pages, js and css)
 - Clean code
 
 - Add admin dashboard (settings and dark/light-mode toggle)
