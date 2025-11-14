@@ -21,9 +21,7 @@
 - Fixes on Tournaments Landing Page:
   - Admin user cannot click on cards only on Actions
   - Actions can also be delete or edit
-  - When clicking the routing should add on the url the year and tournament and then the overview, etc
   - The data loading should be depending on the year and tournament type selected
   - Test also with new tournaments and other users without admin privileges
 
-
-- Load the "data/2025/futsal/tournament-settings.json" data depending on the data and tournament selected
+  - When clicking the routing should add on the url the year and tournament and then the overview, etc
