@@ -398,6 +398,11 @@ function createTournamentCard(tournament) {
         </div>
         <div class="card-stats">
             <div class="stat-item">
+                <span class="icon">🎯</span>
+                <span class="value">${tournament.groupCount}</span>
+                <span class="label">Groups</span>
+            </div>
+            <div class="stat-item">
                 <span class="icon">⚽</span>
                 <span class="value">${tournament.teamCount || 0}</span>
                 <span class="label">Teams</span>
@@ -411,11 +416,6 @@ function createTournamentCard(tournament) {
                 <span class="icon">🤝</span>
                 <span class="value">${tournament.associationCount || 0}</span>
                 <span class="label">Associations</span>
-            </div>
-            <div class="stat-item">
-                <span class="icon">🎯</span>
-                <span class="value">${tournament.groupCount}</span>
-                <span class="label">Groups</span>
             </div>
         </div>
         <div class="card-footer">
