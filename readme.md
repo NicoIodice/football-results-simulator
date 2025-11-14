@@ -559,6 +559,222 @@ footballAdmin.enableAdmin()
 
 This approach ensures you always work with the actual file data and changes are immediately reflected after file replacement and refresh!
 
+---
+
+## 🏆 Adding New Tournaments
+
+### Overview
+The application supports multiple tournaments across different years and sports. Each tournament is registered in a central metadata file and has its own data folder.
+
+### Step-by-Step Guide
+
+#### 1. Create Tournament Data Folder
+Create a new folder structure under `data/`:
+```
+data/
+├── {YEAR}/              # e.g., 2025, 2024
+│   └── {SPORT_TYPE}/    # e.g., futsal, volleyball, tennis, basketball
+│       ├── tournament-settings.json
+│       ├── teams.json
+│       ├── groups.json
+│       ├── fixtures.json
+│       ├── group-stage-results.json
+│       └── knockout-stage-results.json
+```
+
+**Example**: For a 2025 Volleyball tournament:
+```
+data/2025/volleyball/
+```
+
+#### 2. Copy Template Files
+Copy the tournament data files from an existing tournament folder and customize them:
+- `tournament-settings.json` - Tournament configuration
+- `teams.json` - Team and player data
+- `groups.json` - Group definitions
+- `fixtures.json` - Match schedule
+- `group-stage-results.json` - Start with empty results `[]`
+- `knockout-stage-results.json` - Knockout stage data
+
+#### 3. Register Tournament in Metadata
+**This is the most important step!** Add an entry to `data/tournaments.json`:
+
+```json
+[
+  {
+    "year": "2025",
+    "sportType": "futsal",
+    "active": true
+  },
+  {
+    "year": "2025",
+    "sportType": "volleyball",
+    "active": true
+  },
+  {
+    "year": "2024",
+    "sportType": "tennis",
+    "active": true
+  }
+]
+```
+
+**Properties:**
+- `year` (string): The year of the tournament (e.g., "2025")
+- `sportType` (string): The sport type, must match the folder name (e.g., "volleyball")
+- `active` (boolean): Set to `true` to show in tournament list, `false` to hide
+
+#### 4. Customize Tournament Settings
+Edit `tournament-settings.json` in your new tournament folder:
+
+```json
+{
+  "tournamentTitle": "Multi Sport",
+  "tournamentSubTitle": "Volleyball Championship",
+  "year": "2025",
+  "sportType": "volleyball",
+  "defaultGroup": "group-a",
+  "theme": "default",
+  "groupStage": {
+    "startDate": "November 1st, 2025",
+    "endDate": "November 15th, 2025"
+  },
+  "knockout": {
+    "date": "November 20th, 2025"
+  }
+}
+```
+
+**Key Fields:**
+- `tournamentTitle`: Main title (e.g., "Multi Sport")
+- `tournamentSubTitle`: Subtitle (e.g., "Volleyball Championship")
+- `year`: Must match the folder year
+- `sportType`: Must match the folder name
+- `theme`: Visual theme ("default", "csw", "ctw")
+
+#### 5. Add Teams and Players
+Edit `teams.json` to add your teams and players:
+
+```json
+[
+  {
+    "id": "team-1",
+    "name": "Team Alpha",
+    "shortName": "ALP",
+    "league": "Premier",
+    "association": {
+      "name": "Sports Association A",
+      "logo": "../assets/associations/logo-a.png"
+    },
+    "players": [
+      {
+        "id": "player-1",
+        "name": "John Doe",
+        "number": 10,
+        "position": "forward",
+        "isStarter": true,
+        "isCaptain": true
+      }
+    ]
+  }
+]
+```
+
+#### 6. Configure Groups
+Edit `groups.json` to define your tournament groups:
+
+```json
+[
+  {
+    "id": "group-a",
+    "name": "Group A",
+    "description": "Pool A",
+    "teams": ["team-1", "team-2", "team-3", "team-4"]
+  }
+]
+```
+
+#### 7. Create Fixtures
+Edit `fixtures.json` to schedule matches:
+
+```json
+[
+  {
+    "matchId": "match-1",
+    "groupId": "group-a",
+    "gameweek": 1,
+    "date": "November 1st, 2025",
+    "time": "18:00",
+    "homeTeam": "team-1",
+    "awayTeam": "team-2",
+    "location": "Main Stadium"
+  }
+]
+```
+
+#### 8. Verify Setup
+1. Open the application in your browser
+2. Navigate to the Tournaments page
+3. Check the year dropdown - your year should appear
+4. Select your year to see your tournament card
+5. Click "Open Tournament" to load your tournament
+
+### Sport Icon Mapping
+The application uses sport-specific icons:
+- `futsal` → ⚽
+- `football` → 🏈
+- `basketball` → 🏀
+- `volleyball` → 🏐
+- `tennis` → 🎾
+- Default → 🏆
+
+To add a new sport icon, edit `js/tournaments.js`:
+```javascript
+const sportIcons = {
+    'futsal': '⚽',
+    'volleyball': '🏐',
+    'your-sport': '🏅'  // Add your sport here
+};
+```
+
+### Tournament Status
+Tournaments automatically calculate their status based on dates:
+- **Not Started**: Current date is before start date
+- **In Progress**: Current date is between start and end date
+- **Ended**: Current date is after end date
+
+### Troubleshooting
+
+**Problem**: New tournament doesn't appear
+- ✅ Check `tournaments.json` has an entry for your tournament
+- ✅ Verify `active` is set to `true`
+- ✅ Ensure `year` and `sportType` match the folder structure exactly
+- ✅ Confirm folder path is `data/{year}/{sportType}/`
+
+**Problem**: Tournament appears but won't open
+- ✅ Check all required JSON files exist in the tournament folder
+- ✅ Verify JSON files are valid (no syntax errors)
+- ✅ Check browser console (F12) for error messages
+- ✅ Ensure `tournament-settings.json` has `year` and `sportType` fields
+
+**Problem**: Data doesn't load correctly
+- ✅ Verify all team IDs in `groups.json` match IDs in `teams.json`
+- ✅ Check team IDs in `fixtures.json` match `teams.json`
+- ✅ Ensure date formats match: "Month DDth, YYYY"
+
+### Quick Checklist
+- [ ] Create folder: `data/{year}/{sport}/`
+- [ ] Copy all 6 required JSON files
+- [ ] Add entry to `data/tournaments.json`
+- [ ] Set `active: true` in tournaments.json
+- [ ] Customize `tournament-settings.json`
+- [ ] Add teams to `teams.json`
+- [ ] Configure groups in `groups.json`
+- [ ] Schedule fixtures in `fixtures.json`
+- [ ] Start with empty arrays: `group-stage-results.json` → `[]`
+- [ ] Verify tournament appears in dropdown
+- [ ] Test opening the tournament
+
 ### 🛠 Console Commands
 
 ```javascript
