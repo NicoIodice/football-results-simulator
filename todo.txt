@@ -17,6 +17,3 @@
 
 - Load files from dropbox files
  - Add api token environment variable
-
-- Add login page with encrypted credentials (index.html)
- - redirect to landing page > dashboard with current tournaments the player is subscripted

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Tournament - Multi Sport Tournament Manager</title>
+    <link rel="icon" type="image/x-icon" href="../assets/favicon.png">
+    <link rel="apple-touch-icon" href="../assets/favicon-app.png">
+    <link rel="stylesheet" href="../css/tournaments.css">
+</head>
+<body>
+    <div class="tournaments-container">
+        <header class="tournaments-header">
+            <div class="header-content">
+                <h1>🏆 Multi Sport Tournament Manager</h1>
+                <div class="user-info">
+                    <span class="username" id="username-display"></span>
+                    <button class="logout-btn" onclick="logout()" title="Logout">
+                        <span>🚪➜</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="tournaments-main">
+            <div class="controls-bar">
+                <div class="year-selector">
+                    <label for="year-select">Year:</label>
+                    <select id="year-select" onchange="loadTournamentsForYear()">
+                        <!-- Years will be populated by JavaScript -->
+                    </select>
+                </div>
+
+                <div class="view-toggle">
+                    <button class="view-btn active" data-view="grid" onclick="toggleView('grid')" title="Grid View">
+                        <span>⊞</span>
+                    </button>
+                    <button class="view-btn" data-view="table" onclick="toggleView('table')" title="Table View">
+                        <span>☰</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="tournaments-content">
+                <p class="content-subtitle">Select a tournament to view</p>
+                
+                <!-- Loading state -->
+                <div id="loading-state" class="loading-state">
+                    <div class="spinner"></div>
+                    <p>Loading tournaments...</p>
+                </div>
+
+                <!-- Error state -->
+                <div id="error-state" class="error-state" style="display: none;">
+                    <p>❌ Failed to load tournaments</p>
+                </div>
+
+                <!-- Empty state -->
+                <div id="empty-state" class="empty-state" style="display: none;">
+                    <p>📭 No tournaments found for this year</p>
+                </div>
+
+                <!-- Grid View -->
+                <div id="grid-view" class="grid-view" style="display: none;">
+                    <!-- Tournament cards will be populated by JavaScript -->
+                </div>
+
+                <!-- Table View -->
+                <div id="table-view" class="table-view" style="display: none;">
+                    <table class="tournaments-table">
+                        <thead>
+                            <tr>
+                                <th>Sport</th>
+                                <th>Title</th>
+                                <th>Status</th>
+                                <th>Winner</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Teams</th>
+                                <th>Players</th>
+                                <th>Associations</th>
+                                <th>Groups</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body">
+                            <!-- Tournament rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module" src="../js/tournaments.js"></script>
+</body>
+</html>

@@ -3,7 +3,7 @@ import { authenticate, isAuthenticated } from './auth.js';
 
 // Check if already authenticated
 if (isAuthenticated()) {
-    window.location.href = '/pages/app.html#/overview';
+    window.location.href = '/pages/tournaments.html';
 }
 
 const loginForm = document.getElementById('loginForm');
@@ -59,7 +59,7 @@ loginForm.addEventListener('submit', async (e) => {
         if (result.success) {
             showAlert('Login successful! Redirecting...', 'success');
             setTimeout(() => {
-                window.location.href = '/pages/app.html#/overview';
+                window.location.href = '/pages/tournaments.html';
             }, 500);
         } else {
             showAlert(result.error || 'Invalid username or password', 'error');
