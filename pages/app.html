@@ -25,10 +25,15 @@
                 return '/';
             }
             
+            // Get tournament context from sessionStorage
+            const year = sessionStorage.getItem('selectedTournamentYear') || '2025';
+            const sportType = sessionStorage.getItem('selectedTournamentSport') || 'futsal';
+            
             // Fetch theme from tournament-settings.json synchronously
             const xhr = new XMLHttpRequest();
             const basePath = getBasePath();
-            xhr.open('GET', basePath + 'data/2025/futsal/tournament-settings.json', false);
+            const settingsPath = basePath + `data/${year}/${sportType}/tournament-settings.json`;
+            xhr.open('GET', settingsPath, false);
             try {
                 xhr.send(null);
                 if (xhr.status === 200) {

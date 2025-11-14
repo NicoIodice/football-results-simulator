@@ -149,22 +149,47 @@ async function loadAppSettings(loadingMethod = DATA_LOADING_METHODS.LOCAL_FILE) 
 }
 
 /**
+ * Get tournament context from sessionStorage or defaults
+ * @returns {Object} - Object with year and sportType
+ */
+function getTournamentContext() {
+    const year = sessionStorage.getItem('selectedTournamentYear') || '2025';
+    const sportType = sessionStorage.getItem('selectedTournamentSport') || 'futsal';
+    
+    return { year, sportType };
+}
+
+/**
  * Load tournament settings from tournament-settings.json
  * @param {string} loadingMethod - The loading method to use
+ * @param {string} year - Optional year override
+ * @param {string} sportType - Optional sport type override
  * @returns {Promise<Object>} - Tournament settings
  */
-async function loadTournamentSettings(loadingMethod = DATA_LOADING_METHODS.LOCAL_FILE) {
+async function loadTournamentSettings(loadingMethod = DATA_LOADING_METHODS.LOCAL_FILE, year = null, sportType = null) {
     try {
-        const settings = await loadData('data/2025/futsal/tournament-settings.json', loadingMethod);
+        // Get tournament context
+        const context = getTournamentContext();
+        const finalYear = year || context.year;
+        const finalSportType = sportType || context.sportType;
+        
+        const settingsPath = `data/${finalYear}/${finalSportType}/tournament-settings.json`;
+        
+        // Check if the data path exists
+        const settings = await loadData(settingsPath, loadingMethod);
+        
+        // Enrich settings with year and sportType
+        settings.year = finalYear;
+        settings.sportType = finalSportType;
         
         // Set document title and header dynamically
-        if (settings && settings.tournamentTitle && settings.tournamentSubTitle && settings.year) {
-            const fullTitle = `${settings.tournamentTitle}: ${settings.tournamentSubTitle} ${settings.year}`;
+        if (settings && settings.tournamentTitle && settings.tournamentSubTitle) {
+            const fullTitle = `${settings.tournamentTitle}: ${settings.tournamentSubTitle} ${finalYear}`;
             document.title = fullTitle;
             
             // Update header h1 and p
             const h1 = document.querySelector('header h1');
-            if (h1) h1.textContent = `${settings.tournamentTitle} ${settings.year}`;
+            if (h1) h1.textContent = `${settings.tournamentTitle} ${finalYear}`;
             const p = document.querySelector('header p');
             if (p) p.textContent = settings.tournamentSubTitle;
         }
@@ -174,12 +199,12 @@ async function loadTournamentSettings(loadingMethod = DATA_LOADING_METHODS.LOCAL
         if (typeof logger !== 'undefined') {
             logger.error('Error loading tournament-settings.json:', e);
         }
-        // Return default structure
-        return {
-            tournamentTitle: 'Tournament',
-            tournamentSubTitle: 'Manager',
-            year: new Date().getFullYear()
-        };
+        
+        // Throw error with context so caller knows data wasn't found
+        const context = getTournamentContext();
+        const finalYear = year || context.year;
+        const finalSportType = sportType || context.sportType;
+        throw new Error(`Tournament data not found for year ${finalYear} and sport ${finalSportType}`);
     }
 }
 
@@ -269,6 +294,7 @@ export {
     setAppSettings,
     isValidLoadingMethod,
     getLoadingMethod,
+    getTournamentContext,
     loadData,
     loadAppSettings,
     loadTournamentSettings,

@@ -4,6 +4,7 @@ import {
     appSettings,
     setAppSettings,
     getLoadingMethod,
+    getTournamentContext,
     loadAppSettings,
     loadTournamentSettings,
     loadOpenAIKeyFromConfig
@@ -422,20 +423,32 @@ document.addEventListener('DOMContentLoaded', async function() {
     const loadingMethod = getLoadingMethod(appSettings);
     
     // Load tournament settings
-    tournamentSettings = await loadTournamentSettings(loadingMethod);
-    
-    // Apply OpenAI settings from app-settings
-    applyOpenAISettingsFromAppSettings(appSettings);
-    
-    // Initialize theme immediately after loading settings
-    initializeTheme?.();
-    initializeDarkMode?.();
-    
-    // Load all tournament data
-    await loadData();
-    loadPendingResults();
-    showTab('overview');
-    setTimeout(() => initializeSubTabIndicators(), 200);
+    try {
+        tournamentSettings = await loadTournamentSettings(loadingMethod);
+        
+        // Apply OpenAI settings from app-settings
+        applyOpenAISettingsFromAppSettings(appSettings);
+        
+        // Initialize theme immediately after loading settings
+        initializeTheme?.();
+        initializeDarkMode?.();
+        
+        // Load all tournament data
+        await loadData();
+        loadPendingResults();
+        showTab('overview');
+        setTimeout(() => initializeSubTabIndicators(), 200);
+    } catch (error) {
+        logger.error('Failed to load tournament data:', error);
+        
+        // Show error to user
+        const context = getTournamentContext();
+        alert(`❌ Tournament data not found!\n\nYear: ${context.year}\nSport: ${context.sportType}\n\nThe data folder "data/${context.year}/${context.sportType}" does not exist or is missing required files.\n\nReturning to tournament selection...`);
+        
+        // Redirect back to tournaments page
+        window.location.href = resolvePath('pages/tournaments.html');
+        return;
+    }
     
     // Initialize OpenRouter only if enabled
     if (tournamentSettings?.simulation?.useOpenAI) {
